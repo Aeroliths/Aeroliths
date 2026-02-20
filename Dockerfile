@@ -1,4 +1,4 @@
-FROM node:26-alpine
+FROM node:25-alpine
 
 # Install required tools
 RUN apk add --no-cache git openssh-client bash curl postgresql-client
