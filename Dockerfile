@@ -1,34 +1,37 @@
-FROM node:20-alpine
+FROM node:26-alpine
 
-# Installer les outils nécessaires
-RUN apk add --no-cache git openssh-client bash
+# Install required tools
+RUN apk add --no-cache git openssh-client bash curl postgresql-client
 
 WORKDIR /app
 
-# Copier les fichiers de dépendances
+# Copy dependency files
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Installer TOUTES les dépendances (dev incluses pour le build)
+# Install ALL dependencies (including dev for the build)
 RUN npm install --no-package-lock
 
-# Copier le reste du code
+# Copy the rest of the code
 COPY . .
 
-# Générer le client Prisma (DATABASE_URL temporaire nécessaire pour la génération)
+# Entrypoint script for DB setup at startup
+RUN chmod +x docker-entrypoint.sh
+
+# Generate Prisma client (temporary DATABASE_URL required for generation)
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
 RUN npm run prisma:generate
 
-# Build de l'application Nuxt
+# Build the Nuxt application
 RUN npm run build
 
-# Exposer le port
+# Expose port
 EXPOSE 3000
 
-# Variable d'environnement pour la production
+# Production environment variables
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 
-# Lancer l'application Nuxt en mode production
-CMD ["node", ".output/server/index.mjs"]
+# Start the Nuxt application in production mode
+CMD ["sh", "docker-entrypoint.sh"]
