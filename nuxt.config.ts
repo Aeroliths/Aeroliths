@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@vueuse/nuxt'],
   css: ['~/assets/css/global.css'],
   app: {
+    baseURL: '/',
     buildAssetsDir: '/_nuxt/'
   },
   icon: {
