@@ -13,17 +13,63 @@ services:
       ARANGO_USER: "${ARANGO_USER}"
       ARANGO_PASSWORD: "${ARANGO_PASSWORD}"
       DISCORD_WEBHOOK_URL: "${DISCORD_WEBHOOK_URL}"
+    depends_on:
+      - postgres
+      - arangodb
     networks:
       - web
+      - internal
     labels:
       - traefik.enable=true
       - traefik.http.routers.${NAME}.entrypoints=websecure
       - traefik.http.services.${NAME}.loadbalancer.server.port=3000
-      - traefik.http.routers.${NAME}.rule=Host(`${NAME}.jrcan.dev`)
+      - traefik.http.routers.${NAME}.rule=Host(`aeroliths.fr`)
       - traefik.http.routers.${NAME}.tls=true
       - traefik.http.routers.${NAME}.tls.certresolver=myresolver
+
+  # --- Service ArangoDB ---
+  arangodb:
+    image: arangodb:3.12.1
+    container_name: ${PREFIX_NAME}_arango
+    restart: always
+    environment:
+      - ARANGO_ROOT_PASSWORD=${ARANGO_PASSWORD}
+    ports:
+      - "${ARANGO_PORT}:8529"
+    volumes:
+      - arango_data:/var/lib/arangodb3
+      - arango_apps:/var/lib/arangodb3-apps
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # --- Service PostgreSQL ---
+  postgres:
+    image: postgres:15-alpine
+    container_name: ${PREFIX_NAME}_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - internal
 
 networks:
   web:
     external: true
+  internal:
+    driver: bridge
+
+volumes:
+  arango_data:
+  arango_apps:
+  pg_data:
 
