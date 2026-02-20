@@ -5,9 +5,6 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@vueuse/nuxt'],
   css: ['~/assets/css/global.css'],
   app: {
-    // This is the key setting for internal link behavior
-    baseURL: '/aeroliths/',
-    // Optional: ensures build assets are also found here
     buildAssetsDir: '/_nuxt/'
   },
   icon: {
