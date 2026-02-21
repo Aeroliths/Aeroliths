@@ -42,19 +42,11 @@ services:
       - arango_data:/var/lib/arangodb3
       - arango_apps:/var/lib/arangodb3-apps
     networks:
-      - web
       - internal
     deploy:
       resources:
         limits:
           memory: 1G
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.${PREFIX_NAME}-arango.entrypoints=websecure
-      - traefik.http.routers.${PREFIX_NAME}-arango.rule=Host(`arango.aeroliths.fr`)
-      - traefik.http.routers.${PREFIX_NAME}-arango.tls=true
-      - traefik.http.routers.${PREFIX_NAME}-arango.tls.certresolver=myresolver
-      - traefik.http.services.${PREFIX_NAME}-arango.loadbalancer.server.port=8529
 
   # --- Service PostgreSQL ---
   postgres:
