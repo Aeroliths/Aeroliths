@@ -3,8 +3,8 @@
    ========================================= */
 :root {
   /* Colors */
-  --color-primary: #3498db;
-  --color-primary-dark: #2980b9;
+  --color-primary: #5898b8;
+  --color-primary-dark: #4a7fa5;
   --color-success: #27ae60;
   --color-success-dark: #229954;
   --color-warning: #f39c12;
@@ -40,7 +40,7 @@
 
   /* Shadows */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-focus: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  --shadow-focus: 0 0 0 3px rgba(88, 152, 184, 0.15);
 
   /* Transitions */
   --transition-fast: 0.2s;

@@ -16,9 +16,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(rgba(22, 33, 62, 0.9), rgba(22, 33, 62, 0.9)),
+  background: linear-gradient(rgba(30, 32, 40, 0.9), rgba(30, 32, 40, 0.9)),
               url('/placeholder-background.jpg') center/cover no-repeat fixed;
-  background-color: #16213e;
+  background-color: #1e2028;
 }
 
 .main-content {

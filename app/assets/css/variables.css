@@ -1,69 +1,74 @@
 /* =========================================
    DESIGN SYSTEM - CSS VARIABLES
+   Thème Aeroliths — Pierre & Ciel
    ========================================= */
 
 :root {
   /* =========================================
      BRAND COLORS
+     Bleu céruléen — ciel clair, azur atmosphérique
      ========================================= */
-  --color-brand-primary: #4ecca3;
-  --color-brand-primary-light: #5efdb9;
-  --color-brand-primary-dark: #3daa82;
+  --color-brand-primary: #7ab8d4;
+  --color-brand-primary-light: #9dd0e8;
+  --color-brand-primary-dark: #5898b8;
 
   /* =========================================
      GRADIENTS
      ========================================= */
-  --gradient-brand: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-primary: linear-gradient(135deg, #4ecca3 0%, #3daa82 100%);
-  --gradient-primary-hover: linear-gradient(135deg, #5efdb9 0%, #4ecca3 100%);
+  --gradient-brand: linear-gradient(135deg, #4a7fa5 0%, #2d5a80 100%);
+  --gradient-primary: linear-gradient(135deg, #7ab8d4 0%, #5898b8 100%);
+  --gradient-primary-hover: linear-gradient(135deg, #9dd0e8 0%, #7ab8d4 100%);
 
   /* =========================================
      BACKGROUND COLORS
+     Pierres sombres — obsidienne, ardoise, granit
      ========================================= */
-  --color-bg-base: #16213e;
-  --color-bg-primary: #1a1a2e;
-  --color-bg-secondary: #0f0f1e;
-  --color-bg-dark: #0a0e27;
-  --color-bg-darker: #1a1e3e;
+  --color-bg-base: #1e2028;
+  --color-bg-primary: #252830;
+  --color-bg-secondary: #181a21;
+  --color-bg-dark: #13151c;
+  --color-bg-darker: #1c1e26;
 
   /* Glass morphism backgrounds */
-  --bg-glass-light: rgba(255, 255, 255, 0.05);
-  --bg-glass-lighter: rgba(255, 255, 255, 0.03);
-  --bg-glass-medium: rgba(255, 255, 255, 0.08);
-  --bg-glass-card: rgba(26, 38, 62, 0.9);
-  --bg-glass-dark: rgba(26, 38, 62, 0.95);
+  --bg-glass-light: rgba(100, 130, 160, 0.06);
+  --bg-glass-lighter: rgba(100, 130, 160, 0.03);
+  --bg-glass-medium: rgba(100, 130, 160, 0.10);
+  --bg-glass-card: rgba(25, 28, 38, 0.90);
+  --bg-glass-dark: rgba(25, 28, 38, 0.95);
 
   /* Overlay gradients */
-  --overlay-base: rgba(22, 33, 62, 0.95);
-  --overlay-radial: radial-gradient(circle at 50% 50%, rgba(94, 23, 235, 0.1) 0%, transparent 50%);
+  --overlay-base: rgba(30, 32, 40, 0.95);
+  --overlay-radial: radial-gradient(circle at 50% 50%, rgba(70, 130, 180, 0.08) 0%, transparent 50%);
 
   /* =========================================
      TEXT COLORS
+     Calcaire pâle — blanc cassé, brume de pierre
      ========================================= */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: rgba(255, 255, 255, 0.9);
-  --color-text-muted: rgba(255, 255, 255, 0.7);
-  --color-text-subtle: rgba(255, 255, 255, 0.6);
-  --color-text-placeholder: rgba(255, 255, 255, 0.4);
+  --color-text-primary: #ece8e0;
+  --color-text-secondary: rgba(236, 232, 224, 0.9);
+  --color-text-muted: rgba(236, 232, 224, 0.7);
+  --color-text-subtle: rgba(236, 232, 224, 0.6);
+  --color-text-placeholder: rgba(236, 232, 224, 0.4);
   --color-text-inverted: #333;
   --color-text-inverted-secondary: #555;
-  --color-text-highlight: #e0e0e0;
-  --color-text-highlight-alt: #c0c0c0;
-  --color-text-highlight-subtle: #b0b0b0;
-  --color-text-muted-alt: #aaa;
+  --color-text-highlight: #d8d4cc;
+  --color-text-highlight-alt: #c8c4bc;
+  --color-text-highlight-subtle: #b8b4ac;
+  --color-text-muted-alt: #a8a4a0;
 
   /* =========================================
      BORDER COLORS
+     Ciel teinté — bordures subtiles bleues
      ========================================= */
-  --color-border-light: rgba(255, 255, 255, 0.1);
-  --color-border-lighter: rgba(255, 255, 255, 0.05);
-  --color-border-subtle: rgba(255, 255, 255, 0.2);
-  --color-border-brand: rgba(78, 204, 163, 0.3);
-  --color-border-brand-light: rgba(78, 204, 163, 0.2);
-  --color-border-brand-medium: rgba(78, 204, 163, 0.4);
-  --color-border-brand-dark: rgba(78, 204, 163, 0.5);
-  --color-border-brand-darker: rgba(78, 204, 163, 0.8);
-  --color-border-dashed: rgba(78, 204, 163, 0.4);
+  --color-border-light: rgba(122, 184, 212, 0.12);
+  --color-border-lighter: rgba(122, 184, 212, 0.06);
+  --color-border-subtle: rgba(122, 184, 212, 0.25);
+  --color-border-brand: rgba(122, 184, 212, 0.30);
+  --color-border-brand-light: rgba(122, 184, 212, 0.20);
+  --color-border-brand-medium: rgba(122, 184, 212, 0.40);
+  --color-border-brand-dark: rgba(122, 184, 212, 0.50);
+  --color-border-brand-darker: rgba(122, 184, 212, 0.80);
+  --color-border-dashed: rgba(122, 184, 212, 0.40);
   --color-border-inverted: #ddd;
   --color-border-inverted-light: #eee;
 
@@ -83,7 +88,7 @@
   --color-success-dark: #45a049;
   --color-success-light: #3c3;
   --color-success-bg: #efe;
-  --color-success-bg-alt: rgba(78, 204, 163, 0.1);
+  --color-success-bg-alt: rgba(122, 184, 212, 0.10);
 
   /* Warning / Admin */
   --color-warning: #f1c40f;
@@ -92,11 +97,11 @@
   --color-warning-border: rgba(241, 196, 15, 0.3);
   --color-warning-border-hover: rgba(241, 196, 15, 0.5);
 
-  /* Info */
-  --color-info: #667eea;
-  --color-info-dark: #764ba2;
-  --color-info-bg: rgba(102, 126, 234, 0.1);
-  --color-info-border: rgba(102, 126, 234, 0.2);
+  /* Info — bleu acier, reflet de ciel */
+  --color-info: #6ba5c8;
+  --color-info-dark: #4a7fa5;
+  --color-info-bg: rgba(107, 165, 200, 0.10);
+  --color-info-border: rgba(107, 165, 200, 0.20);
 
   /* Inverted status colors */
   --color-error-inverted: #fee;
@@ -109,7 +114,7 @@
   /* =========================================
      ADMIN PANEL COLORS
      ========================================= */
-  --color-admin-bg: #f5f5f5;
+  --color-admin-bg: #f0f2f5;
   --color-admin-text: #2c3e50;
   --color-admin-text-secondary: #495057;
   --color-admin-text-muted: #7f8c8d;
@@ -118,8 +123,8 @@
   --color-admin-border-light: #ced4da;
   --color-admin-card-bg: #f8f9fa;
 
-  --color-admin-primary: #3498db;
-  --color-admin-primary-dark: #2980b9;
+  --color-admin-primary: #5898b8;
+  --color-admin-primary-dark: #4a7fa5;
   --color-admin-success: #27ae60;
   --color-admin-success-dark: #229954;
   --color-admin-warning: #f39c12;
@@ -156,19 +161,20 @@
 
   /* =========================================
      SHADOWS
+     Lueur céleste sur fond de pierre
      ========================================= */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 8px 24px rgba(78, 204, 163, 0.2);
-  --shadow-xl: 0 12px 30px rgba(78, 204, 163, 0.4);
-  --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.3);
-  --shadow-focus: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  --shadow-focus-brand: 0 0 0 3px rgba(52, 152, 219, 0.1);
-  --shadow-text: 0 2px 8px rgba(0, 0, 0, 0.5);
-  --shadow-text-lg: 0 2px 8px rgba(78, 204, 163, 0.3);
-  --shadow-hover: 0 10px 30px rgba(102, 126, 234, 0.4);
-  --shadow-hover-brand: 0 6px 20px rgba(78, 204, 163, 0.5);
-  --shadow-active: 0 2px 8px rgba(78, 204, 163, 0.4);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(122, 184, 212, 0.15);
+  --shadow-xl: 0 12px 30px rgba(122, 184, 212, 0.30);
+  --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.40);
+  --shadow-focus: 0 0 0 3px rgba(107, 165, 200, 0.15);
+  --shadow-focus-brand: 0 0 0 3px rgba(88, 152, 184, 0.15);
+  --shadow-text: 0 2px 8px rgba(0, 0, 0, 0.6);
+  --shadow-text-lg: 0 2px 8px rgba(122, 184, 212, 0.25);
+  --shadow-hover: 0 10px 30px rgba(70, 130, 180, 0.35);
+  --shadow-hover-brand: 0 6px 20px rgba(122, 184, 212, 0.40);
+  --shadow-active: 0 2px 8px rgba(122, 184, 212, 0.35);
 
   /* =========================================
      TRANSITIONS
