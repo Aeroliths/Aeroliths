@@ -1,0 +1,81 @@
+services:
+  # --- Nuxt (dev avec hot-reload) ---
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: dev_app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      PORT: 3000
+      # Utilise les noms de services Docker en interne
+      DATABASE_URL: postgresql://postgres:dev@postgres:5432/mydb_dev?schema=public
+      ARANGO_URL: http://arangodb:8529
+      ARANGO_DB: _system
+      ARANGO_USER: root
+      ARANGO_PASSWORD: dev
+      JWT_SECRET: RJzvXNpqEkN2g9nXlNtTeuEC6SkynWDuyXNLSoZZAqQ=
+      JWT_EXPIRES_IN: 7d
+    ports:
+      - "3000:3000"
+    volumes:
+      # Source code monté pour le hot-reload
+      - ..:/app
+      # node_modules isolés dans un volume Docker (pas écrasés par le mount)
+      - node_modules_dev:/app/node_modules
+      - nuxt_dev:/app/.nuxt
+    depends_on:
+      - postgres
+      - arangodb
+
+  # --- PostgreSQL ---
+  postgres:
+    image: postgres:15-alpine
+    container_name: dev_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: mydb_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data_dev:/var/lib/postgresql/data
+
+  # --- Adminer (DB GUI) ---
+  adminer:
+    image: adminer:latest
+    container_name: dev_adminer
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  # --- ArangoDB ---
+  arangodb:
+    image: arangodb:3.12.1
+    container_name: dev_arango
+    restart: unless-stopped
+    environment:
+      ARANGO_ROOT_PASSWORD: dev
+    ports:
+      - "8530:8529"
+    volumes:
+      - arango_data_dev:/var/lib/arangodb3
+      - arango_apps_dev:/var/lib/arangodb3-apps
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+volumes:
+  pg_data_dev:
+  arango_data_dev:
+  arango_apps_dev:
+  node_modules_dev:
+  nuxt_dev:
