@@ -28,6 +28,5 @@ until curl -sf "http://arangodb:8529/_api/version" \
 done
 echo "[Dev] ArangoDB ready"
 
-# ── Start Nuxt dev server ─────────────────────────────────────────────
-echo "[Dev] Starting Nuxt dev server..."
-exec npm run dev
+echo "[Dev] Setup complete. Run 'npm run dev' manually to start the Nuxt dev server."
+exec tail -f /dev/null
