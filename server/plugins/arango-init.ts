@@ -1,23 +1,22 @@
 import { getArangoDb } from '../utils/arangodb'
 
-// Collections to create if they don't exist yet.
-// Add new collection names here as the app grows.
-const COLLECTIONS: string[] = [
-  // e.g. 'game_sessions', 'player_stats'
+const GRAPH_NAME = 'aeroliths_graph'
+
+const EDGE_DEFINITIONS = [
+  { collection: 'friends',      from: ['players'], to: ['players'] },
+  { collection: 'participates', from: ['players'], to: ['matchmaking'] },
+  { collection: 'has_deck',     from: ['players'], to: ['deck'] },
+  { collection: 'has_stats',    from: ['players'], to: ['stats'] },
 ]
 
 export default defineNitroPlugin(async () => {
-  if (COLLECTIONS.length === 0) return
-
   const db = getArangoDb()
+  const graph = db.graph(GRAPH_NAME)
 
-  for (const name of COLLECTIONS) {
-    const collection = db.collection(name)
-    const exists = await collection.exists()
-    if (!exists) {
-      await collection.create()
-      console.log(`[ArangoDB] Collection '${name}' created`)
-    }
+  const exists = await graph.exists()
+  if (!exists) {
+    await graph.create(EDGE_DEFINITIONS)
+    console.log(`[ArangoDB] Graph '${GRAPH_NAME}' created`)
   }
 
   console.log('[ArangoDB] Setup complete')
