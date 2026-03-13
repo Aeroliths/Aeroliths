@@ -23,11 +23,15 @@
         <button :class="{ active: activeTab === 'lithos' }" @click="activeTab = 'lithos'">
           Lithos Management
         </button>
+        <button :class="{ active: activeTab === 'collections' }" @click="activeTab = 'collections'">
+          Collections Management
+        </button>
       </div>
 
       <AdminUsers v-if="activeTab === 'users'" />
       <AdminElements v-if="activeTab === 'elements'" />
       <AdminLithos v-if="activeTab === 'lithos'" />
+      <AdminCollections v-if="activeTab === 'collections'" />
     </div>
   </div>
 </template>
@@ -39,7 +43,7 @@ import { useAuth } from '~/composables/useAuth'
 const { user, initAuth } = useAuth()
 
 const isAdmin = computed(() => user.value?.role?.name === 'admin')
-const activeTab = ref<'users' | 'elements' | 'lithos'>('users')
+const activeTab = ref<'users' | 'elements' | 'lithos' | 'collections'>('users')
 
 onMounted(async () => {
   await initAuth()
