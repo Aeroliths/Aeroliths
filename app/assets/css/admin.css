@@ -1,7 +1,7 @@
 /* =========================================
    CSS VARIABLES
    ========================================= */
-:root {
+.admin-container {
   /* Colors */
   --color-primary: #5898b8;
   --color-primary-dark: #4a7fa5;
