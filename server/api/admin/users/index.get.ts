@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
         username: true,
         name: true,
         surname: true,
+        profilePicture: true,
         createdAt: true,
         updatedAt: true,
         role: {
