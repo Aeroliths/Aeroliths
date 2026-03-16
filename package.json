@@ -44,10 +44,10 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pg": "^8.16.0",
     "@vitejs/plugin-vue": "^6.0.3",
-    "@vitest/coverage-v8": "^4.0.18",
-    "@vitest/ui": "^3.2.4",
+    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/ui": "^4.1.0",
     "happy-dom": "^20.0.11",
     "tsx": "^4.21.0",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.0"
   }
 }
