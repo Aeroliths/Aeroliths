@@ -10,7 +10,7 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install ALL dependencies (including dev for the build)
-RUN npm install --no-package-lock
+RUN npm install --no-package-lock --legacy-peer-deps
 
 # Copy the rest of the code
 COPY . .
