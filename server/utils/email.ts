@@ -12,16 +12,24 @@ export function hashToken(raw: string): string {
 }
 
 export async function sendVerificationEmail(email: string, token: string): Promise<void> {
-  const config = useRuntimeConfig()
-  const verificationUrl = `${config.appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}`
+  const smtpHost = process.env.SMTP_HOST || 'localhost'
+  const smtpPort = Number(process.env.SMTP_PORT || '587')
+  const smtpUser = process.env.SMTP_USER || ''
+  const smtpPass = process.env.SMTP_PASS || ''
+  const smtpFrom = process.env.SMTP_FROM || 'noreply@aeroliths.fr'
+  const appUrl = process.env.APP_URL || 'http://localhost:3000'
+
+  const verificationUrl = `${appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}`
+
+  console.log(`[Email] Connecting to SMTP: ${smtpHost}:${smtpPort}`)
 
   const transporter = nodemailer.createTransport({
-    host: config.smtpHost,
-    port: Number(config.smtpPort),
-    secure: Number(config.smtpPort) === 465,
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
     auth: {
-      user: config.smtpUser,
-      pass: config.smtpPass,
+      user: smtpUser,
+      pass: smtpPass,
     },
     tls: {
       rejectUnauthorized: false,
@@ -29,7 +37,7 @@ export async function sendVerificationEmail(email: string, token: string): Promi
   })
 
   await transporter.sendMail({
-    from: `Aeroliths <${config.smtpFrom}>`,
+    from: `Aeroliths <${smtpFrom}>`,
     to: email,
     subject: 'Verify your email - Aeroliths',
     html: `
