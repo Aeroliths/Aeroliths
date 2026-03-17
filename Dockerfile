@@ -18,12 +18,11 @@ COPY . .
 # Entrypoint script for DB setup at startup
 RUN chmod +x docker-entrypoint.sh
 
-# Generate Prisma client (temporary DATABASE_URL required for generation)
-ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public"
-RUN npm run prisma:generate
+# Generate Prisma client (temporary DATABASE_URL required for generation only)
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public" npm run prisma:generate
 
 # Build the Nuxt application
-RUN npm run build
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy?schema=public" npm run build
 
 # Expose port
 EXPOSE 3000

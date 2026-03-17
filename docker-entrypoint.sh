@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# ── Debug: show DATABASE_URL (masked password) ────────────────────
+echo "[Setup] DATABASE_URL host: $(echo $DATABASE_URL | sed 's|://[^@]*@|://***@|')"
+
 # ── Wait for PostgreSQL ──────────────────────────────────────────────
 echo "[Setup] Waiting for PostgreSQL..."
 until pg_isready -h postgres -p 5432 -U "${POSTGRES_USER:-postgres}" 2>/dev/null; do
@@ -8,10 +11,10 @@ until pg_isready -h postgres -p 5432 -U "${POSTGRES_USER:-postgres}" 2>/dev/null
 done
 echo "[Setup] PostgreSQL ready"
 
-# ── Prisma migrations (idempotent — skips already applied) ──────────
-echo "[Setup] Running Prisma migrations..."
-npx prisma migrate deploy
-echo "[Setup] Migrations done"
+# ── Prisma schema push (creates/updates tables) ────────────────────
+echo "[Setup] Pushing Prisma schema to database..."
+npx prisma db push --skip-generate --accept-data-loss 2>&1
+echo "[Setup] Schema push done"
 
 # ── Seed (uses upsert — safe to run on existing data) ───────────────
 echo "[Setup] Running seed..."
