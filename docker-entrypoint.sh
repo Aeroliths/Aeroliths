@@ -13,7 +13,7 @@ echo "[Setup] PostgreSQL ready"
 
 # ── Prisma schema push (creates/updates tables) ────────────────────
 echo "[Setup] Pushing Prisma schema to database..."
-npx prisma db push --skip-generate --accept-data-loss 2>&1
+npx prisma db push --accept-data-loss 2>&1
 echo "[Setup] Schema push done"
 
 # ── Seed (uses upsert — safe to run on existing data) ───────────────
