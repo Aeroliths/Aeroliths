@@ -29,6 +29,8 @@ services:
       NUXT_SMTP_FROM: "${SMTP_FROM}"
       NUXT_APP_URL: "${APP_URL}"
       POSTGRES_USER: "${POSTGRES_USER}"
+    extra_hosts:
+      - "mail.aeroliths.fr:host-gateway"
     depends_on:
       - postgres
       - arangodb
