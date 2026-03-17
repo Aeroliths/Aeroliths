@@ -3,7 +3,7 @@ set -e
 
 # ── Wait for PostgreSQL ──────────────────────────────────────────────
 echo "[Setup] Waiting for PostgreSQL..."
-until pg_isready -h postgres -p 5432 2>/dev/null; do
+until pg_isready -h postgres -p 5432 -U "${POSTGRES_USER:-postgres}" 2>/dev/null; do
   sleep 2
 done
 echo "[Setup] PostgreSQL ready"
