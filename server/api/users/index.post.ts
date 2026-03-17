@@ -73,6 +73,10 @@ export default defineEventHandler(async (event) => {
     const saltRounds = 10
     const hashedPassword = await bcrypt.hash(password, saltRounds)
 
+    // Generate email verification token
+    const { raw: verificationTokenRaw, hashed: verificationTokenHashed } = generateVerificationToken()
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
     // Create user with authentication in a transaction
     const user = await db.postgres.user.create({
       data: {
@@ -80,6 +84,9 @@ export default defineEventHandler(async (event) => {
         username,
         name: name || null,
         surname: surname || null,
+        emailVerified: false,
+        verificationToken: verificationTokenHashed,
+        verificationTokenExpiresAt: tokenExpiry,
         roleId: userRole.id,
         authentication: {
           create: {
@@ -92,13 +99,20 @@ export default defineEventHandler(async (event) => {
       },
     })
 
+    // Send verification email (don't fail registration if email fails)
+    try {
+      await sendVerificationEmail(email, verificationTokenRaw)
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError)
+    }
+
     // Remove sensitive data from response
-    const { authentication, ...userWithoutAuth } = user as any
+    const { authentication, verificationToken, ...userWithoutSensitive } = user as any
 
     return {
       success: true,
-      data: userWithoutAuth,
-      message: 'User created successfully',
+      data: userWithoutSensitive,
+      message: 'Account created. Please check your email to verify your account.',
     }
   } catch (error) {
     if (error && typeof error === 'object' && 'statusCode' in error) {

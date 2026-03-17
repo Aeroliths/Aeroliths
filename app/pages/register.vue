@@ -1,7 +1,34 @@
 <template>
   <div class="register-page">
     <div class="register-container">
-      <div class="register-card">
+      <!-- Verification pending state -->
+      <div class="register-card" v-if="registrationComplete">
+        <div class="register-header">
+          <h1>Check your email</h1>
+          <p>We sent a verification link to <strong>{{ registeredEmail }}</strong></p>
+        </div>
+        <div class="verification-notice">
+          <p>Click the link in the email to activate your account. The link expires in 24 hours.</p>
+          <button
+            @click="handleResend"
+            :disabled="resendCooldown > 0 || isLoading"
+            class="register-button resend-button"
+          >
+            <span v-if="resendCooldown > 0">Resend in {{ resendCooldown }}s</span>
+            <span v-else>Resend verification email</span>
+          </button>
+          <p v-if="resendMessage" class="resend-message">{{ resendMessage }}</p>
+        </div>
+        <div class="register-footer">
+          <p>
+            Already verified?
+            <NuxtLink to="/login">Login here</NuxtLink>
+          </p>
+        </div>
+      </div>
+
+      <!-- Registration form -->
+      <div class="register-card" v-else>
         <div class="register-header">
           <h1>Join Aeroliths</h1>
           <p>Create your account to start playing</p>
@@ -104,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
@@ -112,7 +139,7 @@ definePageMeta({
   middleware: 'guest'
 })
 
-const { register, isLoading, isAuthenticated } = useAuth()
+const { register, resendVerification, isLoading } = useAuth()
 
 const formData = ref({
   email: '',
@@ -124,23 +151,36 @@ const formData = ref({
 
 const confirmPassword = ref('')
 const errorMessage = ref('')
+const registrationComplete = ref(false)
+const registeredEmail = ref('')
+const resendCooldown = ref(0)
+const resendMessage = ref('')
+let cooldownInterval: ReturnType<typeof setInterval> | null = null
+
+const startCooldown = () => {
+  resendCooldown.value = 60
+  cooldownInterval = setInterval(() => {
+    resendCooldown.value--
+    if (resendCooldown.value <= 0) {
+      if (cooldownInterval) clearInterval(cooldownInterval)
+      cooldownInterval = null
+    }
+  }, 1000)
+}
 
 const handleRegister = async () => {
   errorMessage.value = ''
 
-  // Validate passwords match
   if (formData.value.password !== confirmPassword.value) {
     errorMessage.value = 'Passwords do not match'
     return
   }
 
-  // Validate password length
   if (formData.value.password.length < 8) {
     errorMessage.value = 'Password must be at least 8 characters long'
     return
   }
 
-  // Prepare data (remove empty optional fields)
   const registrationData = {
     email: formData.value.email,
     username: formData.value.username,
@@ -151,12 +191,29 @@ const handleRegister = async () => {
 
   const result = await register(registrationData)
 
-  if (result.success) {
-    navigateTo('/play')
-  } else {
+  if (result.success && result.needsVerification) {
+    registrationComplete.value = true
+    registeredEmail.value = result.email || formData.value.email
+    startCooldown()
+  } else if (!result.success) {
     errorMessage.value = result.error || 'Registration failed. Please try again.'
   }
 }
+
+const handleResend = async () => {
+  resendMessage.value = ''
+  const result = await resendVerification(registeredEmail.value)
+  if (result.success) {
+    resendMessage.value = 'Verification email sent!'
+    startCooldown()
+  } else {
+    resendMessage.value = result.error || 'Failed to resend. Please try again.'
+  }
+}
+
+onUnmounted(() => {
+  if (cooldownInterval) clearInterval(cooldownInterval)
+})
 
 useHead({
   title: 'Register - Aeroliths',

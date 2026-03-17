@@ -42,6 +42,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Check email verification
+    if (!user.emailVerified) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'EMAIL_NOT_VERIFIED',
+        message: 'Please verify your email before logging in. Check your inbox for a verification link.',
+      })
+    }
+
     // Get JWT secret from environment
     const jwtSecret = process.env.JWT_SECRET
     if (!jwtSecret) {

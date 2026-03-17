@@ -87,7 +87,8 @@ export const useAuth = () => {
       console.error('Login failed:', error)
       return {
         success: false,
-        error: error.data?.message || error.message || 'Login failed'
+        error: error.data?.message || error.message || 'Login failed',
+        code: error.data?.statusMessage || null,
       }
     } finally {
       isLoading.value = false
@@ -98,25 +99,37 @@ export const useAuth = () => {
   const register = async (data: RegisterData) => {
     isLoading.value = true
     try {
-      // First create the user
       await $fetch('/api/users', {
         method: 'POST',
         body: data
       })
 
-      // Then login with the credentials
-      return await login({
-        email: data.email,
-        password: data.password
-      })
+      return { success: true, needsVerification: true, email: data.email }
     } catch (error: any) {
       console.error('Registration failed:', error)
       return {
         success: false,
+        needsVerification: false,
         error: error.data?.message || error.message || 'Registration failed'
       }
     } finally {
       isLoading.value = false
+    }
+  }
+
+  // Resend verification email
+  const resendVerification = async (email: string) => {
+    try {
+      await $fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        body: { email },
+      })
+      return { success: true }
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.data?.message || 'Failed to resend verification email',
+      }
     }
   }
 
@@ -143,6 +156,7 @@ export const useAuth = () => {
     initAuth,
     login,
     register,
+    resendVerification,
     logout,
     hasRole
   }

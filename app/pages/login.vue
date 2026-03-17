@@ -36,6 +36,20 @@
             {{ errorMessage }}
           </div>
 
+          <!-- Resend verification option -->
+          <div v-if="showResendOption" class="resend-section">
+            <button
+              type="button"
+              @click="handleResend"
+              :disabled="resendCooldown > 0"
+              class="resend-button"
+            >
+              <span v-if="resendCooldown > 0">Resend in {{ resendCooldown }}s</span>
+              <span v-else>Resend verification email</span>
+            </button>
+            <p v-if="resendMessage" class="resend-message">{{ resendMessage }}</p>
+          </div>
+
           <button type="submit" class="login-button" :disabled="isLoading">
             <span v-if="!isLoading">Login</span>
             <span v-else>Logging in...</span>
@@ -54,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
@@ -62,7 +76,7 @@ definePageMeta({
   middleware: 'guest'
 })
 
-const { login, isLoading, isAuthenticated } = useAuth()
+const { login, resendVerification, isLoading } = useAuth()
 
 const credentials = ref({
   email: '',
@@ -70,18 +84,53 @@ const credentials = ref({
 })
 
 const errorMessage = ref('')
+const showResendOption = ref(false)
+const resendCooldown = ref(0)
+const resendMessage = ref('')
+let cooldownInterval: ReturnType<typeof setInterval> | null = null
+
+const startCooldown = () => {
+  resendCooldown.value = 60
+  cooldownInterval = setInterval(() => {
+    resendCooldown.value--
+    if (resendCooldown.value <= 0) {
+      if (cooldownInterval) clearInterval(cooldownInterval)
+      cooldownInterval = null
+    }
+  }, 1000)
+}
 
 const handleLogin = async () => {
   errorMessage.value = ''
+  showResendOption.value = false
+  resendMessage.value = ''
 
   const result = await login(credentials.value)
 
   if (result.success) {
     navigateTo('/play')
+  } else if (result.code === 'EMAIL_NOT_VERIFIED') {
+    errorMessage.value = result.error || 'Please verify your email before logging in.'
+    showResendOption.value = true
   } else {
     errorMessage.value = result.error || 'Login failed. Please check your credentials.'
   }
 }
+
+const handleResend = async () => {
+  resendMessage.value = ''
+  const result = await resendVerification(credentials.value.email)
+  if (result.success) {
+    resendMessage.value = 'Verification email sent!'
+    startCooldown()
+  } else {
+    resendMessage.value = result.error || 'Failed to resend. Please try again.'
+  }
+}
+
+onUnmounted(() => {
+  if (cooldownInterval) clearInterval(cooldownInterval)
+})
 
 useHead({
   title: 'Login - Aeroliths',

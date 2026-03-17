@@ -1,0 +1,93 @@
+/* =========================================
+   VERIFY EMAIL PAGE
+   ========================================= */
+
+.verify-email-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(var(--overlay-base), var(--overlay-base)),
+              var(--overlay-radial);
+  background-color: var(--color-bg-base);
+  padding: var(--spacing-xl);
+}
+
+.verify-email-container {
+  width: 100%;
+  max-width: 450px;
+}
+
+.verify-email-card {
+  background: var(--bg-glass-light);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-3xl) var(--spacing-2xl);
+  box-shadow: var(--shadow-2xl);
+  text-align: center;
+}
+
+.verify-email-card h1 {
+  font-size: var(--font-5xl);
+  font-weight: var(--font-bold);
+  margin: 0 0 var(--spacing-lg) 0;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.verify-email-card.success h1 {
+  color: var(--color-success);
+  background: none;
+  -webkit-text-fill-color: var(--color-success);
+}
+
+.verify-email-card.error h1 {
+  color: var(--color-error);
+  background: none;
+  -webkit-text-fill-color: var(--color-error);
+}
+
+.verify-email-card p {
+  color: var(--color-text-muted);
+  font-size: var(--font-base);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--spacing-lg);
+}
+
+.verify-email-card .verify-link {
+  display: inline-block;
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--gradient-brand);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-weight: var(--font-semibold);
+  font-size: var(--font-lg);
+  transition: var(--transition-all);
+}
+
+.verify-email-card .verify-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.loading-spinner {
+  color: var(--color-brand-primary);
+  font-size: var(--font-lg);
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .verify-email-card {
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+
+  .verify-email-card h1 {
+    font-size: var(--font-4xl);
+  }
+}
