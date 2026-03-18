@@ -77,6 +77,12 @@ export default defineEventHandler(async (event) => {
       signOptions
     )
 
+    // Update last active date
+    await db.postgres.user.update({
+      where: { id: user.id },
+      data: { lastActiveAt: new Date() },
+    })
+
     // Set token in httpOnly cookie for secure authentication
     setCookie(event, 'auth_token', token, {
       httpOnly: true,

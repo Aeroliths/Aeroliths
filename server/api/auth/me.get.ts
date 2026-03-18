@@ -19,6 +19,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Update last active date
+    await db.postgres.user.update({
+      where: { id: user.userId },
+      data: { lastActiveAt: new Date() },
+    })
+
     return {
       success: true,
       data: userDetails,

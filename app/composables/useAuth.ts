@@ -7,6 +7,8 @@ interface User {
   username: string
   name?: string
   surname?: string
+  profilePicture?: string | null
+  lastActiveAt: string
   role: {
     id: string
     name: string

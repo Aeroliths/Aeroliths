@@ -39,6 +39,7 @@ export default defineEventHandler(async (event) => {
       emailVerified: true,
       verificationToken: null,
       verificationTokenExpiresAt: null,
+      lastActiveAt: new Date(),
     },
   })
 
