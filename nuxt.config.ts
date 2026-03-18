@@ -5,11 +5,8 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@vueuse/nuxt'],
   css: ['~/assets/css/global.css'],
   runtimeConfig: {
-    smtpHost: process.env.SMTP_HOST || 'localhost',
-    smtpPort: process.env.SMTP_PORT || '587',
-    smtpUser: process.env.SMTP_USER || '',
-    smtpPass: process.env.SMTP_PASS || '',
-    smtpFrom: process.env.SMTP_FROM || 'noreply@aeroliths.fr',
+    resendApiKey: process.env.RESEND_API_KEY || '',
+    emailFrom: process.env.EMAIL_FROM || 'noreply@aeroliths.fr',
     appUrl: process.env.APP_URL || 'http://localhost:3000',
   },
   app: {

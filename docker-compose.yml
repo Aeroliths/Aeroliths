@@ -15,22 +15,14 @@ services:
       DISCORD_WEBHOOK_URL: "${DISCORD_WEBHOOK_URL}"
       JWT_SECRET: "${JWT_SECRET}"
       JWT_EXPIRES_IN: "${JWT_EXPIRES_IN}"
-      SMTP_HOST: "${SMTP_HOST}"
-      SMTP_PORT: "${SMTP_PORT}"
-      SMTP_USER: "${SMTP_USER}"
-      SMTP_PASS: "${SMTP_PASS}"
-      SMTP_FROM: "${SMTP_FROM}"
+      RESEND_API_KEY: "${RESEND_API_KEY}"
+      EMAIL_FROM: "${EMAIL_FROM}"
       APP_URL: "${APP_URL}"
       # Nuxt runtimeConfig override (needs NUXT_ prefix at runtime)
-      NUXT_SMTP_HOST: "${SMTP_HOST}"
-      NUXT_SMTP_PORT: "${SMTP_PORT}"
-      NUXT_SMTP_USER: "${SMTP_USER}"
-      NUXT_SMTP_PASS: "${SMTP_PASS}"
-      NUXT_SMTP_FROM: "${SMTP_FROM}"
+      NUXT_RESEND_API_KEY: "${RESEND_API_KEY}"
+      NUXT_EMAIL_FROM: "${EMAIL_FROM}"
       NUXT_APP_URL: "${APP_URL}"
       POSTGRES_USER: "${POSTGRES_USER}"
-    extra_hosts:
-      - "mail.aeroliths.fr:host-gateway"
     depends_on:
       - postgres
       - arangodb
