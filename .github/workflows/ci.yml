@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy?schema=public
 
 jobs:
   # == Unit tests =====================================================
