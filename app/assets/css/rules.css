@@ -58,6 +58,163 @@
   font-size: var(--font-lg);
 }
 
+.rules-content p strong {
+  color: var(--color-brand-primary);
+}
+
+/* =========================================
+   LITHO DIAGRAM
+   ========================================= */
+.litho-diagram {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.litho-card {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  background: var(--bg-glass-medium);
+  border: 2px solid var(--color-border-brand);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.litho-center {
+  color: var(--color-text-primary);
+  font-size: var(--font-base);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.litho-value {
+  position: absolute;
+  color: var(--color-brand-primary);
+  font-size: var(--font-2xl);
+  font-weight: var(--font-bold);
+}
+
+.litho-value.top {
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.litho-value.right {
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.litho-value.bottom {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.litho-value.left {
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* =========================================
+   CAPTURE EXAMPLE
+   ========================================= */
+.capture-example {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.capture-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.mini-litho {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xxs);
+}
+
+.mini-litho.yours {
+  background: rgba(74, 127, 165, 0.2);
+  border: 2px solid var(--color-brand-primary);
+}
+
+.mini-litho.opponent {
+  background: rgba(239, 68, 68, 0.15);
+  border: 2px solid var(--color-error);
+}
+
+.mini-litho.opponent.captured {
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+.mini-label {
+  font-size: var(--font-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mini-value {
+  font-size: var(--font-2xl);
+  font-weight: var(--font-bold);
+}
+
+.mini-litho.yours .mini-value {
+  color: var(--color-brand-primary);
+}
+
+.mini-litho.opponent .mini-value {
+  color: var(--color-error);
+}
+
+.capture-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xxs);
+}
+
+.arrow-text {
+  color: var(--color-success);
+  font-size: var(--font-sm);
+  font-weight: var(--font-bold);
+}
+
+/* =========================================
+   ELEMENT EXAMPLE
+   ========================================= */
+.element-example {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--bg-glass-medium);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-brand-primary);
+}
+
+.element-detail {
+  color: var(--color-text-muted) !important;
+  font-size: var(--font-base) !important;
+  font-style: italic;
+}
+
 /* =========================================
    RESPONSIVE
    ========================================= */
@@ -68,5 +225,15 @@
 
   .rules-content h2 {
     font-size: var(--font-2xl);
+  }
+
+  .litho-card {
+    width: 110px;
+    height: 110px;
+  }
+
+  .mini-litho {
+    width: 70px;
+    height: 70px;
   }
 }
