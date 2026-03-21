@@ -37,12 +37,21 @@
 }
 
 .hero-title {
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 800;
   color: var(--color-text-primary);
   line-height: 1.1;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
   letter-spacing: -0.02em;
+}
+
+.hero-tagline {
+  font-size: var(--font-3xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-lg);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .hero-gradient-text {
