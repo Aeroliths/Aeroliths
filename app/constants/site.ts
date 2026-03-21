@@ -5,7 +5,7 @@
 
 export const SITE_INFO = {
   name: 'Aeroliths',
-  description: 'A strategic card game inspired by Skylanders Skystones',
+  description: 'A strategic board game inspired by Skylanders Skystones',
   tagline: 'Discover the legendary strategy game inspired by Skylanders Skystones',
 
   // Social & Contact

@@ -1,7 +1,7 @@
 <template>
   <section class="hero">
     <div class="hero-content">
-      <span class="hero-tag">Strategy Card Game</span>
+      <span class="hero-tag">Strategy Board Game</span>
       <h1 class="hero-title">
         <span class="hero-gradient-text">Aeroliths</span>
       </h1>

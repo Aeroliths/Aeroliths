@@ -7,7 +7,7 @@
         <section>
           <h2>Overview</h2>
           <p>
-            Aeroliths is a <strong>1v1 strategy card game</strong>. Two players face off
+            Aeroliths is a <strong>1v1 strategy board game</strong>. Two players face off
             on a board by placing stones called <strong>Lithos</strong>. The goal is to
             <strong>own more Lithos on the board</strong> than your opponent when the board is full.
           </p>
