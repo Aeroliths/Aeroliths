@@ -1,22 +1,24 @@
 <template>
-  <section class="cta-section">
-    <div class="cta-content">
-      <h2 class="cta-title">Ready to become an Aeroliths master?</h2>
-      <p class="cta-text">
-        Challenge players from around the world, collect legendary stones,
-        and climb the leaderboard!
-      </p>
-      <div class="cta-buttons">
-        <UButton size="xl" color="primary">
-          Start Playing
-        </UButton>
-        <UButton size="xl" color="secondary" variant="outline">
-          Learn More
-        </UButton>
-      </div>
-      <div class="cta-image-placeholder">
-        <span class="placeholder-text">[Image - Stone collection]</span>
-      </div>
+  <section class="cta">
+    <h2 class="cta-title">Ready to play?</h2>
+    <p class="cta-desc">Join the community and start your first game today.</p>
+    <div class="cta-buttons">
+      <NuxtLink to="/register" class="btn btn--primary btn--lg">
+        Get Started
+      </NuxtLink>
+      <a
+        :href="SITE_INFO.discord.url"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn btn--discord btn--lg"
+      >
+        <UIcon name="i-simple-icons-discord" />
+        Discord
+      </a>
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+import { SITE_INFO } from '~/constants/site'
+</script>

@@ -1,8 +1,7 @@
 <template>
-  <div class="game-intro">
+  <div class="home">
     <HomeHero />
-    <HomeRules />
-    <HomeTips />
+    <HomeFeatures />
     <HomeCTA />
   </div>
 </template>
