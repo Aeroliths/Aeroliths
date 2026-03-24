@@ -5,7 +5,6 @@
 .legal-page {
   min-height: 100vh;
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-darker) 100%);
 }
 
 .legal-container {

@@ -14,11 +14,12 @@
 
       <nav class="nav" :class="{ 'nav-open': mobileMenuOpen }">
         <NuxtLink href="/" @click="mobileMenuOpen = false">Home</NuxtLink>
+        <NuxtLink href="/rules" @click="mobileMenuOpen = false">Rules</NuxtLink>
 
         <!-- Protected links - only visible when authenticated -->
         <template v-if="isAuthenticated">
           <NuxtLink href="/play" @click="mobileMenuOpen = false">Play</NuxtLink>
-          <NuxtLink href="/rules" @click="mobileMenuOpen = false">Rules</NuxtLink>
+          <NuxtLink href="/friends" @click="mobileMenuOpen = false">Friends</NuxtLink>
           <NuxtLink href="/leaderboard" @click="mobileMenuOpen = false">Leaderboard</NuxtLink>
 
           <!-- Admin link - only visible for admin users -->

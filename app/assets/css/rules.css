@@ -5,8 +5,6 @@
 .rules-page {
   min-height: calc(100vh - 80px);
   padding: var(--spacing-xl);
-  background: linear-gradient(var(--overlay-base), var(--overlay-base));
-  background-color: var(--color-bg-base);
 }
 
 .rules-container {

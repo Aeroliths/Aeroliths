@@ -7,9 +7,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(var(--overlay-base), var(--overlay-base)),
-              var(--overlay-radial);
-  background-color: var(--color-bg-base);
   padding: var(--spacing-xl);
 }
 
