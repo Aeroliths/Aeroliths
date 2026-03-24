@@ -2,7 +2,10 @@
   <footer class="footer">
     <div class="footer-container">
       <div class="footer-content">
-        <p>{{ SITE_INFO.copyright }}</p>
+        <div class="footer-left">
+          <p>{{ SITE_INFO.copyright }}</p>
+          <p class="footer-hosting">Hosted by <a :href="SITE_INFO.hosting.website" target="_blank" rel="noopener noreferrer">{{ SITE_INFO.hosting.provider }}</a></p>
+        </div>
         <div class="footer-links">
           <NuxtLink href="/legal">Legal</NuxtLink>
           <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer" class="discord-link">

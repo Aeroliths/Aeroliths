@@ -8,7 +8,7 @@
         <p><strong>Game Name:</strong> {{ SITE_INFO.name }}</p>
         <p><strong>Developer / Studio:</strong> {{ SITE_INFO.developer.name }}</p>
         <p><strong>Legal Status:</strong> {{ SITE_INFO.developer.status }}</p>
-        <p><strong>Contact / Support:</strong> <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer" class="discord-link">{{ SITE_INFO.discord.label }}</a></p>
+        <p><strong>Contact / Support:</strong> <a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a></p>
         <p><strong>Publication Director:</strong> {{ SITE_INFO.developer.director }}</p>
       </div>
     </section>
@@ -206,7 +206,7 @@
           <li><strong>Right to Object:</strong> Object to certain data processing activities</li>
         </ul>
         <p>
-          To exercise any of these rights, please contact us on our Discord server: <strong><a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer" class="discord-link">{{ SITE_INFO.discord.label }}</a></strong>
+          To exercise any of these rights, please contact us at: <strong><a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a></strong>
         </p>
       </div>
     </section>

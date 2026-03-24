@@ -28,6 +28,27 @@
   font-size: var(--font-sm);
 }
 
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.footer-hosting {
+  color: var(--color-text-subtle);
+  font-size: var(--font-xs) !important;
+}
+
+.footer-hosting a {
+  color: var(--color-text-muted-alt);
+  text-decoration: none;
+  transition: color var(--transition-normal);
+}
+
+.footer-hosting a:hover {
+  color: var(--color-brand-primary);
+}
+
 .footer-links {
   display: flex;
   gap: var(--spacing-xl);

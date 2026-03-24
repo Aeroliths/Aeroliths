@@ -13,24 +13,27 @@ export const SITE_INFO = {
     url: 'https://discord.gg/zUSjypxYdR',
     label: 'Join our Discord'
   },
+  support: {
+    email: 'support@aeroliths.fr'
+  },
 
   // Developer Info
   developer: {
     name: 'Enzo Fournier & Julien Behani',
-    status: 'Student Project',
+    status: 'Personal Project',
     director: 'Enzo Fournier & Julien Behani'
   },
 
   // Hosting Info
   hosting: {
-    provider: 'JrCanDev',
-    address: '19 rue Louis David, 62100 Calais, France',
-    website: 'https://jrcan.dev'
+    provider: 'IONOS SARL',
+    address: '7 place de la Gare, 57200 Sarreguemines, France',
+    website: 'https://www.ionos.fr'
   },
 
   // Legal
   copyright: `© ${new Date().getFullYear()} Aeroliths. All rights reserved.`,
-  lastUpdated: 'December 2025'
+  lastUpdated: 'March 2026'
 } as const
 
 export const EXTERNAL_LINKS = {
