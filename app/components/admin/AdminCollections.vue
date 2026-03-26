@@ -173,8 +173,7 @@ const filteredUsers = computed(() => {
   return users.value.filter((u) => {
     return (
       u.username?.toLowerCase().includes(q) ||
-      u.email?.toLowerCase().includes(q) ||
-      u.name?.toLowerCase().includes(q)
+      u.email?.toLowerCase().includes(q)
     )
   })
 })

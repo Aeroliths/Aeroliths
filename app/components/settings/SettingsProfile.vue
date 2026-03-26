@@ -53,30 +53,6 @@
       />
     </div>
 
-    <!-- Name -->
-    <div class="form-group">
-      <label for="name">First Name</label>
-      <input
-        id="name"
-        v-model="formData.name"
-        type="text"
-        placeholder="Your first name (optional)"
-        :disabled="loading"
-      />
-    </div>
-
-    <!-- Surname -->
-    <div class="form-group">
-      <label for="surname">Last Name</label>
-      <input
-        id="surname"
-        v-model="formData.surname"
-        type="text"
-        placeholder="Your last name (optional)"
-        :disabled="loading"
-      />
-    </div>
-
     <div v-if="error" class="error-message">{{ error }}</div>
     <div v-if="success" class="success-message">{{ success }}</div>
 
@@ -95,8 +71,6 @@ const { user, initAuth } = useAuth()
 const formData = ref({
   email: '',
   username: '',
-  name: '',
-  surname: '',
   profilePicture: ''
 })
 
@@ -111,8 +85,6 @@ onMounted(async () => {
     formData.value = {
       email: user.value.email || '',
       username: user.value.username || '',
-      name: user.value.name || '',
-      surname: user.value.surname || '',
       profilePicture: user.value.profilePicture || ''
     }
   }
@@ -162,8 +134,6 @@ const handleSubmit = async () => {
       body: {
         email: formData.value.email,
         username: formData.value.username,
-        name: formData.value.name || null,
-        surname: formData.value.surname || null,
         profilePicture: formData.value.profilePicture || null
       }
     })

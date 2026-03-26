@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const { email, username, password, name, surname } = body
+    const { email, username, password } = body
 
     // Validate required fields
     if (!email || !username || !password) {
@@ -82,8 +82,6 @@ export default defineEventHandler(async (event) => {
       data: {
         email,
         username,
-        name: name || null,
-        surname: surname || null,
         emailVerified: false,
         verificationToken: verificationTokenHashed,
         verificationTokenExpiresAt: tokenExpiry,

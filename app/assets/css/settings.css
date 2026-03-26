@@ -214,6 +214,92 @@
 }
 
 /* =========================================
+   ACCOUNT DELETION SECTION
+   ========================================= */
+.deletion-section {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.deletion-section h2 {
+  margin: 0 0 var(--spacing-md) 0;
+  border-top: none;
+  padding-top: 0;
+  color: var(--color-error-light);
+}
+
+.deletion-description {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.deletion-pending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.deletion-pending-text {
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+  line-height: 1.6;
+  padding: var(--spacing-md);
+  background: rgba(229, 115, 115, 0.08);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-lg);
+  margin: 0;
+}
+
+.request-deletion-btn {
+  padding: var(--spacing-md);
+  background: transparent;
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-error-light);
+  font-size: var(--font-base);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: var(--transition-all);
+  margin-top: var(--spacing-sm);
+  width: 100%;
+}
+
+.request-deletion-btn:hover:not(:disabled) {
+  background: var(--color-error-bg);
+}
+
+.request-deletion-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-deletion-btn {
+  padding: var(--spacing-md);
+  background: var(--gradient-brand);
+  border: none;
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  font-size: var(--font-base);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: var(--transition-all);
+  width: 100%;
+}
+
+.cancel-deletion-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.cancel-deletion-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================
    RESPONSIVE
    ========================================= */
 @media (max-width: 600px) {

@@ -59,30 +59,6 @@
             />
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="name">First Name</label>
-              <input
-                id="name"
-                v-model="formData.name"
-                type="text"
-                placeholder="John"
-                :disabled="isLoading"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="surname">Last Name</label>
-              <input
-                id="surname"
-                v-model="formData.surname"
-                type="text"
-                placeholder="Doe"
-                :disabled="isLoading"
-              />
-            </div>
-          </div>
-
           <div class="form-group">
             <label for="password">Password *</label>
             <input
@@ -144,9 +120,7 @@ const { register, resendVerification, isLoading } = useAuth()
 const formData = ref({
   email: '',
   username: '',
-  password: '',
-  name: '',
-  surname: ''
+  password: ''
 })
 
 const confirmPassword = ref('')
@@ -185,8 +159,6 @@ const handleRegister = async () => {
     email: formData.value.email,
     username: formData.value.username,
     password: formData.value.password,
-    ...(formData.value.name && { name: formData.value.name }),
-    ...(formData.value.surname && { surname: formData.value.surname })
   }
 
   const result = await register(registrationData)

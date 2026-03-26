@@ -5,10 +5,9 @@ interface User {
   id: string
   email: string
   username: string
-  name?: string
-  surname?: string
   profilePicture?: string | null
   lastActiveAt: string
+  deletionRequestedAt?: string | null
   role: {
     id: string
     name: string
@@ -24,8 +23,6 @@ interface RegisterData {
   email: string
   username: string
   password: string
-  name?: string
-  surname?: string
 }
 
 const user: Ref<User | null> = ref(null)

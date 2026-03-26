@@ -24,7 +24,6 @@
           <tr>
             <th>Username</th>
             <th>Email</th>
-            <th>Name</th>
             <th>Role</th>
             <th>Created</th>
             <th>Actions</th>
@@ -34,7 +33,6 @@
           <tr v-for="userItem in filteredUsers" :key="userItem.id">
             <td>{{ userItem.username }}</td>
             <td>{{ userItem.email }}</td>
-            <td>{{ userItem.name || '-' }} {{ userItem.surname || '' }}</td>
             <td>
               <span :class="['role-badge', userItem.role.name]">
                 {{ userItem.role.name }}
@@ -121,15 +119,6 @@
           <label for="edit-email">Email</label>
           <input id="edit-email" v-model="editUserForm.email" type="email" required />
         </div>
-        <div class="form-group">
-          <label for="edit-name">Name</label>
-          <input id="edit-name" v-model="editUserForm.name" type="text" />
-        </div>
-        <div class="form-group">
-          <label for="edit-surname">Surname</label>
-          <input id="edit-surname" v-model="editUserForm.surname" type="text" />
-        </div>
-
         <div v-if="modalError" class="error-message">{{ modalError }}</div>
         <div class="modal-actions">
           <button type="button" @click="closeEditUserModal" :disabled="modalLoading">Cancel</button>
@@ -185,10 +174,7 @@ const filteredUsers = computed(() => {
   return users.value.filter((userItem) => {
     const username = userItem.username?.toLowerCase() || ''
     const email = userItem.email?.toLowerCase() || ''
-    const name = userItem.name?.toLowerCase() || ''
-    const surname = userItem.surname?.toLowerCase() || ''
-    const fullName = `${name} ${surname}`.trim()
-    return username.includes(query) || email.includes(query) || name.includes(query) || surname.includes(query) || fullName.includes(query)
+    return username.includes(query) || email.includes(query)
   })
 })
 
@@ -237,7 +223,7 @@ const confirmAction = async () => {
 
 // Edit user modal
 const showEditUserModal = ref(false)
-const editUserForm = ref({ id: '', username: '', email: '', name: '', surname: '', profilePicture: '' })
+const editUserForm = ref({ id: '', username: '', email: '', profilePicture: '' })
 const uploadingUserProfilePicture = ref(false)
 const modalLoading = ref(false)
 const modalError = ref('')
@@ -260,8 +246,6 @@ const openEditUserModal = (userItem: any) => {
     id: userItem.id,
     username: userItem.username,
     email: userItem.email,
-    name: userItem.name || '',
-    surname: userItem.surname || '',
     profilePicture: userItem.profilePicture || '',
   }
   modalError.value = ''
@@ -270,7 +254,7 @@ const openEditUserModal = (userItem: any) => {
 
 const closeEditUserModal = () => {
   showEditUserModal.value = false
-  editUserForm.value = { id: '', username: '', email: '', name: '', surname: '', profilePicture: '' }
+  editUserForm.value = { id: '', username: '', email: '', profilePicture: '' }
   modalError.value = ''
 }
 
@@ -310,8 +294,6 @@ const updateUser = async () => {
       body: {
         username: editUserForm.value.username,
         email: editUserForm.value.email,
-        name: editUserForm.value.name || null,
-        surname: editUserForm.value.surname || null,
         profilePicture: editUserForm.value.profilePicture || null,
       },
     })

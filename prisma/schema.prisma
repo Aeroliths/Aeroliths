@@ -12,13 +12,17 @@ model User {
   id             String   @id @default(cuid())
   email          String   @unique
   username       String   @unique
-  name           String?
-  surname        String?
   profilePicture             String?
   emailVerified              Boolean   @default(false)
   verificationToken          String?
   verificationTokenExpiresAt DateTime?
   lastActiveAt               DateTime  @default(now())
+  deletionRequestedAt        DateTime?
+  deletionReminderSent       Boolean   @default(false)
+  warning6MonthsSent         Boolean   @default(false)
+  warning2MonthsSent         Boolean   @default(false)
+  warning1MonthSent          Boolean   @default(false)
+  warning1WeekSent           Boolean   @default(false)
   createdAt                  DateTime  @default(now())
   updatedAt                  DateTime  @updatedAt
 

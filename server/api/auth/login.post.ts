@@ -77,10 +77,18 @@ export default defineEventHandler(async (event) => {
       signOptions
     )
 
-    // Update last active date
+    // Update last active date, cancel any pending deletion request, and reset inactivity warning flags
     await db.postgres.user.update({
       where: { id: user.id },
-      data: { lastActiveAt: new Date() },
+      data: {
+        lastActiveAt: new Date(),
+        deletionRequestedAt: null,
+        deletionReminderSent: false,
+        warning6MonthsSent: false,
+        warning2MonthsSent: false,
+        warning1MonthSent: false,
+        warning1WeekSent: false,
+      },
     })
 
     // Set token in httpOnly cookie for secure authentication

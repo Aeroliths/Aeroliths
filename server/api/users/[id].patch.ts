@@ -93,14 +93,6 @@ export default defineEventHandler(async (event) => {
       updateData.username = body.username
     }
 
-    if (body.name !== undefined) {
-      updateData.name = body.name || null
-    }
-
-    if (body.surname !== undefined) {
-      updateData.surname = body.surname || null
-    }
-
     if (body.profilePicture !== undefined) {
       updateData.profilePicture = body.profilePicture || null
     }

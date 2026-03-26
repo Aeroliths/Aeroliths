@@ -4,6 +4,7 @@
       <h1>Account Settings</h1>
       <SettingsProfile />
       <SettingsPassword />
+      <SettingsAccountDeletion />
     </div>
   </div>
 </template>
