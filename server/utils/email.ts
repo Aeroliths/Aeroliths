@@ -44,30 +44,30 @@ export function hashToken(raw: string): string {
 
 export async function sendDeletionRequestEmail(email: string, username: string, deletionDate: Date): Promise<void> {
   const appUrl = process.env.APP_URL || 'http://localhost:3000'
-  const formattedDate = deletionDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const formattedDate = deletionDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
 
   console.log(`[Email] Sending deletion request confirmation to ${email}`)
-  await sendEmail(email, 'Demande de suppression de compte - Aeroliths', `
+  await sendEmail(email, 'Account deletion request - Aeroliths', `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h1 style="color: #7ab8d4; text-align: center;">Aeroliths</h1>
-      <h2 style="color: #333; text-align: center;">Demande de suppression de compte</h2>
+      <h2 style="color: #333; text-align: center;">Account deletion request</h2>
       <p style="color: #555; font-size: 16px; line-height: 1.6;">
-        Bonjour <strong>${username}</strong>,
+        Hello <strong>${username}</strong>,
       </p>
       <p style="color: #555; font-size: 16px; line-height: 1.6;">
-        Nous avons bien reçu votre demande de suppression de compte. Si vous ne vous reconnectez pas avant le <strong>${formattedDate}</strong>, votre compte sera définitivement supprimé.
+        We have received your account deletion request. If you do not log in before <strong>${formattedDate}</strong>, your account will be permanently deleted.
       </p>
       <p style="color: #555; font-size: 16px; line-height: 1.6;">
-        Pour annuler cette demande, il vous suffit de vous reconnecter à votre compte avant cette date.
+        To cancel this request, simply log back into your account before that date.
       </p>
       <div style="text-align: center; margin: 30px 0;">
         <a href="${appUrl}/login"
            style="background-color: #7ab8d4; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
-          Se connecter pour annuler
+          Log in to cancel
         </a>
       </div>
       <p style="color: #888; font-size: 13px; text-align: center;">
-        Si vous n'êtes pas à l'origine de cette demande, connectez-vous immédiatement pour sécuriser votre compte.
+        If you did not make this request, log in immediately to secure your account.
       </p>
     </div>
   `)
