@@ -19,7 +19,10 @@
         <!-- Protected links - only visible when authenticated -->
         <template v-if="isAuthenticated">
           <NuxtLink href="/play" @click="mobileMenuOpen = false">Play</NuxtLink>
-          <NuxtLink href="/friends" @click="mobileMenuOpen = false">Friends</NuxtLink>
+          <NuxtLink href="/friends" @click="mobileMenuOpen = false" class="nav-link-with-badge">
+            Friends
+            <span v-if="pendingCount > 0" class="nav-badge">{{ pendingCount }}</span>
+          </NuxtLink>
           <NuxtLink href="/leaderboard" @click="mobileMenuOpen = false">Leaderboard</NuxtLink>
 
           <!-- Admin link - only visible for admin users -->
@@ -49,13 +52,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '~/composables/useAuth'
+import { useFriendRequests } from '~/composables/useFriendRequests'
 
 const mobileMenuOpen = ref(false)
 const { isAuthenticated, user, logout, initAuth } = useAuth()
+const { pendingCount, fetchPendingCount } = useFriendRequests()
 
-// Initialize auth state on component mount
 onMounted(async () => {
   await initAuth()
+  await fetchPendingCount()
 })
 
 const handleLogout = () => {

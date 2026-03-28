@@ -841,8 +841,8 @@ tr:hover td {
    ========================================= */
 .add-lithos-form {
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-sm);
-  align-items: flex-end;
   margin-bottom: var(--spacing-lg);
 }
 
@@ -899,4 +899,151 @@ tr:hover td {
   .modal {
     padding: var(--spacing-lg);
   }
+}
+
+/* =========================================
+   LITHOS PICKER (Collections admin)
+   ========================================= */
+.add-lithos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+  gap: var(--spacing-md);
+}
+
+.add-lithos-header h4 {
+  margin: 0;
+}
+
+.picker-search-input {
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  font-size: var(--font-sm);
+  width: 180px;
+}
+
+.lithos-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.6rem;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.picker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--bg-glass-medium);
+}
+
+.picker-card:hover {
+  border-color: var(--color-brand-primary);
+  background: var(--bg-glass-light);
+}
+
+.picker-card.selected {
+  border-color: var(--color-brand-primary);
+  background: rgba(102, 126, 234, 0.15);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.picker-card.rarity-rare      { border-color: rgba(59, 130, 246, 0.3); }
+.picker-card.rarity-epic      { border-color: rgba(139, 92, 246, 0.3); }
+.picker-card.rarity-legendary { border-color: rgba(245, 158, 11, 0.3); }
+.picker-card.selected.rarity-rare      { border-color: #3b82f6; }
+.picker-card.selected.rarity-epic      { border-color: #8b5cf6; }
+.picker-card.selected.rarity-legendary { border-color: #f59e0b; }
+
+.picker-sprite {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.picker-name {
+  font-size: 0.65rem;
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.picker-rarity {
+  font-size: 0.6rem;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.add-lithos-confirm {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0.6rem 0.75rem;
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  border-radius: var(--radius-lg);
+  flex-wrap: wrap;
+}
+
+.selected-name {
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  font-size: var(--font-sm);
+  flex: 1;
+  min-width: 80px;
+}
+
+.qty-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.qty-group label {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.qty-input {
+  width: 60px;
+  padding: 0.3rem 0.5rem;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: var(--font-sm);
+}
+
+.btn-cancel-pick {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+}
+
+.btn-cancel-pick:hover {
+  color: var(--color-error-light);
 }

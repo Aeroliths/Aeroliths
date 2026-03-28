@@ -45,8 +45,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
+import { useFriendRequests } from '~/composables/useFriendRequests'
 
 const { token } = useAuth()
+const { fetchPendingCount } = useFriendRequests()
 
 const receivedRequests = ref<any[]>([])
 const sentRequests = ref<any[]>([])
@@ -68,6 +70,7 @@ const fetchRequests = async () => {
     })
     receivedRequests.value = res.data.received
     sentRequests.value = res.data.sent
+    fetchPendingCount()
   } catch (e: any) {
     console.error('Failed to fetch requests:', e)
   }

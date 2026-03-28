@@ -8,8 +8,9 @@
         <button :class="{ active: activeTab === 'list' }" @click="activeTab = 'list'">
           My Friends
         </button>
-        <button :class="{ active: activeTab === 'requests' }" @click="activeTab = 'requests'">
+        <button :class="{ active: activeTab === 'requests' }" @click="activeTab = 'requests'" class="tab-with-badge">
           Requests
+          <span v-if="pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
         </button>
         <button :class="{ active: activeTab === 'search' }" @click="activeTab = 'search'">
           Search
@@ -24,9 +25,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useFriendRequests } from '~/composables/useFriendRequests'
 
 const activeTab = ref<'list' | 'requests' | 'search'>('list')
+const { pendingCount, fetchPendingCount } = useFriendRequests()
+
+onMounted(() => fetchPendingCount())
 </script>
 
 <style src="~/assets/css/friends.css"></style>

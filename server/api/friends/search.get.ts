@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   const users = await db.postgres.user.findMany({
     where: {
       username: { contains: search, mode: 'insensitive' },
-      NOT: { id: Number(user.userId) },
+      NOT: { id: user.userId },
     },
     select: {
       id: true,
