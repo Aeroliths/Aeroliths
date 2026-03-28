@@ -1,33 +1,33 @@
 <template>
   <div class="deletion-section">
-    <h2>Supprimer mon compte</h2>
+    <h2>Delete my account</h2>
 
     <div v-if="deletionRequestedAt" class="deletion-pending">
       <p class="deletion-pending-text">
-        Une demande de suppression est en cours. Votre compte sera supprimé le
-        <strong>{{ formattedDeletionDate }}</strong> si vous ne vous reconnectez pas avant cette date.
+        A deletion request is in progress. Your account will be deleted on
+        <strong>{{ formattedDeletionDate }}</strong> if you do not log in before that date.
       </p>
       <div v-if="error" class="error-message">{{ error }}</div>
       <div v-if="success" class="success-message">{{ success }}</div>
       <button class="cancel-deletion-btn" :disabled="loading" @click="cancelDeletion">
-        {{ loading ? 'Annulation...' : 'Annuler la suppression' }}
+        {{ loading ? 'Cancelling...' : 'Cancel deletion' }}
       </button>
     </div>
 
     <div v-else>
       <p class="deletion-description">
-        Vous pouvez demander la suppression de votre compte. Si vous ne vous reconnectez pas dans les
-        <strong>30 jours</strong> suivant votre demande, votre compte et toutes vos données seront
-        définitivement supprimés.
+        You can request the deletion of your account. If you do not log in within
+        <strong>30 days</strong> of your request, your account and all your data will be
+        permanently deleted.
       </p>
       <p class="deletion-description">
-        Un e-mail de confirmation vous sera envoyé. Vous pouvez annuler la suppression à tout moment
-        en vous reconnectant.
+        A confirmation email will be sent to you. You can cancel the deletion at any time
+        by logging back in.
       </p>
       <div v-if="error" class="error-message">{{ error }}</div>
       <div v-if="success" class="success-message">{{ success }}</div>
       <button class="request-deletion-btn" :disabled="loading" @click="requestDeletion">
-        {{ loading ? 'Traitement...' : 'Demander la suppression de mon compte' }}
+        {{ loading ? 'Processing...' : 'Request account deletion' }}
       </button>
     </div>
   </div>
@@ -53,7 +53,7 @@ const formattedDeletionDate = computed(() => {
   if (!deletionRequestedAt.value) return ''
   const requestDate = new Date(deletionRequestedAt.value)
   const deletionDate = new Date(requestDate.getTime() + 30 * 24 * 60 * 60 * 1000)
-  return deletionDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  return deletionDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
 })
 
 const requestDeletion = async () => {
@@ -63,11 +63,11 @@ const requestDeletion = async () => {
   success.value = ''
   try {
     await $fetch(`/api/users/${user.value.id}/request-deletion`, { method: 'POST' })
-    success.value = 'Demande envoyée. Vous recevrez un e-mail de confirmation.'
+    success.value = 'Request sent. You will receive a confirmation email.'
     await initAuth()
     setTimeout(() => { success.value = '' }, 5000)
   } catch (err: any) {
-    error.value = err.data?.statusMessage || 'Une erreur est survenue.'
+    error.value = err.data?.statusMessage || 'An error occurred.'
   } finally {
     loading.value = false
   }
@@ -80,11 +80,11 @@ const cancelDeletion = async () => {
   success.value = ''
   try {
     await $fetch(`/api/users/${user.value.id}/cancel-deletion`, { method: 'POST' })
-    success.value = 'La suppression de votre compte a été annulée.'
+    success.value = 'Your account deletion has been cancelled.'
     await initAuth()
     setTimeout(() => { success.value = '' }, 5000)
   } catch (err: any) {
-    error.value = err.data?.statusMessage || 'Une erreur est survenue.'
+    error.value = err.data?.statusMessage || 'An error occurred.'
   } finally {
     loading.value = false
   }
