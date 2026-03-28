@@ -1,8 +1,11 @@
 <template>
   <div class="play-page">
     <div class="play-container">
-      <h1>Play Aeroliths</h1>
-      <p>Welcome {{ user?.username }}! The game interface will be here.</p>
+      <div class="play-header">
+        <h1>Play Aeroliths</h1>
+        <p>Welcome, <strong>{{ user?.username }}</strong>! Build your deck below.</p>
+      </div>
+      <DeckBuilder />
     </div>
   </div>
 </template>

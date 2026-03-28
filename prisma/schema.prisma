@@ -31,6 +31,7 @@ model User {
   role           Role            @relation(fields: [roleId], references: [id])
   roleId         String
   collections    Collections[]
+  deck           Deck?
 
   @@map("users")
 }
@@ -62,7 +63,8 @@ model Lithos {
 
   // Relations
   collections Collections[]
-  element     Elements?     @relation(fields: [elementId], references: [id])
+  deckEntries DeckEntry[]
+  element     Elements?   @relation(fields: [elementId], references: [id])
   elementId   String?
 
   @@map("lithos")
@@ -142,4 +144,30 @@ model StrengthElements {
   // An element can only have one strength entry per other element
   @@unique([elementId, strongAgainstId])
   @@map("strength_elements")
+}
+
+model Deck {
+  id        String      @id @default(cuid())
+  name      String      @default("My Deck")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  userId  String      @unique
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries DeckEntry[]
+
+  @@map("decks")
+}
+
+model DeckEntry {
+  id       String @id @default(cuid())
+  quantity Int    @default(1)
+
+  deckId   String
+  deck     Deck   @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  lithosId String
+  lithos   Lithos @relation(fields: [lithosId], references: [id], onDelete: Cascade)
+
+  @@unique([deckId, lithosId])
+  @@map("deck_entries")
 }

@@ -13,8 +13,6 @@ export default defineEventHandler(async (event) => {
         id: true,
         email: true,
         username: true,
-        name: true,
-        surname: true,
         profilePicture: true,
         createdAt: true,
         updatedAt: true,

@@ -17,13 +17,21 @@
   border-radius: var(--radius-2xl);
 }
 
-.play-container h1 {
-  color: var(--color-text-primary);
-  font-size: var(--font-5xl);
-  margin-bottom: var(--spacing-md);
+.play-header {
+  margin-bottom: var(--spacing-xl);
 }
 
-.play-container p {
+.play-header h1 {
+  color: var(--color-text-primary);
+  font-size: var(--font-5xl);
+  margin-bottom: var(--spacing-xs);
+}
+
+.play-header p {
   color: var(--color-text-muted);
-  font-size: var(--font-xl);
+  font-size: var(--font-lg);
+}
+
+.play-header strong {
+  color: var(--color-text-primary);
 }
