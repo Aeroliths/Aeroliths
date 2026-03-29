@@ -27,6 +27,7 @@ logs
 # Test files
 coverage
 *.tsbuildinfo
+compose.local.yml
 
 # Public uploaded files
 public/lithos/*
