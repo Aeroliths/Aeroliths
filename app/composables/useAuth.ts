@@ -26,37 +26,25 @@ interface RegisterData {
 }
 
 const user: Ref<User | null> = ref(null)
-const token: Ref<string | null> = ref(null)
 const isLoading = ref(false)
 
 export const useAuth = () => {
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAuthenticated = computed(() => !!user.value)
 
-  // Initialize auth state from localStorage
+  // Initialize auth state from httpOnly cookie (server validates it)
   const initAuth = async () => {
-    if (import.meta.client) {
-      const storedToken = localStorage.getItem('auth_token')
-      if (storedToken) {
-        token.value = storedToken
-        try {
-          await fetchCurrentUser()
-        } catch (error) {
-          // Token is invalid, clear it
-          logout()
-        }
-      }
+    try {
+      await fetchCurrentUser()
+    } catch {
+      // No valid session
     }
   }
 
-  // Fetch current user from API
+  // Fetch current user from API (cookie sent automatically)
   const fetchCurrentUser = async () => {
-    if (!token.value) return
-
     try {
       const response = await $fetch<{ data: User }>('/api/auth/me', {
-        headers: {
-          Authorization: `Bearer ${token.value}`
-        }
+        credentials: 'include',
       })
       user.value = response.data
     } catch (error) {
@@ -69,17 +57,13 @@ export const useAuth = () => {
   const login = async (credentials: LoginCredentials) => {
     isLoading.value = true
     try {
-      const response = await $fetch<{ data: { user: User; token: string } }>('/api/auth/login', {
+      const response = await $fetch<{ data: { user: User } }>('/api/auth/login', {
         method: 'POST',
-        body: credentials
+        body: credentials,
+        credentials: 'include',
       })
 
-      token.value = response.data.token
       user.value = response.data.user
-
-      if (import.meta.client) {
-        localStorage.setItem('auth_token', response.data.token)
-      }
 
       return { success: true }
     } catch (error: any) {
@@ -133,12 +117,13 @@ export const useAuth = () => {
   }
 
   // Logout function
-  const logout = () => {
-    token.value = null
-    user.value = null
-    if (import.meta.client) {
-      localStorage.removeItem('auth_token')
+  const logout = async () => {
+    try {
+      await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+    } catch {
+      // Proceed even if the request fails
     }
+    user.value = null
     navigateTo('/login')
   }
 
@@ -149,7 +134,6 @@ export const useAuth = () => {
 
   return {
     user: computed(() => user.value),
-    token: computed(() => token.value),
     isAuthenticated,
     isLoading: computed(() => isLoading.value),
     initAuth,

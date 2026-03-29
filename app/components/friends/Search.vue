@@ -46,9 +46,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useAuth } from '~/composables/useAuth'
-
-const { token } = useAuth()
 
 const searchQuery = ref('')
 const searchResults = ref<any[]>([])
@@ -58,8 +55,6 @@ const friends = ref<any[]>([])
 const pendingRequests = ref<{ received: any[]; sent: any[] }>({ received: [], sent: [] })
 const errorMessage = ref('')
 const successMessage = ref('')
-
-const headers = () => ({ Authorization: `Bearer ${token.value}` })
 
 const showMessage = (type: 'error' | 'success', message: string) => {
   errorMessage.value = type === 'error' ? message : ''
@@ -81,8 +76,8 @@ const hasPendingRequest = (userId: number) => {
 const fetchContext = async () => {
   try {
     const [friendsRes, requestsRes] = await Promise.all([
-      $fetch<{ data: any[] }>('/api/friends', { headers: headers() }),
-      $fetch<{ data: { received: any[]; sent: any[] } }>('/api/friends/requests', { headers: headers() }),
+      $fetch<{ data: any[] }>('/api/friends'),
+      $fetch<{ data: { received: any[]; sent: any[] } }>('/api/friends/requests'),
     ])
     friends.value = friendsRes.data
     pendingRequests.value = requestsRes.data
@@ -95,9 +90,7 @@ const searchUsers = async () => {
   if (searchQuery.value.length < 2) return
   hasSearched.value = true
   try {
-    const res = await $fetch<{ data: any[] }>(`/api/friends/search?q=${encodeURIComponent(searchQuery.value)}`, {
-      headers: headers(),
-    })
+    const res = await $fetch<{ data: any[] }>(`/api/friends/search?q=${encodeURIComponent(searchQuery.value)}`)
     searchResults.value = res.data
   } catch (e: any) {
     showMessage('error', e.data?.message || 'Search failed')
@@ -108,7 +101,7 @@ const sendRequest = async (username: string) => {
   sendingTo.value = username
   try {
     await $fetch('/api/friends/request', {
-      method: 'POST', headers: headers(), body: { targetUsername: username },
+      method: 'POST', body: { targetUsername: username },
     })
     showMessage('success', `Friend request sent to ${username}`)
     await fetchContext()

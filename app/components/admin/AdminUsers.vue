@@ -154,12 +154,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
-const { user, token, initAuth } = useAuth()
-
-const getAuthHeaders = (): Record<string, string> => {
-  if (!token.value) return {}
-  return { Authorization: `Bearer ${token.value}` }
-}
+const { user, initAuth } = useAuth()
 
 const users = ref<any[]>([])
 const usersLoading = ref(false)
@@ -232,7 +227,7 @@ const fetchUsers = async () => {
   usersLoading.value = true
   usersError.value = ''
   try {
-    const response = await $fetch<any>('/api/admin/users', { headers: getAuthHeaders() })
+    const response = await $fetch<any>('/api/admin/users')
     users.value = response.data.users
   } catch (error: any) {
     usersError.value = error.data?.statusMessage || 'Failed to load users'
@@ -290,7 +285,6 @@ const updateUser = async () => {
   try {
     await $fetch(`/api/users/${editUserForm.value.id}`, {
       method: 'PATCH',
-      headers: getAuthHeaders(),
       body: {
         username: editUserForm.value.username,
         email: editUserForm.value.email,
@@ -322,7 +316,6 @@ const toggleUserRole = (userItem: any) => {
         const newRole = userItem.role.name === 'user' ? 'admin' : 'user'
         await $fetch(`/api/admin/users/${userItem.id}/role`, {
           method: 'PATCH',
-          headers: getAuthHeaders(),
           body: { roleName: newRole },
         })
         usersSuccess.value = 'User role updated successfully'
@@ -348,7 +341,7 @@ const deleteUser = (userItem: any) => {
       actionLoading.value = true
       usersError.value = ''
       try {
-        await $fetch(`/api/admin/users/${userItem.id}`, { method: 'DELETE', headers: getAuthHeaders() })
+        await $fetch(`/api/admin/users/${userItem.id}`, { method: 'DELETE' })
         usersSuccess.value = `User ${userItem.username} deleted successfully`
         await fetchUsers()
         setTimeout(() => { usersSuccess.value = '' }, 3000)

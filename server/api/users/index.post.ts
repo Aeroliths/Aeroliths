@@ -36,6 +36,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Validate username format (3-30 chars, alphanumeric + underscore/hyphen)
+    const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/
+    if (!usernameRegex.test(username)) {
+      throw createError({
+        statusCode: 400,
+        message: 'Username must be 3-30 characters and contain only letters, numbers, underscores, or hyphens',
+      })
+    }
+
     // Validate password strength (minimum 8 characters)
     if (password.length < 8) {
       throw createError({

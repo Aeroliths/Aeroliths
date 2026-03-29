@@ -149,12 +149,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
-const { token, initAuth } = useAuth()
+const { initAuth } = useAuth()
 
-const getAuthHeaders = (): Record<string, string> => {
-  if (!token.value) return {}
-  return { Authorization: `Bearer ${token.value}` }
-}
 
 const lithosList = ref<any[]>([])
 const elementsList = ref<any[]>([])
@@ -321,10 +317,10 @@ const saveLithos = async () => {
     }
 
     if (lithosForm.value.id) {
-      await $fetch(`/api/lithos/${lithosForm.value.id}`, { method: 'PATCH', headers: getAuthHeaders(), body: bodyData })
+      await $fetch(`/api/lithos/${lithosForm.value.id}`, { method: 'PATCH', body: bodyData })
       lithosSuccess.value = 'Lithos updated successfully'
     } else {
-      await $fetch('/api/lithos', { method: 'POST', headers: getAuthHeaders(), body: bodyData })
+      await $fetch('/api/lithos', { method: 'POST', body: bodyData })
       lithosSuccess.value = 'Lithos created successfully'
     }
 
@@ -346,7 +342,7 @@ const deleteLithos = (lithos: any) => {
       actionLoading.value = true
       lithosError.value = ''
       try {
-        await $fetch(`/api/admin/lithos/${lithos.id}`, { method: 'DELETE', headers: getAuthHeaders() })
+        await $fetch(`/api/admin/lithos/${lithos.id}`, { method: 'DELETE' })
         lithosSuccess.value = `Lithos ${lithos.name} deleted successfully`
         await fetchLithos()
         setTimeout(() => { lithosSuccess.value = '' }, 3000)

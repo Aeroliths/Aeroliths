@@ -47,15 +47,12 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useFriendRequests } from '~/composables/useFriendRequests'
 
-const { token } = useAuth()
 const { fetchPendingCount } = useFriendRequests()
 
 const receivedRequests = ref<any[]>([])
 const sentRequests = ref<any[]>([])
 const errorMessage = ref('')
 const successMessage = ref('')
-
-const headers = () => ({ Authorization: `Bearer ${token.value}` })
 
 const showMessage = (type: 'error' | 'success', message: string) => {
   errorMessage.value = type === 'error' ? message : ''
@@ -65,9 +62,7 @@ const showMessage = (type: 'error' | 'success', message: string) => {
 
 const fetchRequests = async () => {
   try {
-    const res = await $fetch<{ data: { received: any[]; sent: any[] } }>('/api/friends/requests', {
-      headers: headers(),
-    })
+    const res = await $fetch<{ data: { received: any[]; sent: any[] } }>('/api/friends/requests')
     receivedRequests.value = res.data.received
     sentRequests.value = res.data.sent
     fetchPendingCount()
@@ -79,7 +74,7 @@ const fetchRequests = async () => {
 const acceptRequest = async (req: any) => {
   try {
     await $fetch('/api/friends/accept', {
-      method: 'POST', headers: headers(), body: { requestId: req.requestId },
+      method: 'POST', body: { requestId: req.requestId },
     })
     showMessage('success', `Friend request from ${req.senderUsername} accepted!`)
     await fetchRequests()
@@ -91,7 +86,7 @@ const acceptRequest = async (req: any) => {
 const rejectRequest = async (req: any) => {
   try {
     await $fetch('/api/friends/reject', {
-      method: 'POST', headers: headers(), body: { requestId: req.requestId },
+      method: 'POST', body: { requestId: req.requestId },
     })
     showMessage('success', 'Friend request rejected')
     await fetchRequests()
@@ -102,7 +97,7 @@ const rejectRequest = async (req: any) => {
 
 const cancelRequest = async (req: any) => {
   try {
-    await $fetch(`/api/friends/${req.requestId}`, { method: 'DELETE', headers: headers() })
+    await $fetch(`/api/friends/${req.requestId}`, { method: 'DELETE' })
     showMessage('success', 'Request cancelled')
     await fetchRequests()
   } catch (e: any) {

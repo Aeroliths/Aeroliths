@@ -89,9 +89,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useAuth } from '~/composables/useAuth'
-
-const { token } = useAuth()
 
 interface Lithos {
   id: string
@@ -134,16 +131,12 @@ function maxInDeck(item: CollectionItem): number {
   return Math.min(2, item.quantity)
 }
 
-const authHeaders = computed(() => ({
-  Authorization: `Bearer ${token.value}`,
-}))
-
 async function fetchAll() {
   loading.value = true
   try {
     const [colRes, deckRes] = await Promise.all([
-      $fetch<{ data: CollectionItem[] }>('/api/collections', { headers: authHeaders.value }),
-      $fetch<{ data: { entries: DeckEntry[] } }>('/api/deck', { headers: authHeaders.value }),
+      $fetch<{ data: CollectionItem[] }>('/api/collections'),
+      $fetch<{ data: { entries: DeckEntry[] } }>('/api/deck'),
     ])
     collection.value = colRes.data
     deckEntries.value = deckRes.data.entries
@@ -157,7 +150,6 @@ async function updateDeck(lithosId: string, quantity: number) {
   try {
     await $fetch('/api/deck/entries', {
       method: 'PUT',
-      headers: authHeaders.value,
       body: { lithosId, quantity },
     })
     // Update local state
@@ -169,9 +161,7 @@ async function updateDeck(lithosId: string, quantity: number) {
         existing.quantity = quantity
       } else {
         // Refetch to get full entry with lithos details
-        const res = await $fetch<{ data: { entries: DeckEntry[] } }>('/api/deck', {
-          headers: authHeaders.value,
-        })
+        const res = await $fetch<{ data: { entries: DeckEntry[] } }>('/api/deck')
         deckEntries.value = res.data.entries
       }
     }

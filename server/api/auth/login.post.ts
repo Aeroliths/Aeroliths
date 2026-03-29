@@ -108,8 +108,6 @@ export default defineEventHandler(async (event) => {
       message: 'Login successful',
       data: {
         user: userWithoutAuth,
-        token,
-        expiresIn,
       },
     }
   } catch (error) {

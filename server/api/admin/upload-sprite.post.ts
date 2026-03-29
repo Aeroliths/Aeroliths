@@ -45,12 +45,38 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Validate file type (only images)
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024
+    if (file.data.length > maxSize) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'File size exceeds the 5MB limit',
+      })
+    }
+
+    // Validate file type (only images) — check both MIME type and magic bytes
     const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']
     if (!allowedTypes.includes(file.type || '')) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Only image files are allowed (PNG, JPG, GIF, WEBP)',
+      })
+    }
+
+    // Validate magic bytes to prevent MIME type spoofing
+    const magicBytes: Record<string, number[]> = {
+      'image/png':  [0x89, 0x50, 0x4E, 0x47],
+      'image/jpeg': [0xFF, 0xD8, 0xFF],
+      'image/jpg':  [0xFF, 0xD8, 0xFF],
+      'image/gif':  [0x47, 0x49, 0x46, 0x38],
+      'image/webp': [0x52, 0x49, 0x46, 0x46], // RIFF header (WEBP)
+    }
+    const signature = magicBytes[file.type || '']
+    const isValidMagic = signature?.every((byte, i) => file.data[i] === byte)
+    if (!isValidMagic) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'File content does not match the declared image type',
       })
     }
 

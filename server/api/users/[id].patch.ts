@@ -75,6 +75,15 @@ export default defineEventHandler(async (event) => {
     }
 
     if (body.username !== undefined) {
+      // Validate username format
+      const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/
+      if (!usernameRegex.test(body.username)) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'Username must be 3-30 characters and contain only letters, numbers, underscores, or hyphens',
+        })
+      }
+
       // Check if username is already taken by another user
       const usernameExists = await db.postgres.user.findFirst({
         where: {
@@ -94,6 +103,14 @@ export default defineEventHandler(async (event) => {
     }
 
     if (body.profilePicture !== undefined) {
+      if (body.profilePicture !== null && body.profilePicture !== '') {
+        if (typeof body.profilePicture !== 'string' || !body.profilePicture.startsWith('/profile_pictures/')) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: 'Invalid profile picture path',
+          })
+        }
+      }
       updateData.profilePicture = body.profilePicture || null
     }
 

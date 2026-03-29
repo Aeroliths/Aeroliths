@@ -190,12 +190,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
-const { token, initAuth } = useAuth()
+const { initAuth } = useAuth()
 
-const getAuthHeaders = (): Record<string, string> => {
-  if (!token.value) return {}
-  return { Authorization: `Bearer ${token.value}` }
-}
 
 const elementsList = ref<any[]>([])
 const elementsLoading = ref(false)
@@ -353,14 +349,14 @@ const saveElement = async () => {
     if (elementForm.value.id) {
       await $fetch(`/api/admin/elements/${elementForm.value.id}`, {
         method: 'PATCH',
-        headers: getAuthHeaders(),
+  
         body: { name: elementForm.value.name, sprite: elementForm.value.sprite },
       })
       elementsSuccess.value = 'Element updated successfully'
     } else {
       const response = await $fetch<any>('/api/admin/elements', {
         method: 'POST',
-        headers: getAuthHeaders(),
+  
         body: { name: elementForm.value.name, sprite: elementForm.value.sprite },
       })
 
@@ -370,7 +366,7 @@ const saveElement = async () => {
         try {
           await $fetch('/api/admin/weaknesses', {
             method: 'POST',
-            headers: getAuthHeaders(),
+      
             body: { elementId: newElementId, weakAgainstId },
           })
         } catch (error) {
@@ -382,7 +378,7 @@ const saveElement = async () => {
         try {
           await $fetch('/api/admin/strengths', {
             method: 'POST',
-            headers: getAuthHeaders(),
+      
             body: { elementId: newElementId, strongAgainstId },
           })
         } catch (error) {
@@ -411,7 +407,7 @@ const deleteElement = (element: any) => {
       actionLoading.value = true
       elementsError.value = ''
       try {
-        await $fetch(`/api/admin/elements/${element.id}`, { method: 'DELETE', headers: getAuthHeaders() })
+        await $fetch(`/api/admin/elements/${element.id}`, { method: 'DELETE' })
         elementsSuccess.value = `Element ${element.name} deleted successfully`
         await fetchElements()
         setTimeout(() => { elementsSuccess.value = '' }, 3000)
@@ -456,7 +452,7 @@ const addWeakness = async () => {
   try {
     await $fetch('/api/admin/weaknesses', {
       method: 'POST',
-      headers: getAuthHeaders(),
+
       body: { elementId: selectedElement.value.id, weakAgainstId: newWeaknessId.value },
     })
     relationsSuccess.value = 'Weakness added successfully'
@@ -479,7 +475,7 @@ const deleteWeakness = async (weaknessId: string) => {
   relationLoading.value = true
   relationsError.value = ''
   try {
-    await $fetch(`/api/admin/weaknesses/${weaknessId}`, { method: 'DELETE', headers: getAuthHeaders() })
+    await $fetch(`/api/admin/weaknesses/${weaknessId}`, { method: 'DELETE' })
     relationsSuccess.value = 'Weakness removed successfully'
     await fetchElements()
     const updatedElement = elementsList.value.find(e => e.id === selectedElement.value!.id)
@@ -502,7 +498,7 @@ const addStrength = async () => {
   try {
     await $fetch('/api/admin/strengths', {
       method: 'POST',
-      headers: getAuthHeaders(),
+
       body: { elementId: selectedElement.value.id, strongAgainstId: newStrengthId.value },
     })
     relationsSuccess.value = 'Strength added successfully'
@@ -525,7 +521,7 @@ const deleteStrength = async (strengthId: string) => {
   relationLoading.value = true
   relationsError.value = ''
   try {
-    await $fetch(`/api/admin/strengths/${strengthId}`, { method: 'DELETE', headers: getAuthHeaders() })
+    await $fetch(`/api/admin/strengths/${strengthId}`, { method: 'DELETE' })
     relationsSuccess.value = 'Strength removed successfully'
     await fetchElements()
     const updatedElement = elementsList.value.find(e => e.id === selectedElement.value!.id)

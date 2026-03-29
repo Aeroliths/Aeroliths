@@ -161,12 +161,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
-const { token, initAuth } = useAuth()
+const { initAuth } = useAuth()
 
-const getAuthHeaders = (): Record<string, string> => {
-  if (!token.value) return {}
-  return { Authorization: `Bearer ${token.value}` }
-}
 
 const users = ref<any[]>([])
 const usersLoading = ref(false)
@@ -237,7 +233,7 @@ const confirmAction = async () => {
 const fetchUsers = async () => {
   usersLoading.value = true
   try {
-    const response = await $fetch<any>('/api/admin/users', { headers: getAuthHeaders() })
+    const response = await $fetch<any>('/api/admin/users', {})
     users.value = response.data.users
   } catch {}
   finally { usersLoading.value = false }
@@ -254,7 +250,7 @@ const fetchUserCollection = async (userId: string) => {
   collectionLoading.value = true
   collectionError.value = ''
   try {
-    const response = await $fetch<any>(`/api/admin/collections/user/${userId}`, { headers: getAuthHeaders() })
+    const response = await $fetch<any>(`/api/admin/collections/user/${userId}`, {})
     userCollection.value = response.data
   } catch (error: any) {
     collectionError.value = error.data?.statusMessage || 'Failed to load collection'
@@ -289,7 +285,7 @@ const addLithos = async () => {
   try {
     await $fetch(`/api/admin/collections/user/${selectedUser.value.id}`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+
       body: { lithosId: addForm.value.lithosId, quantity: addForm.value.quantity },
     })
     collectionSuccess.value = 'Lithos added successfully'
@@ -311,7 +307,7 @@ const saveQuantity = async (entry: any) => {
   collectionLoading.value = true
   try {
     await $fetch(`/api/admin/collections/${entry.id}`, {
-      method: 'PATCH', headers: getAuthHeaders(), body: { quantity: editQuantity.value },
+      method: 'PATCH', body: { quantity: editQuantity.value },
     })
     collectionSuccess.value = 'Quantity updated'
     editingId.value = null
@@ -331,7 +327,7 @@ const removeEntry = (entry: any) => {
     async () => {
       collectionLoading.value = true
       try {
-        await $fetch(`/api/admin/collections/${entry.id}`, { method: 'DELETE', headers: getAuthHeaders() })
+        await $fetch(`/api/admin/collections/${entry.id}`, { method: 'DELETE' })
         collectionSuccess.value = `${entry.lithos.name} removed`
         await fetchUserCollection(selectedUser.value.id)
         await fetchUsers()

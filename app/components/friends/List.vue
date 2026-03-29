@@ -27,15 +27,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useAuth } from '~/composables/useAuth'
-
-const { token } = useAuth()
 
 const friends = ref<any[]>([])
 const errorMessage = ref('')
 const successMessage = ref('')
-
-const headers = () => ({ Authorization: `Bearer ${token.value}` })
 
 const showMessage = (type: 'error' | 'success', message: string) => {
   errorMessage.value = type === 'error' ? message : ''
@@ -51,7 +46,7 @@ const formatDate = (dateStr: string) => {
 
 const fetchFriends = async () => {
   try {
-    const res = await $fetch<{ data: any[] }>('/api/friends', { headers: headers() })
+    const res = await $fetch<{ data: any[] }>('/api/friends')
     friends.value = res.data
   } catch (e: any) {
     console.error('Failed to fetch friends:', e)
@@ -60,7 +55,7 @@ const fetchFriends = async () => {
 
 const removeFriend = async (friend: any) => {
   try {
-    await $fetch(`/api/friends/${friend.edgeId}`, { method: 'DELETE', headers: headers() })
+    await $fetch(`/api/friends/${friend.edgeId}`, { method: 'DELETE' })
     showMessage('success', `${friend.username} removed from friends`)
     await fetchFriends()
   } catch (e: any) {
