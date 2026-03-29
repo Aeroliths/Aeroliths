@@ -27,3 +27,11 @@ logs
 # Test files
 coverage
 *.tsbuildinfo
+
+# Public uploaded files
+public/lithos/*
+!public/lithos/.gitkeep
+public/profile_picture/*
+!public/profile_picture/.gitkeep
+public/sprites/*
+!public/sprites/.gitkeep
