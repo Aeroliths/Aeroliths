@@ -23,6 +23,9 @@ services:
       NUXT_EMAIL_FROM: "${EMAIL_FROM}"
       NUXT_APP_URL: "${APP_URL}"
       POSTGRES_USER: "${POSTGRES_USER}"
+      ADMIN_USERNAME: "${ADMIN_USERNAME}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
     depends_on:
       - postgres
       - arangodb

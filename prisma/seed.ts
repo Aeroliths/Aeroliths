@@ -49,9 +49,9 @@ async function main() {
             where: { email: adminEmail },
         })
 
-        if (!existingAdmin) {
-            const hashedPassword = await bcrypt.hash(adminPassword, 10)
+        const hashedPassword = await bcrypt.hash(adminPassword, 10)
 
+        if (!existingAdmin) {
             await prisma.user.create({
                 data: {
                     username: adminUsername,
@@ -68,7 +68,22 @@ async function main() {
 
             console.log(`[Seed] Admin account created: ${adminUsername} (${adminEmail})`)
         } else {
-            console.log(`[Seed] Admin account already exists: ${adminEmail}`)
+            await prisma.user.update({
+                where: { email: adminEmail },
+                data: {
+                    username: adminUsername,
+                    emailVerified: true,
+                    roleId: adminRole.id,
+                    authentication: {
+                        upsert: {
+                            create: { password: hashedPassword },
+                            update: { password: hashedPassword },
+                        },
+                    },
+                },
+            })
+
+            console.log(`[Seed] Admin account updated: ${adminUsername} (${adminEmail})`)
         }
     } else {
         console.warn('[Seed] ADMIN_USERNAME, ADMIN_EMAIL or ADMIN_PASSWORD not set in .env — skipping admin creation')
