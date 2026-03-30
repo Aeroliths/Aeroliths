@@ -10,15 +10,11 @@
         v-model="searchQuery"
         type="text"
         placeholder="Search by username..."
-        @keyup.enter="searchUsers"
       />
-      <button class="search-btn" :disabled="searchQuery.length < 2" @click="searchUsers">
-        Search
-      </button>
     </div>
 
-    <div v-if="searchResults.length" class="friends-list">
-      <div v-for="result in searchResults" :key="result.id" class="user-item">
+    <div v-if="filteredResults.length" class="friends-list">
+      <div v-for="result in filteredResults" :key="result.id" class="user-item">
         <div class="user-info">
           <div class="user-avatar">
             <img v-if="result.profilePicture" :src="result.profilePicture" :alt="result.username" />
@@ -40,21 +36,47 @@
         </div>
       </div>
     </div>
-    <div v-else-if="hasSearched" class="empty-state">No players found.</div>
+    <div v-else-if="allUsers.length && searchQuery.trim()" class="empty-state">No players found.</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const searchQuery = ref('')
-const searchResults = ref<any[]>([])
-const hasSearched = ref(false)
+const allUsers = ref<any[]>([])
 const sendingTo = ref('')
 const friends = ref<any[]>([])
 const pendingRequests = ref<{ received: any[]; sent: any[] }>({ received: [], sent: [] })
 const errorMessage = ref('')
 const successMessage = ref('')
+
+const fuzzyMatch = (username: string, query: string): boolean => {
+  const a = username.toLowerCase()
+  const b = query.toLowerCase()
+  if (a.includes(b)) return true
+  // Levenshtein distance for short queries
+  if (b.length <= 1) return false
+  const maxDistance = b.length <= 3 ? 1 : 2
+  const len1 = a.length
+  const len2 = b.length
+  // Check each substring of username with same length as query
+  for (let start = 0; start <= len1 - len2; start++) {
+    const sub = a.substring(start, start + len2)
+    let dist = 0
+    for (let i = 0; i < len2; i++) {
+      if (sub[i] !== b[i]) dist++
+    }
+    if (dist <= maxDistance) return true
+  }
+  return false
+}
+
+const filteredResults = computed(() => {
+  const query = searchQuery.value.trim()
+  if (!query) return allUsers.value
+  return allUsers.value.filter((u) => fuzzyMatch(u.username, query))
+})
 
 const showMessage = (type: 'error' | 'success', message: string) => {
   errorMessage.value = type === 'error' ? message : ''
@@ -73,27 +95,18 @@ const hasPendingRequest = (userId: number) => {
   )
 }
 
-const fetchContext = async () => {
+const fetchData = async () => {
   try {
-    const [friendsRes, requestsRes] = await Promise.all([
+    const [friendsRes, requestsRes, usersRes] = await Promise.all([
       $fetch<{ data: any[] }>('/api/friends'),
       $fetch<{ data: { received: any[]; sent: any[] } }>('/api/friends/requests'),
+      $fetch<{ data: any[] }>('/api/friends/search'),
     ])
     friends.value = friendsRes.data
     pendingRequests.value = requestsRes.data
+    allUsers.value = usersRes.data
   } catch (e: any) {
-    console.error('Failed to fetch context:', e)
-  }
-}
-
-const searchUsers = async () => {
-  if (searchQuery.value.length < 2) return
-  hasSearched.value = true
-  try {
-    const res = await $fetch<{ data: any[] }>(`/api/friends/search?q=${encodeURIComponent(searchQuery.value)}`)
-    searchResults.value = res.data
-  } catch (e: any) {
-    showMessage('error', e.data?.message || 'Search failed')
+    showMessage('error', 'Failed to load users')
   }
 }
 
@@ -104,7 +117,7 @@ const sendRequest = async (username: string) => {
       method: 'POST', body: { targetUsername: username },
     })
     showMessage('success', `Friend request sent to ${username}`)
-    await fetchContext()
+    await fetchData()
   } catch (e: any) {
     showMessage('error', e.data?.message || 'Failed to send request')
   } finally {
@@ -112,5 +125,5 @@ const sendRequest = async (username: string) => {
   }
 }
 
-onMounted(() => fetchContext())
+onMounted(() => fetchData())
 </script>
