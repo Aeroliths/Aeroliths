@@ -14,10 +14,17 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 403, statusMessage: 'You can only request deletion of your own account' })
     }
 
-    const user = await db.postgres.user.findUnique({ where: { id } })
+    const user = await db.postgres.user.findUnique({
+      where: { id },
+      include: { role: true },
+    })
 
     if (!user) {
       throw createError({ statusCode: 404, statusMessage: 'User not found' })
+    }
+
+    if (user.role.name === 'admin') {
+      throw createError({ statusCode: 403, statusMessage: 'Admin accounts cannot be deleted' })
     }
 
     if (user.deletionRequestedAt) {

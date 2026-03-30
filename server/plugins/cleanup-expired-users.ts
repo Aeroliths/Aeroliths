@@ -17,10 +17,11 @@ async function cleanupExpiredUsers() {
   const now = new Date()
 
   try {
-    // Delete unverified accounts older than 2 weeks
+    // Delete unverified accounts older than 2 weeks (except admins)
     const unverifiedResult = await db.postgres.user.deleteMany({
       where: {
         emailVerified: false,
+        role: { name: { not: 'admin' } },
         createdAt: {
           lt: new Date(now.getTime() - TWO_WEEKS_MS),
         },
@@ -31,10 +32,11 @@ async function cleanupExpiredUsers() {
       console.log(`[Cleanup] Deleted ${unverifiedResult.count} unverified account(s) older than 2 weeks`)
     }
 
-    // Delete accounts that requested deletion 30+ days ago (and haven't logged in since)
+    // Delete accounts that requested deletion 30+ days ago (except admins)
     const deletionRequestedResult = await db.postgres.user.deleteMany({
       where: {
         emailVerified: true,
+        role: { name: { not: 'admin' } },
         deletionRequestedAt: {
           lt: new Date(now.getTime() - THIRTY_DAYS_MS),
           not: null,
@@ -73,10 +75,11 @@ async function cleanupExpiredUsers() {
       }
     }
 
-    // Delete inactive accounts (no activity for 3 years)
+    // Delete inactive accounts (no activity for 3 years, except admins)
     const inactiveResult = await db.postgres.user.deleteMany({
       where: {
         emailVerified: true,
+        role: { name: { not: 'admin' } },
         deletionRequestedAt: null,
         lastActiveAt: {
           lt: new Date(now.getTime() - THREE_YEARS_MS),
