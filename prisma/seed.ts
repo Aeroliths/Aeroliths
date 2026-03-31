@@ -45,8 +45,13 @@ async function main() {
     const adminPassword = process.env.ADMIN_PASSWORD
 
     if (adminUsername && adminEmail && adminPassword) {
-        const existingAdmin = await prisma.user.findUnique({
-            where: { email: adminEmail },
+        const existingAdmin = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email: adminEmail },
+                    { username: adminUsername },
+                ],
+            },
         })
 
         const hashedPassword = await bcrypt.hash(adminPassword, 10)
@@ -69,9 +74,10 @@ async function main() {
             console.log(`[Seed] Admin account created: ${adminUsername} (${adminEmail})`)
         } else {
             await prisma.user.update({
-                where: { email: adminEmail },
+                where: { id: existingAdmin.id },
                 data: {
                     username: adminUsername,
+                    email: adminEmail,
                     emailVerified: true,
                     roleId: adminRole.id,
                     authentication: {
