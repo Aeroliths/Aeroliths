@@ -3,16 +3,16 @@ import { useAuth } from '~/composables/useAuth'
 
 export const useFriendRequests = () => {
   const pendingCount = useState<number>('friendRequestsCount', () => 0)
-  const { token, isAuthenticated } = useAuth()
+  const { isAuthenticated } = useAuth()
 
   const fetchPendingCount = async () => {
-    if (!isAuthenticated.value || !token.value) {
+    if (!isAuthenticated.value) {
       pendingCount.value = 0
       return
     }
     try {
       const res = await $fetch<{ data: { received: any[]; sent: any[] } }>('/api/friends/requests', {
-        headers: { Authorization: `Bearer ${token.value}` },
+        credentials: 'include',
       })
       pendingCount.value = res.data.received.length
     } catch {

@@ -1,9 +1,4 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  // Only run on client side
-  if (import.meta.server) {
-    return
-  }
-
   const { isAuthenticated, initAuth } = useAuth()
 
   // Try to restore session from httpOnly cookie if not already authenticated
@@ -11,7 +6,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     try {
       await initAuth()
     } catch (error) {
-      console.error('Auth initialization failed:', error)
+      // Auth initialization failed
     }
   }
 

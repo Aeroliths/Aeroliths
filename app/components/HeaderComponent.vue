@@ -55,12 +55,13 @@ import { useAuth } from '~/composables/useAuth'
 import { useFriendRequests } from '~/composables/useFriendRequests'
 
 const mobileMenuOpen = ref(false)
-const { isAuthenticated, user, logout, initAuth } = useAuth()
+const { isAuthenticated, user, logout } = useAuth()
 const { pendingCount, fetchPendingCount } = useFriendRequests()
 
-onMounted(async () => {
-  await initAuth()
-  await fetchPendingCount()
+onMounted(() => {
+  if (isAuthenticated.value) {
+    fetchPendingCount()
+  }
 })
 
 const handleLogout = () => {

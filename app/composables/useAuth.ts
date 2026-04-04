@@ -1,5 +1,4 @@
-import { ref, computed } from 'vue'
-import type { Ref } from 'vue'
+import { computed } from 'vue'
 
 interface User {
   id: string
@@ -25,14 +24,23 @@ interface RegisterData {
   password: string
 }
 
-const user: Ref<User | null> = ref(null)
-const isLoading = ref(false)
-
 export const useAuth = () => {
+  const user = useState<User | null>('auth-user', () => null)
+  const isLoading = useState<boolean>('auth-loading', () => false)
   const isAuthenticated = computed(() => !!user.value)
 
   // Initialize auth state from httpOnly cookie (server validates it)
   const initAuth = async () => {
+    if (user.value) return
+
+    // On server, check if an auth cookie is present before making the request
+    if (import.meta.server) {
+      const requestHeaders = useRequestHeaders(['cookie'])
+      if (!requestHeaders.cookie?.includes('auth_token')) {
+        return
+      }
+    }
+
     try {
       await fetchCurrentUser()
     } catch {
@@ -42,14 +50,20 @@ export const useAuth = () => {
 
   // Fetch current user from API (cookie sent automatically)
   const fetchCurrentUser = async () => {
-    try {
-      const response = await $fetch<{ data: User }>('/api/auth/me', {
-        credentials: 'include',
-      })
+    const headers: Record<string, string> = {}
+    if (import.meta.server) {
+      const requestHeaders = useRequestHeaders(['cookie'])
+      if (requestHeaders.cookie) {
+        headers.cookie = requestHeaders.cookie
+      }
+    }
+    const response = await $fetch<{ data: User }>('/api/auth/me', {
+      credentials: 'include',
+      headers,
+      ignoreResponseError: true,
+    })
+    if (response?.data) {
       user.value = response.data
-    } catch (error) {
-      console.error('Failed to fetch current user:', error)
-      throw error
     }
   }
 
