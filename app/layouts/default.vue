@@ -10,6 +10,7 @@
       <slot />
     </main>
     <FooterComponent />
+    <CookieBanner />
   </div>
 </template>
 
