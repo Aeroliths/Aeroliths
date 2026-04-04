@@ -1,24 +1,57 @@
 <template>
   <div class="error-page">
+    <!-- Ambient glows -->
+    <div class="ambient-glow ambient-glow--sky"></div>
+    <div class="ambient-glow ambient-glow--stone"></div>
+
     <div class="error-container">
       <div class="error-content">
         <!-- Error Code -->
-        <div class="error-code">
-          <h1>{{ error.statusCode }}</h1>
-        </div>
+        <h1 class="error-code">{{ error.statusCode }}</h1>
 
         <!-- Error Icon -->
         <div class="error-icon">
-          <UIcon
-            :name="errorIcon"
-            class="icon"
-          />
+          <UIcon :name="errorIcon" class="icon" />
         </div>
 
         <!-- Error Message -->
-        <div class="error-message">
-          <h2>{{ errorTitle }}</h2>
-          <p>{{ errorDescription }}</p>
+        <h2 class="error-title">{{ errorTitle }}</h2>
+        <p class="error-description">{{ errorDescription }}</p>
+
+        <!-- Teapot Easter Egg (418 only) -->
+        <div v-if="error.statusCode === 418" class="teapot-section">
+          <div class="teapot-art">
+            <div class="steam">
+              <span class="steam-line"></span>
+              <span class="steam-line"></span>
+              <span class="steam-line"></span>
+            </div>
+            <pre class="teapot-ascii">
+        ______
+      /        \
+     |  ~  ~   |
+      \  ___  /
+    ___)|___|(___
+   /    _____    \
+  |   /     \    |_
+  |  |       |   | \
+   \  \_____/   /  |
+    \___________/  /
+     \___________/
+            </pre>
+          </div>
+          <p class="teapot-fact">
+            RFC 2324 defines this status code. It was originally an April Fools' joke in 1998, but some say lithos are best served as tea...
+          </p>
+          <div class="teapot-recipe">
+            <p class="recipe-title">Lithos Tea Recipe</p>
+            <ul>
+              <li>1 crushed Fire lithos for warmth</li>
+              <li>2 drops of Water lithos essence</li>
+              <li>A pinch of Earth lithos dust</li>
+              <li>Stir with an Air lithos breeze</li>
+            </ul>
+          </div>
         </div>
 
         <!-- Action Buttons -->
@@ -51,14 +84,13 @@
           </details>
         </div>
       </div>
-
-      <!-- Decorative Elements -->
-      <div class="error-decoration">
-        <div class="floating-lithos lithos-1"></div>
-        <div class="floating-lithos lithos-2"></div>
-        <div class="floating-lithos lithos-3"></div>
-      </div>
     </div>
+
+    <!-- Floating lithos -->
+    <div class="floating-lithos lithos-1"></div>
+    <div class="floating-lithos lithos-2"></div>
+    <div class="floating-lithos lithos-3"></div>
+    <div class="floating-lithos lithos-4"></div>
   </div>
 </template>
 
@@ -78,6 +110,8 @@ const errorIcon = computed(() => {
       return 'i-heroicons-magnifying-glass-circle'
     case 403:
       return 'i-heroicons-lock-closed'
+    case 418:
+      return 'i-heroicons-beaker'
     case 500:
       return 'i-heroicons-exclamation-triangle'
     default:
@@ -88,9 +122,11 @@ const errorIcon = computed(() => {
 const errorTitle = computed(() => {
   switch (props.error.statusCode) {
     case 404:
-      return 'Page Not Found'
+      return 'Lost in the Clouds'
     case 403:
       return 'Access Forbidden'
+    case 418:
+      return "I'm a Teapot"
     case 500:
       return 'Server Error'
     default:
@@ -101,11 +137,13 @@ const errorTitle = computed(() => {
 const errorDescription = computed(() => {
   switch (props.error.statusCode) {
     case 404:
-      return 'The page you are looking for seems to have disappeared into the clouds...'
+      return 'This page seems to have crumbled to dust. The lithos you seek does not exist.'
     case 403:
       return "You don't have permission to access this page."
+    case 418:
+      return "You tried to brew coffee, but Aeroliths is a teapot. We only serve lithos here, not espresso."
     case 500:
-      return 'An internal error occurred. Please try again later.'
+      return 'Something broke deep in the earth. Please try again later.'
     default:
       return props.error.message || 'An unexpected error occurred.'
   }
@@ -129,153 +167,274 @@ useHead({
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(rgba(22, 33, 62, 0.95), rgba(22, 33, 62, 0.95)),
-              radial-gradient(circle at 50% 50%, rgba(94, 23, 235, 0.1) 0%, transparent 50%);
-  background-color: #16213e;
-  padding: 2rem;
+  background-color: var(--color-bg-base);
+  padding: var(--spacing-xl);
   position: relative;
   overflow: hidden;
 }
 
 .error-container {
-  max-width: 600px;
-  width: 100%;
   position: relative;
-  z-index: 10;
+  z-index: var(--z-base);
+  width: 100%;
+  max-width: 480px;
 }
 
 .error-content {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 3rem 2rem;
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-4xl) var(--spacing-xl);
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-2xl);
 }
 
+/* Error code */
 .error-code {
-  margin-bottom: 1rem;
-}
-
-.error-code h1 {
-  font-size: 8rem;
+  font-size: 7rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0;
   line-height: 1;
-  text-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
+  letter-spacing: -0.04em;
 }
 
+/* Icon */
 .error-icon {
-  margin-bottom: 1.5rem;
+  margin: var(--spacing-md) 0 var(--spacing-lg);
 }
 
 .error-icon .icon {
-  width: 80px;
-  height: 80px;
-  color: #667eea;
-  opacity: 0.8;
+  width: 56px;
+  height: 56px;
+  color: var(--color-brand-primary);
+  opacity: 0.7;
 }
 
-.error-message {
-  margin-bottom: 2rem;
+/* Title & description */
+.error-title {
+  font-size: var(--font-3xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
 }
 
-.error-message h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0 0 0.5rem 0;
+.error-description {
+  font-size: var(--font-base);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--spacing-xl) 0;
+  line-height: var(--line-height-relaxed);
 }
 
-.error-message p {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin: 0;
-  line-height: 1.6;
-}
-
+/* Buttons */
 .error-actions {
   display: flex;
-  gap: 1rem;
+  gap: var(--spacing-sm);
   justify-content: center;
   flex-wrap: wrap;
 }
 
+/* Debug */
 .error-debug {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-light);
 }
 
 .error-debug summary {
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
+  color: var(--color-text-subtle);
+  font-size: var(--font-xs);
+  margin-bottom: var(--spacing-sm);
 }
 
 .error-debug summary:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-muted);
 }
 
 .error-debug pre {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1rem;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 0.85rem;
+  background: var(--color-bg-dark);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-xs);
   text-align: left;
   overflow-x: auto;
-  max-height: 300px;
+  max-height: 250px;
   overflow-y: auto;
 }
 
-/* Decorative floating elements */
-.error-decoration {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
+/* Teapot 418 */
+.teapot-section {
+  margin-bottom: var(--spacing-xl);
 }
 
+.teapot-art {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.teapot-ascii {
+  color: var(--color-brand-primary);
+  font-size: 0.65rem;
+  line-height: 1.2;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.steam {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  height: 30px;
+}
+
+.steam-line {
+  display: block;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to top, var(--color-brand-primary), transparent);
+  border-radius: var(--radius-full);
+  opacity: 0.4;
+  animation: steam-rise 2s ease-in-out infinite;
+}
+
+.steam-line:nth-child(2) {
+  height: 80%;
+  animation-delay: 0.4s;
+}
+
+.steam-line:nth-child(3) {
+  height: 60%;
+  animation-delay: 0.8s;
+}
+
+@keyframes steam-rise {
+  0%, 100% {
+    opacity: 0.1;
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateY(-6px) scaleY(1.3);
+  }
+}
+
+.teapot-fact {
+  font-size: var(--font-xs);
+  color: var(--color-text-subtle);
+  font-style: italic;
+  margin: var(--spacing-md) 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.teapot-recipe {
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  text-align: left;
+}
+
+.recipe-title {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-brand-primary);
+}
+
+.teapot-recipe ul {
+  margin: 0;
+  padding-left: var(--spacing-lg);
+  list-style: none;
+}
+
+.teapot-recipe li {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-loose);
+}
+
+.teapot-recipe li::before {
+  content: "~ ";
+  color: var(--color-brand-primary-dark);
+}
+
+/* Ambient glows */
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow--sky {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(122, 184, 212, 0.1) 0%, transparent 70%);
+  top: -10%;
+  right: -5%;
+  animation: drift 16s ease-in-out infinite alternate;
+}
+
+.ambient-glow--stone {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(160, 140, 110, 0.06) 0%, transparent 70%);
+  bottom: -5%;
+  left: -5%;
+  animation: drift 20s ease-in-out infinite alternate-reverse;
+}
+
+/* Floating lithos */
 .floating-lithos {
   position: absolute;
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
-  border-radius: 12px;
-  animation: float 6s ease-in-out infinite;
-  opacity: 0.3;
+  background: linear-gradient(135deg, rgba(122, 184, 212, 0.12), rgba(74, 127, 165, 0.08));
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-lg);
+  animation: float 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .lithos-1 {
-  top: 10%;
-  left: 10%;
+  width: 48px;
+  height: 48px;
+  top: 15%;
+  left: 12%;
   animation-delay: 0s;
 }
 
 .lithos-2 {
-  top: 60%;
-  right: 15%;
-  animation-delay: 2s;
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
+  top: 20%;
+  right: 10%;
+  animation-delay: -2s;
+  border-radius: var(--radius-xl);
 }
 
 .lithos-3 {
-  bottom: 20%;
-  left: 20%;
-  animation-delay: 4s;
-  width: 50px;
-  height: 50px;
+  width: 36px;
+  height: 36px;
+  bottom: 25%;
+  left: 8%;
+  animation-delay: -4s;
+}
+
+.lithos-4 {
+  width: 52px;
+  height: 52px;
+  bottom: 15%;
+  right: 15%;
+  animation-delay: -6s;
+  border-radius: var(--radius-md);
 }
 
 @keyframes float {
@@ -283,31 +442,32 @@ useHead({
     transform: translateY(0) rotate(0deg);
   }
   50% {
-    transform: translateY(-20px) rotate(10deg);
+    transform: translateY(-18px) rotate(8deg);
   }
+}
+
+@keyframes drift {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(15px, -20px) scale(1.08); }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .error-code h1 {
+  .error-code {
     font-size: 5rem;
   }
 
   .error-icon .icon {
-    width: 60px;
-    height: 60px;
+    width: 44px;
+    height: 44px;
   }
 
-  .error-message h2 {
-    font-size: 1.5rem;
-  }
-
-  .error-message p {
-    font-size: 1rem;
+  .error-title {
+    font-size: var(--font-2xl);
   }
 
   .error-content {
-    padding: 2rem 1.5rem;
+    padding: var(--spacing-3xl) var(--spacing-lg);
   }
 
   .error-actions {
