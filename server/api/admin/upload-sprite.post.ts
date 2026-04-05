@@ -101,7 +101,11 @@ export default defineEventHandler(async (event) => {
       : `${uploadType}-${timestamp}-${randomSuffix}.${ext}`
 
     // Define the upload directory
-    const uploadDir = join(process.cwd(), 'public', subDir)
+    // In production, Nitro serves from .output/public, not /public
+    const publicBase = process.env.NODE_ENV === 'production'
+      ? join(process.cwd(), '.output', 'public')
+      : join(process.cwd(), 'public')
+    const uploadDir = join(publicBase, subDir)
 
     // Create directory if it doesn't exist
     if (!existsSync(uploadDir)) {

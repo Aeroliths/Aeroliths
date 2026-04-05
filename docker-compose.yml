@@ -26,6 +26,10 @@ services:
       ADMIN_USERNAME: "${ADMIN_USERNAME}"
       ADMIN_EMAIL: "${ADMIN_EMAIL}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+    volumes:
+      - uploads_data:/app/.output/public/profile_pictures
+      - uploads_lithos:/app/.output/public/lithos
+      - uploads_elements:/app/.output/public/elements
     depends_on:
       - postgres
       - arangodb
@@ -88,4 +92,7 @@ volumes:
   arango_data:
   arango_apps:
   pg_data:
+  uploads_data:
+  uploads_lithos:
+  uploads_elements:
 
