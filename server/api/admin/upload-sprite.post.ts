@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const file = form[0]
+    const file = form[0]!
 
     if (!file.filename || !file.data) {
       throw createError({
@@ -100,12 +100,9 @@ export default defineEventHandler(async (event) => {
       ? `profile-${user.userId}-${timestamp}-${randomSuffix}.${ext}`
       : `${uploadType}-${timestamp}-${randomSuffix}.${ext}`
 
-    // Define the upload directory
-    // In production, Nitro serves from .output/public, not /public
-    const publicBase = process.env.NODE_ENV === 'production'
-      ? join(process.cwd(), '.output', 'public')
-      : join(process.cwd(), 'public')
-    const uploadDir = join(publicBase, subDir)
+    // Define the upload directory — use /app/uploads in prod, public/ in dev
+    const uploadsBase = join(process.cwd(), 'uploads')
+    const uploadDir = join(uploadsBase, subDir)
 
     // Create directory if it doesn't exist
     if (!existsSync(uploadDir)) {
@@ -122,8 +119,8 @@ export default defineEventHandler(async (event) => {
     }
     await writeFile(filePath, file.data)
 
-    // Return the public URL path
-    const publicPath = `/${subDir}/${filename}`
+    // Return the URL path served via /api/uploads/
+    const publicPath = `/api/uploads/${subDir}/${filename}`
 
     return {
       success: true,

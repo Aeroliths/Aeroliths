@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
 
     if (body.profilePicture !== undefined) {
       if (body.profilePicture !== null && body.profilePicture !== '') {
-        if (typeof body.profilePicture !== 'string' || !body.profilePicture.startsWith('/profile_pictures/')) {
+        if (typeof body.profilePicture !== 'string' || !(body.profilePicture.startsWith('/profile_pictures/') || body.profilePicture.startsWith('/api/uploads/profile_pictures/'))) {
           throw createError({
             statusCode: 400,
             statusMessage: 'Invalid profile picture path',

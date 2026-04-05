@@ -36,3 +36,6 @@ public/profile_picture/*
 !public/profile_picture/.gitkeep
 public/sprites/*
 !public/sprites/.gitkeep
+
+# Uploads directory (served via /api/uploads/)
+uploads/
