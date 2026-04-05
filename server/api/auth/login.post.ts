@@ -5,6 +5,9 @@ import type { SignOptions } from 'jsonwebtoken'
 // API route to authenticate user and return JWT token
 export default defineEventHandler(async (event) => {
   try {
+    // Rate limit: 10 attempts per 15 minutes per IP
+    rateLimit(event, { key: 'login', limit: 10, windowMs: 15 * 60 * 1000 })
+
     const body = await readBody(event)
     const { email, password } = body || {}
 
@@ -72,6 +75,7 @@ export default defineEventHandler(async (event) => {
         email: user.email,
         username: user.username,
         role: user.role.name,
+        tokenVersion: user.authentication.tokenVersion,
       },
       jwtSecret,
       signOptions

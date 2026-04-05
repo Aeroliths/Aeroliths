@@ -3,6 +3,9 @@ import bcrypt from 'bcrypt'
 // API route to update user password (user can update their own password or admin can update any password)
 export default defineEventHandler(async (event) => {
   try {
+    // Rate limit: 5 password changes per 15 minutes per IP
+    rateLimit(event, { key: 'password-change', limit: 5, windowMs: 15 * 60 * 1000 })
+
     // Verify user is authenticated
     const authUser = getAuthUser(event)
 
@@ -29,11 +32,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Validate new password strength (minimum 8 characters)
-    if (newPassword.length < 8) {
+    // Validate new password strength
+    const passwordError = validatePassword(newPassword)
+    if (passwordError) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'New password must be at least 8 characters long',
+        statusMessage: passwordError,
       })
     }
 
@@ -99,11 +103,12 @@ export default defineEventHandler(async (event) => {
     const saltRounds = 10
     const hashedPassword = await bcrypt.hash(newPassword, saltRounds)
 
-    // Update the password
+    // Update the password and increment tokenVersion to invalidate existing sessions
     await db.postgres.authentication.update({
       where: { userId: id },
       data: {
         password: hashedPassword,
+        tokenVersion: { increment: 1 },
       },
     })
 

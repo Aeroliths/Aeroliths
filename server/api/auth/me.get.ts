@@ -9,6 +9,9 @@ export default defineEventHandler(async (event) => {
       where: { id: user.userId },
       include: {
         role: true,
+        authentication: {
+          select: { tokenVersion: true },
+        },
       },
     })
 
@@ -19,6 +22,21 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Verify token version (invalidates old tokens after password change)
+    if (
+      user.tokenVersion !== undefined &&
+      userDetails.authentication &&
+      user.tokenVersion !== userDetails.authentication.tokenVersion
+    ) {
+      throw createError({
+        statusCode: 401,
+        message: 'Session expired. Please log in again.',
+      })
+    }
+
+    // Remove authentication from response
+    const { authentication, ...userWithoutAuth } = userDetails
+
     // Update last active date
     await db.postgres.user.update({
       where: { id: user.userId },
@@ -27,7 +45,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      data: userDetails,
+      data: userWithoutAuth,
     }
   } catch (error) {
     if (error && typeof error === 'object' && 'statusCode' in error) {

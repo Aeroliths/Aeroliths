@@ -37,10 +37,11 @@ model User {
 }
 
 model Authentication {
-  id        String   @id @default(cuid())
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  password     String
+  tokenVersion Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Foreign key to User
   userId String @unique

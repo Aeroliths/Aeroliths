@@ -6,6 +6,7 @@ export interface JWTPayload {
   email: string
   username: string
   role: string
+  tokenVersion?: number
 }
 
 /**

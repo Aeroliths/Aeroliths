@@ -85,12 +85,20 @@ export default defineEventHandler(async (event) => {
                    uploadType === 'elements' ? 'elements' :
                    'profile_pictures'
 
-    // Generate unique filename
+    // Generate unique filename with safe extension
     const timestamp = Date.now()
-    const ext = file.filename.split('.').pop()
+    const mimeToExt: Record<string, string> = {
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/gif': 'gif',
+      'image/webp': 'webp',
+    }
+    const ext = mimeToExt[file.type || ''] || 'png'
+    const randomSuffix = Math.random().toString(36).substring(2, 8)
     const filename = uploadType === 'profile'
-      ? `profile-${user.id}-${timestamp}.${ext}`
-      : `${uploadType}-${timestamp}.${ext}`
+      ? `profile-${user.userId}-${timestamp}-${randomSuffix}.${ext}`
+      : `${uploadType}-${timestamp}-${randomSuffix}.${ext}`
 
     // Define the upload directory
     const uploadDir = join(process.cwd(), 'public', subDir)
@@ -100,8 +108,14 @@ export default defineEventHandler(async (event) => {
       await mkdir(uploadDir, { recursive: true })
     }
 
-    // Write file to disk
+    // Write file to disk (verify resolved path stays within upload directory)
     const filePath = join(uploadDir, filename)
+    if (!filePath.startsWith(uploadDir)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Invalid file path',
+      })
+    }
     await writeFile(filePath, file.data)
 
     // Return the public URL path

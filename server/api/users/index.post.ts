@@ -3,6 +3,9 @@ import bcrypt from 'bcrypt'
 // API route to create a new user with authentication
 export default defineEventHandler(async (event) => {
   try {
+    // Rate limit: 5 registrations per 15 minutes per IP
+    rateLimit(event, { key: 'register', limit: 5, windowMs: 15 * 60 * 1000 })
+
     let body = await readBody(event)
 
     // Parse JSON if body is a string
@@ -45,11 +48,12 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Validate password strength (minimum 8 characters)
-    if (password.length < 8) {
+    // Validate password strength
+    const passwordError = validatePassword(password)
+    if (passwordError) {
       throw createError({
         statusCode: 400,
-        message: 'Password must be at least 8 characters long',
+        message: passwordError,
       })
     }
 
