@@ -23,5 +23,18 @@ export default defineEventHandler(async (event) => {
 
   const friends = await cursor.all()
 
+  // Enrich with profile pictures from PostgreSQL
+  const friendIds = friends.map((f: any) => f.friendId)
+  if (friendIds.length > 0) {
+    const users = await db.postgres.user.findMany({
+      where: { id: { in: friendIds } },
+      select: { id: true, profilePicture: true },
+    })
+    const pictureMap = new Map(users.map((u) => [u.id, u.profilePicture]))
+    for (const friend of friends) {
+      friend.profilePicture = pictureMap.get(friend.friendId) || null
+    }
+  }
+
   return { success: true, data: friends }
 })

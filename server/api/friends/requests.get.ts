@@ -36,5 +36,24 @@ export default defineEventHandler(async (event) => {
   const received = await receivedCursor.all()
   const sent = await sentCursor.all()
 
+  // Enrich with profile pictures from PostgreSQL
+  const allIds = [
+    ...received.map((r: any) => r.senderId),
+    ...sent.map((r: any) => r.targetId),
+  ]
+  if (allIds.length > 0) {
+    const users = await db.postgres.user.findMany({
+      where: { id: { in: allIds } },
+      select: { id: true, profilePicture: true },
+    })
+    const pictureMap = new Map(users.map((u) => [u.id, u.profilePicture]))
+    for (const r of received) {
+      r.senderProfilePicture = pictureMap.get(r.senderId) || null
+    }
+    for (const r of sent) {
+      r.targetProfilePicture = pictureMap.get(r.targetId) || null
+    }
+  }
+
   return { success: true, data: { received, sent } }
 })

@@ -12,7 +12,8 @@
       <div v-for="req in receivedRequests" :key="req.requestId" class="request-item">
         <div class="user-info">
           <div class="user-avatar">
-            <span>{{ req.senderUsername.charAt(0) }}</span>
+            <img v-if="req.senderProfilePicture" :src="req.senderProfilePicture" :alt="req.senderUsername" />
+            <span v-else>{{ req.senderUsername.charAt(0) }}</span>
           </div>
           <span class="username-text">{{ req.senderUsername }}</span>
         </div>
@@ -29,7 +30,8 @@
       <div v-for="req in sentRequests" :key="req.requestId" class="request-item">
         <div class="user-info">
           <div class="user-avatar">
-            <span>{{ req.targetUsername.charAt(0) }}</span>
+            <img v-if="req.targetProfilePicture" :src="req.targetProfilePicture" :alt="req.targetUsername" />
+            <span v-else>{{ req.targetUsername.charAt(0) }}</span>
           </div>
           <span class="username-text">{{ req.targetUsername }}</span>
         </div>

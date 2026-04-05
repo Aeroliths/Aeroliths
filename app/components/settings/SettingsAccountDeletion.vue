@@ -1,7 +1,5 @@
 <template>
-  <div class="deletion-section">
-    <h2>Delete my account</h2>
-
+  <div class="deletion-section-discreet">
     <div v-if="deletionRequestedAt" class="deletion-pending">
       <p class="deletion-pending-text">
         A deletion request is in progress. Your account will be deleted on
@@ -18,11 +16,11 @@
       <div v-if="error" class="error-message">{{ error }}</div>
       <div v-if="success" class="success-message">{{ success }}</div>
       <button class="request-deletion-btn" @click="showConfirm = true">
-        Request account deletion
+        Delete my account
       </button>
     </div>
 
-    <!-- Confirmation modal — teleported to body to escape backdrop-filter stacking context -->
+    <!-- Confirmation modal -->
     <Teleport to="body">
       <div v-if="showConfirm" class="modal-overlay" @click.self="showConfirm = false">
         <div class="modal">

@@ -1,69 +1,85 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="settings-form">
-    <!-- Profile Picture -->
-    <div class="form-group">
-      <label for="profile-picture">Profile Picture</label>
-      <div class="profile-picture-upload">
-        <div v-if="formData.profilePicture" class="profile-picture-preview">
-          <img :src="formData.profilePicture" alt="Profile picture" />
-          <button
-            type="button"
-            @click="removeProfilePicture"
-            class="remove-btn"
-            :disabled="loading"
-          >
-            Remove
-          </button>
+  <div class="profile-section-wrapper">
+    <!-- Profile Card Preview -->
+    <div class="profile-card-preview">
+      <div class="profile-card-avatar">
+        <div class="profile-card-avatar-inner">
+          <img v-if="formData.profilePicture" :src="formData.profilePicture" :alt="formData.username" />
+          <span v-else class="profile-card-initials">{{ formData.username ? formData.username[0].toUpperCase() : '?' }}</span>
         </div>
-        <div v-else class="profile-picture-placeholder">
-          <span>No profile picture</span>
-        </div>
-        <input
-          id="profile-picture"
-          type="file"
-          accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
-          @change="handleProfilePictureUpload"
-          :disabled="loading || uploadingProfilePicture"
-        />
-        <span v-if="uploadingProfilePicture" class="uploading-text">Uploading...</span>
+        <label class="profile-card-avatar-edit" for="profile-picture-input" :class="{ disabled: loading || uploadingProfilePicture }">
+          <span v-if="uploadingProfilePicture" class="avatar-edit-icon spinning">&#x21bb;</span>
+          <span v-else class="avatar-edit-icon">&#x270E;</span>
+        </label>
       </div>
+      <h2 class="profile-card-username">{{ formData.username || 'Username' }}</h2>
+      <span class="profile-card-email">{{ formData.email || 'email@example.com' }}</span>
+      <span v-if="userRole" class="profile-card-role" :class="'role-' + userRole">{{ userRole }}</span>
     </div>
 
-    <!-- Email -->
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input
-        id="email"
-        v-model="formData.email"
-        type="email"
-        placeholder="your@email.com"
-        :disabled="loading"
-      />
-    </div>
+    <!-- Hidden file input -->
+    <input
+      id="profile-picture-input"
+      type="file"
+      accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+      @change="handleProfilePictureUpload"
+      :disabled="loading || uploadingProfilePicture"
+      class="hidden-file-input"
+    />
 
-    <!-- Username -->
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input
-        id="username"
-        v-model="formData.username"
-        type="text"
-        placeholder="Your username"
-        :disabled="loading"
-      />
-    </div>
+    <!-- Edit Form -->
+    <form @submit.prevent="handleSubmit" class="settings-form">
+      <!-- Profile Picture Actions -->
+      <div v-if="formData.profilePicture" class="profile-picture-actions">
+        <label for="profile-picture-input" class="change-picture-btn" :class="{ disabled: loading || uploadingProfilePicture }">
+          Change Picture
+        </label>
+        <button type="button" class="remove-picture-btn" @click="removeProfilePicture" :disabled="loading">
+          Remove
+        </button>
+      </div>
+      <div v-else class="profile-picture-actions">
+        <label for="profile-picture-input" class="change-picture-btn" :class="{ disabled: loading || uploadingProfilePicture }">
+          Upload Picture
+        </label>
+      </div>
 
-    <div v-if="error" class="error-message">{{ error }}</div>
-    <div v-if="success" class="success-message">{{ success }}</div>
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          v-model="formData.email"
+          type="email"
+          placeholder="your@email.com"
+          :disabled="loading"
+        />
+      </div>
 
-    <button type="submit" class="submit-btn" :disabled="loading">
-      {{ loading ? 'Updating...' : 'Save Changes' }}
-    </button>
-  </form>
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          v-model="formData.username"
+          type="text"
+          placeholder="Your username"
+          :disabled="loading"
+        />
+      </div>
+
+      <div v-if="error" class="error-message">{{ error }}</div>
+      <div v-if="success" class="success-message">{{ success }}</div>
+
+      <button type="submit" class="submit-btn" :disabled="loading">
+        {{ loading ? 'Updating...' : 'Save Changes' }}
+      </button>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { user, initAuth } = useAuth()
@@ -78,6 +94,8 @@ const loading = ref(false)
 const uploadingProfilePicture = ref(false)
 const error = ref('')
 const success = ref('')
+
+const userRole = computed(() => user.value?.role?.name || '')
 
 onMounted(async () => {
   await initAuth()
@@ -117,7 +135,7 @@ const handleProfilePictureUpload = async (event: Event) => {
 
 const removeProfilePicture = () => {
   formData.value.profilePicture = ''
-  const fileInput = document.getElementById('profile-picture') as HTMLInputElement
+  const fileInput = document.getElementById('profile-picture-input') as HTMLInputElement
   if (fileInput) fileInput.value = ''
 }
 

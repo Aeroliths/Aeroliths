@@ -9,7 +9,8 @@
       <div v-for="friend in friends" :key="friend.edgeId" class="friend-item">
         <div class="user-info">
           <div class="user-avatar">
-            <span>{{ friend.username.charAt(0) }}</span>
+            <img v-if="friend.profilePicture" :src="friend.profilePicture" :alt="friend.username" />
+            <span v-else>{{ friend.username.charAt(0) }}</span>
           </div>
           <div>
             <div class="username-text">{{ friend.username }}</div>
