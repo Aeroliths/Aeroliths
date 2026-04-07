@@ -22,6 +22,36 @@ export default defineNuxtConfig({
       allowedHosts: ['aeroliths.fr']
     }
   },
+  nitro: {
+    routeRules: {
+      '/**': {
+        headers: {
+          // Remove framework fingerprinting
+          'X-Powered-By': '',
+          // Defense-in-depth security headers
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+          // Content Security Policy — restrict script/style/connect sources
+          'Content-Security-Policy': [
+            "default-src 'self'",
+            // 'unsafe-inline' kept for Nuxt hydration scripts; tighten with nonces later
+            "script-src 'self' 'unsafe-inline'",
+            "style-src 'self' 'unsafe-inline'",
+            "img-src 'self' data: blob: https:",
+            "font-src 'self' data:",
+            "connect-src 'self'",
+            "frame-ancestors 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "object-src 'none'",
+            'upgrade-insecure-requests',
+          ].join('; '),
+        },
+      },
+    },
+  },
   // Exclude test files from Nuxt
   ignore: [
     '**/*.test.ts',

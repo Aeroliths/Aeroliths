@@ -4,14 +4,20 @@ export default defineEventHandler(async (event) => {
     // Get authenticated user from token
     const user = getAuthUser(event)
 
-    // Fetch full user details from database
+    // Fetch user details (only fields needed by the frontend — internal flags excluded)
     const userDetails = await db.postgres.user.findUnique({
       where: { id: user.userId },
-      include: {
-        role: true,
-        authentication: {
-          select: { tokenVersion: true },
-        },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        profilePicture: true,
+        emailVerified: true,
+        lastActiveAt: true,
+        deletionRequestedAt: true,
+        createdAt: true,
+        role: { select: { id: true, name: true } },
+        authentication: { select: { tokenVersion: true } },
       },
     })
 

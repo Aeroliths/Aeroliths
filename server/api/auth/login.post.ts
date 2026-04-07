@@ -104,14 +104,24 @@ export default defineEventHandler(async (event) => {
       path: '/',
     })
 
-    // Remove sensitive data
-    const { authentication, ...userWithoutAuth } = user
+    // Only expose fields needed by the frontend (internal flags excluded)
+    const safeUser = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      profilePicture: user.profilePicture,
+      emailVerified: user.emailVerified,
+      lastActiveAt: user.lastActiveAt,
+      deletionRequestedAt: user.deletionRequestedAt,
+      createdAt: user.createdAt,
+      role: { id: user.role.id, name: user.role.name },
+    }
 
     return {
       success: true,
       message: 'Login successful',
       data: {
-        user: userWithoutAuth,
+        user: safeUser,
       },
     }
   } catch (error) {
