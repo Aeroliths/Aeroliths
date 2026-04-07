@@ -153,11 +153,10 @@ const handleError = () => {
   clearError({ redirect: '/' })
 }
 
-useHead({
-  title: `Error ${props.error.statusCode} - Aeroliths`,
-  meta: [
-    { name: 'description', content: errorDescription.value }
-  ]
+useSeoMeta({
+  title: `Error ${props.error.statusCode} – Aeroliths`,
+  description: errorDescription.value,
+  robots: 'noindex, nofollow',
 })
 </script>
 

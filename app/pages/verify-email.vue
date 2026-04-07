@@ -56,11 +56,10 @@ onMounted(async () => {
   }
 })
 
-useHead({
-  title: 'Verify Email - Aeroliths',
-  meta: [
-    { name: 'description', content: 'Verify your email address for Aeroliths' }
-  ]
+useSeoMeta({
+  title: 'Verify Email – Aeroliths',
+  description: 'Verify your email address for Aeroliths.',
+  robots: 'noindex, nofollow',
 })
 </script>
 

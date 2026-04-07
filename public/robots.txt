@@ -1,2 +1,10 @@
 User-Agent: *
-Disallow:
+Disallow: /admin
+Disallow: /play
+Disallow: /friends
+Disallow: /settings
+Disallow: /leaderboard
+Disallow: /verify-email
+Disallow: /api/
+
+Sitemap: https://aeroliths.fr/sitemap.xml

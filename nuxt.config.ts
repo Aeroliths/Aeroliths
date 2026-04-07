@@ -11,7 +11,34 @@ export default defineNuxtConfig({
   },
   app: {
     baseURL: '/',
-    buildAssetsDir: '/_nuxt/'
+    buildAssetsDir: '/_nuxt/',
+    head: {
+      htmlAttrs: { lang: 'en' },
+      titleTemplate: (title?: string) =>
+        title ? `${title} | Aeroliths` : 'Aeroliths – Strategy Board Game Inspired by Skystones',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'Aeroliths is a free fan-made online strategy board game inspired by Skylanders Skystones. Build your deck, master the elements, and climb the leaderboard.' },
+        // Open Graph defaults
+        { property: 'og:site_name', content: 'Aeroliths' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:locale', content: 'en_US' },
+        { property: 'og:title', content: 'Aeroliths – Strategy Board Game Inspired by Skystones' },
+        { property: 'og:description', content: 'Free online strategy game inspired by Skylanders Skystones. Build your deck, master the elements, dominate the board.' },
+        { property: 'og:url', content: 'https://aeroliths.fr' },
+        { property: 'og:image', content: 'https://aeroliths.fr/placeholder-background.jpg' },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+        // Twitter Card
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'Aeroliths – Strategy Board Game Inspired by Skystones' },
+        { name: 'twitter:description', content: 'Free online strategy game inspired by Skylanders Skystones. Build your deck, master the elements, dominate the board.' },
+        { name: 'twitter:image', content: 'https://aeroliths.fr/placeholder-background.jpg' },
+        // Theme
+        { name: 'theme-color', content: '#1e2028' },
+      ],
+    },
   },
   icon: {
     provider: 'iconify',
@@ -23,6 +50,7 @@ export default defineNuxtConfig({
     }
   },
   nitro: {
+    compressPublicAssets: { gzip: true, brotli: true },
     routeRules: {
       '/**': {
         headers: {

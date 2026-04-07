@@ -26,15 +26,17 @@
   cursor: pointer;
 }
 
-.logo h1 {
+.logo .logo-text {
+  display: inline-block;
   margin: 0;
   font-size: var(--font-4xl);
   color: var(--color-brand-primary);
   font-weight: var(--font-bold);
   transition: opacity var(--transition-normal);
+  line-height: 1;
 }
 
-.logo a:hover h1 {
+.logo a:hover .logo-text {
   opacity: 0.8;
 }
 
@@ -166,7 +168,7 @@
     position: relative;
   }
 
-  .logo h1 {
+  .logo .logo-text {
     font-size: var(--font-3xl);
   }
 

@@ -7,10 +7,9 @@ definePageMeta({
   middleware: 'auth'
 })
 
-useHead({
-  title: 'Play - Aeroliths',
-  meta: [
-    { name: 'description', content: 'Play Aeroliths game' }
-  ]
+useSeoMeta({
+  title: 'Play – Aeroliths',
+  description: 'Play Aeroliths online.',
+  robots: 'noindex, nofollow',
 })
 </script>

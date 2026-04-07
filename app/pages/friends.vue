@@ -6,4 +6,10 @@
 definePageMeta({
   middleware: 'auth'
 })
+
+useSeoMeta({
+  title: 'Friends – Aeroliths',
+  description: 'Manage your Aeroliths friends list.',
+  robots: 'noindex, nofollow',
+})
 </script>

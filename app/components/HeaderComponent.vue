@@ -2,8 +2,8 @@
   <header class="header">
     <div class="header-container">
       <div class="logo">
-        <NuxtLink href="/">
-          <h1>Aeroliths</h1>
+        <NuxtLink href="/" aria-label="Aeroliths home">
+          <span class="logo-text">Aeroliths</span>
         </NuxtLink>
       </div>
 

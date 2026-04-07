@@ -7,10 +7,9 @@ definePageMeta({
   middleware: 'auth'
 })
 
-useHead({
-  title: 'Leaderboard - Aeroliths',
-  meta: [
-    { name: 'description', content: 'View the top players on Aeroliths' }
-  ]
+useSeoMeta({
+  title: 'Leaderboard – Aeroliths',
+  description: 'View the top players on the Aeroliths ranked leaderboard.',
+  robots: 'noindex, nofollow',
 })
 </script>

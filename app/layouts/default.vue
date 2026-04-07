@@ -15,6 +15,13 @@
 </template>
 
 <script setup lang="ts">
+// Inject a canonical URL for every page based on the current route (no query string)
+const route = useRoute()
+const canonical = computed(() => `https://aeroliths.fr${route.path}`)
+useHead({
+  link: [{ rel: 'canonical', href: canonical }],
+  meta: [{ property: 'og:url', content: canonical }],
+})
 </script>
 
 <style scoped>

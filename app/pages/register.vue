@@ -187,11 +187,12 @@ onUnmounted(() => {
   if (cooldownInterval) clearInterval(cooldownInterval)
 })
 
-useHead({
-  title: 'Register - Aeroliths',
-  meta: [
-    { name: 'description', content: 'Create an account to play Aeroliths' }
-  ]
+useSeoMeta({
+  title: 'Create an Account – Join the Aeroliths Community for Free',
+  description: 'Sign up for a free Aeroliths account in seconds. Build your deck, collect Lithos, climb the ranked leaderboard and join the community.',
+  ogTitle: 'Join Aeroliths – Create Your Free Account',
+  ogDescription: 'Sign up for free, build your deck, collect Lithos and join the Aeroliths community.',
+  robots: 'noindex, follow',
 })
 </script>
 
