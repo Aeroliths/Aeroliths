@@ -16,6 +16,8 @@ model User {
   emailVerified              Boolean   @default(false)
   verificationToken          String?
   verificationTokenExpiresAt DateTime?
+  resetToken                 String?
+  resetTokenExpiresAt        DateTime?
   lastActiveAt               DateTime  @default(now())
   deletionRequestedAt        DateTime?
   deletionReminderSent       Boolean   @default(false)

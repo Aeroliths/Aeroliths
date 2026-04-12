@@ -166,6 +166,35 @@ export async function sendInactivityWarningEmail(
   console.log(`[Email] Inactivity warning (${warningType}) sent to ${email}`)
 }
 
+export async function sendPasswordResetEmail(email: string, username: string, token: string): Promise<void> {
+  const appUrl = process.env.APP_URL || 'http://localhost:3000'
+  const resetUrl = `${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`
+
+  console.log(`[Email] Sending password reset email to ${email}`)
+  await sendEmail(email, 'Reset your password - Aeroliths', `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h1 style="color: #7ab8d4; text-align: center;">Aeroliths</h1>
+      <h2 style="color: #333; text-align: center;">Reset your password</h2>
+      <p style="color: #555; font-size: 16px; line-height: 1.6;">
+        Hello <strong>${username}</strong>,
+      </p>
+      <p style="color: #555; font-size: 16px; line-height: 1.6;">
+        We received a request to reset your password. Click the button below to choose a new one.
+      </p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${resetUrl}"
+           style="background-color: #7ab8d4; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+          Reset Password
+        </a>
+      </div>
+      <p style="color: #888; font-size: 13px; text-align: center;">
+        This link expires in 1 hour. If you didn't request a password reset, you can safely ignore this email.
+      </p>
+    </div>
+  `)
+  console.log(`[Email] Password reset email sent to ${email}`)
+}
+
 export async function sendVerificationEmail(email: string, token: string): Promise<void> {
   const appUrl = process.env.APP_URL || 'http://localhost:3000'
   const verificationUrl = `${appUrl}/verify-email?token=${token}&email=${encodeURIComponent(email)}`

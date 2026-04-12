@@ -58,6 +58,9 @@
 
         <div class="login-footer">
           <p>
+            <NuxtLink to="/forgot-password">Forgot your password?</NuxtLink>
+          </p>
+          <p>
             Don't have an account?
             <NuxtLink to="/register">Register here</NuxtLink>
           </p>
