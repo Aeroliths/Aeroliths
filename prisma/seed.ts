@@ -71,7 +71,7 @@ async function main() {
                 },
             })
 
-            console.log(`[Seed] Admin account created: ${adminUsername} (${adminEmail})`)
+            console.log('[Seed] Admin account created')
         } else {
             await prisma.user.update({
                 where: { id: existingAdmin.id },
@@ -89,7 +89,7 @@ async function main() {
                 },
             })
 
-            console.log(`[Seed] Admin account updated: ${adminUsername} (${adminEmail})`)
+            console.log('[Seed] Admin account updated')
         }
     } else {
         console.warn('[Seed] ADMIN_USERNAME, ADMIN_EMAIL or ADMIN_PASSWORD not set in .env — skipping admin creation')
