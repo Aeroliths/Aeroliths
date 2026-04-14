@@ -129,7 +129,7 @@ export default defineEventHandler(async (event) => {
     if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
-    console.error('Error creating user:', error)
+    console.error('Error creating user:', error instanceof Error ? error.name : 'UnknownError')
     throw createError({
       statusCode: 500,
       message: 'Failed to create user',

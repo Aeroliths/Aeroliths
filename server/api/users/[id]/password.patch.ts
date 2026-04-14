@@ -127,7 +127,7 @@ export default defineEventHandler(async (event) => {
       throw error
     }
 
-    console.error('Error updating password:', error)
+    console.error('Error updating password:', error instanceof Error ? error.name : 'UnknownError')
     throw createError({
       statusCode: 500,
       statusMessage: 'Error updating password',

@@ -94,7 +94,7 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     if (error.statusCode) throw error
 
-    console.error('Error in reset-password:', error)
+    console.error('Error in reset-password:', error instanceof Error ? error.name : 'UnknownError')
     throw createError({
       statusCode: 500,
       statusMessage: 'An error occurred. Please try again later.',
