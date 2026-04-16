@@ -34,8 +34,21 @@ model User {
   roleId         String
   collections    Collections[]
   deck           Deck?
+  loginHistory   LoginHistory[]
 
   @@map("users")
+}
+
+model LoginHistory {
+  id        String   @id @default(cuid())
+  loggedAt  DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([loggedAt])
+  @@index([userId, loggedAt])
+  @@map("login_history")
 }
 
 model Authentication {

@@ -95,6 +95,11 @@ export default defineEventHandler(async (event) => {
       },
     })
 
+    // Record login in history for admin stats
+    await db.postgres.loginHistory.create({
+      data: { userId: user.id },
+    })
+
     // Set token in httpOnly cookie for secure authentication
     setCookie(event, 'auth_token', token, {
       httpOnly: true,

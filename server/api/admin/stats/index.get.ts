@@ -11,13 +11,18 @@ export default defineEventHandler(async (event) => {
     const monthStart = new Date(todayStart)
     monthStart.setDate(monthStart.getDate() - 30)
 
+    // Login chart windows: inclusive of today
+    const loginWeekStart = new Date(todayStart)
+    loginWeekStart.setDate(loginWeekStart.getDate() - 6)
+    const loginMonthStart = new Date(todayStart)
+    loginMonthStart.setDate(loginMonthStart.getDate() - 29)
+
     // Run all queries in parallel
     const [
       totalUsers,
       usersToday,
       usersThisWeek,
       usersThisMonth,
-      usersByRole,
       activeToday,
       activeThisWeek,
       totalLithos,
@@ -45,14 +50,6 @@ export default defineEventHandler(async (event) => {
       // New users this month (30 days)
       db.postgres.user.count({
         where: { createdAt: { gte: monthStart } },
-      }),
-
-      // Users by role
-      db.postgres.role.findMany({
-        select: {
-          name: true,
-          _count: { select: { users: true } },
-        },
       }),
 
       // Active users today
@@ -116,6 +113,58 @@ export default defineEventHandler(async (event) => {
       }),
     ])
 
+    // Login history for chart: fetch last 30 days once, bucket client-side by period
+    const loginRows = await db.postgres.loginHistory.findMany({
+      where: { loggedAt: { gte: loginMonthStart } },
+      select: { loggedAt: true },
+    })
+
+    // Bucket: today by hour (0-23)
+    const loginsByHour = new Array(24).fill(0) as number[]
+    // Bucket: week by day (index 0 = 6 days ago ... index 6 = today)
+    const loginsByDayWeek = new Array(7).fill(0) as number[]
+    // Bucket: month by day (index 0 = 29 days ago ... index 29 = today)
+    const loginsByDayMonth = new Array(30).fill(0) as number[]
+
+    const dayMs = 24 * 60 * 60 * 1000
+    for (const row of loginRows) {
+      const d = row.loggedAt
+      // Month bucket (always fits since we filtered by loginMonthStart)
+      const daysFromMonthStart = Math.floor(
+        (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginMonthStart.getTime()) / dayMs
+      )
+      if (daysFromMonthStart >= 0 && daysFromMonthStart < 30) {
+        loginsByDayMonth[daysFromMonthStart]++
+      }
+      // Week bucket (subset of month)
+      if (d.getTime() >= loginWeekStart.getTime()) {
+        const daysFromWeekStart = Math.floor(
+          (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginWeekStart.getTime()) / dayMs
+        )
+        if (daysFromWeekStart >= 0 && daysFromWeekStart < 7) {
+          loginsByDayWeek[daysFromWeekStart]++
+        }
+      }
+      // Today hourly bucket
+      if (d.getTime() >= todayStart.getTime()) {
+        loginsByHour[d.getHours()]++
+      }
+    }
+
+    // Build labels (ISO date strings for days, hour labels for today)
+    const hourLabels = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}h`)
+    const buildDayLabels = (start: Date, count: number) => {
+      const labels: string[] = []
+      for (let i = 0; i < count; i++) {
+        const d = new Date(start)
+        d.setDate(d.getDate() + i)
+        labels.push(d.toISOString().slice(0, 10))
+      }
+      return labels
+    }
+    const weekDayLabels = buildDayLabels(loginWeekStart, 7)
+    const monthDayLabels = buildDayLabels(loginMonthStart, 30)
+
     // Process element distribution
     const elementCounts: Record<string, number> = {}
     for (const l of lithosByElement) {
@@ -158,10 +207,6 @@ export default defineEventHandler(async (event) => {
           newThisMonth: usersThisMonth,
           activeToday,
           activeThisWeek,
-          byRole: usersByRole.map((r) => ({
-            role: r.name,
-            count: r._count.users,
-          })),
         },
         lithos: {
           total: totalLithos,
@@ -183,6 +228,11 @@ export default defineEventHandler(async (event) => {
         },
         decks: {
           total: totalDecks,
+        },
+        logins: {
+          today: { labels: hourLabels, counts: loginsByHour },
+          week: { labels: weekDayLabels, counts: loginsByDayWeek },
+          month: { labels: monthDayLabels, counts: loginsByDayMonth },
         },
         recentUsers,
       },

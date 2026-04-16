@@ -88,32 +88,33 @@
             </div>
           </div>
 
-          <!-- Users by Role -->
+          <!-- Logins Chart -->
           <div class="stats-table-small">
-            <h4>By Role</h4>
-            <table>
-              <thead>
-                <tr>
-                  <th>Role</th>
-                  <th>Count</th>
-                  <th>Percentage</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="role in stats.users.byRole" :key="role.role">
-                  <td>
-                    <span :class="['role-badge', role.role]">{{ role.role }}</span>
-                  </td>
-                  <td>{{ role.count }}</td>
-                  <td>
-                    <div class="stats-bar-wrapper">
-                      <div class="stats-bar" :style="{ width: getRolePercent(role.count) + '%' }"></div>
-                      <span class="stats-bar-label">{{ getRolePercent(role.count) }}%</span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="stats-table-header">
+              <h4>Logins {{ userPeriodLabel }}</h4>
+              <span class="stats-chart-total">Total: {{ loginChartTotal }}</span>
+            </div>
+            <div v-if="loginChartTotal === 0" class="no-data">
+              No logins recorded for this period yet.
+            </div>
+            <div v-else class="login-chart" :aria-label="`Login chart for ${userPeriodLabel}`">
+              <div
+                v-for="(count, i) in loginChartData.counts"
+                :key="loginChartData.labels[i]"
+                class="login-chart-col"
+                :title="`${loginChartData.labels[i]}: ${count} login${count === 1 ? '' : 's'}`"
+              >
+                <div class="login-chart-bar-track">
+                  <div
+                    class="login-chart-bar"
+                    :style="{ height: getLoginBarHeight(count) + '%' }"
+                  >
+                    <span v-if="count > 0" class="login-chart-value">{{ count }}</span>
+                  </div>
+                </div>
+                <span class="login-chart-label">{{ formatChartLabel(loginChartData.labels[i], i) }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -504,10 +505,40 @@ const filteredActivityUsers = computed(() => {
   return list
 })
 
-// Percentage helpers
-const getRolePercent = (count: number) => {
-  if (!stats.value || stats.value.users.total === 0) return 0
-  return Math.round((count / stats.value.users.total) * 100)
+// Login chart data (bucketed server-side)
+const loginChartData = computed<{ labels: string[]; counts: number[] }>(() => {
+  const empty = { labels: [], counts: [] }
+  if (!stats.value?.logins) return empty
+  return stats.value.logins[userPeriod.value] || empty
+})
+
+const loginChartTotal = computed(() =>
+  loginChartData.value.counts.reduce((sum, n) => sum + n, 0)
+)
+
+const loginChartMax = computed(() =>
+  Math.max(1, ...loginChartData.value.counts)
+)
+
+const getLoginBarHeight = (count: number) => {
+  if (loginChartMax.value === 0) return 0
+  return Math.round((count / loginChartMax.value) * 100)
+}
+
+const formatChartLabel = (label: string, index: number) => {
+  if (userPeriod.value === 'today') {
+    // Show every 3rd hour to reduce clutter
+    return index % 3 === 0 ? label : ''
+  }
+  if (userPeriod.value === 'week') {
+    // Day short name (Mon, Tue...)
+    const d = new Date(label + 'T00:00:00')
+    return d.toLocaleDateString(undefined, { weekday: 'short' })
+  }
+  // month: show day number, every 3rd for readability
+  if (index % 3 !== 0 && index !== loginChartData.value.labels.length - 1) return ''
+  const d = new Date(label + 'T00:00:00')
+  return String(d.getDate())
 }
 
 const getLithosPercent = (count: number) => {
