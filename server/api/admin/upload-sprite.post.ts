@@ -119,8 +119,8 @@ export default defineEventHandler(async (event) => {
     }
     await writeFile(filePath, file.data)
 
-    // Return the URL path served via /api/uploads/
-    const publicPath = `/api/uploads/${subDir}/${filename}`
+    // Return the URL path served via /app/uploads/
+    const publicPath = `/app/uploads/${subDir}/${filename}`
 
     return {
       success: true,

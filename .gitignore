@@ -29,13 +29,5 @@ coverage
 *.tsbuildinfo
 compose.local.yml
 
-# Public uploaded files
-public/lithos/*
-!public/lithos/.gitkeep
-public/profile_picture/*
-!public/profile_picture/.gitkeep
-public/sprites/*
-!public/sprites/.gitkeep
-
-# Uploads directory (served via /api/uploads/)
+# Uploads directory (served via /app/uploads/)
 uploads/
