@@ -219,6 +219,7 @@ const lithosForm = ref({
   id: '', name: '', sprite: '', rarity: 'common', elementId: '',
   spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0,
 })
+const selectedFile = ref<File | null>(null)
 const uploadingSprite = ref(false)
 const modalLoading = ref(false)
 const modalError = ref('')
@@ -243,34 +244,26 @@ const fetchElements = async () => {
   } catch {}
 }
 
-const handleSpriteUpload = async (event: Event) => {
+const handleSpriteUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
   if (!file) return
 
-  uploadingSprite.value = true
   modalError.value = ''
-
-  try {
-    const formData = new FormData()
-    formData.append('file', file)
-    const response = await $fetch<any>('/api/admin/upload-sprite?type=lithos', { method: 'POST', body: formData })
-    lithosForm.value.sprite = response.data.path
-  } catch (error: any) {
-    modalError.value = error.data?.statusMessage || error.message || 'Failed to upload sprite'
-  } finally {
-    uploadingSprite.value = false
-  }
+  selectedFile.value = file
+  lithosForm.value.sprite = URL.createObjectURL(file)
 }
 
 const removeSprite = () => {
   lithosForm.value.sprite = ''
+  selectedFile.value = null
   const fileInput = document.getElementById('lithos-sprite') as HTMLInputElement
   if (fileInput) fileInput.value = ''
 }
 
 const openCreateLithosModal = () => {
   lithosForm.value = { id: '', name: '', sprite: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0 }
+  selectedFile.value = null
   modalError.value = ''
   showLithosModal.value = true
 }
@@ -287,6 +280,7 @@ const openEditLithosModal = (lithos: any) => {
     spikeDown: lithos.spikeDown,
     spikeLeft: lithos.spikeLeft,
   }
+  selectedFile.value = null
   modalError.value = ''
   showLithosModal.value = true
 }
@@ -294,6 +288,7 @@ const openEditLithosModal = (lithos: any) => {
 const closeLithosModal = () => {
   showLithosModal.value = false
   lithosForm.value = { id: '', name: '', sprite: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0 }
+  selectedFile.value = null
   modalError.value = ''
 }
 
@@ -302,9 +297,27 @@ const saveLithos = async () => {
   modalError.value = ''
 
   try {
+    let finalSpritePath = lithosForm.value.sprite
+
+    // If a new file was selected, upload it first
+    if (selectedFile.value) {
+      uploadingSprite.value = true
+      try {
+        const formData = new FormData()
+        formData.append('file', selectedFile.value)
+        const response = await $fetch<any>('/api/admin/upload-sprite?type=lithos', { method: 'POST', body: formData })
+        finalSpritePath = response.data.path
+      } catch (error: any) {
+        modalError.value = error.data?.statusMessage || error.message || 'Failed to upload sprite'
+        return // Exit early if the upload failed
+      } finally {
+        uploadingSprite.value = false
+      }
+    }
+
     const bodyData: any = {
       name: lithosForm.value.name,
-      sprite: lithosForm.value.sprite,
+      sprite: finalSpritePath,
       rarity: lithosForm.value.rarity,
       spikeUp: lithosForm.value.spikeUp,
       spikeRight: lithosForm.value.spikeRight,
