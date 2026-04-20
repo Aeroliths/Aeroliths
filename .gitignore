@@ -23,11 +23,13 @@ logs
 .env
 .env.*
 !.env.example
+Dockerfile.dev
+compose.local.yml
+docker-entrypoint-dev.sh
 
 # Test files
 coverage
 *.tsbuildinfo
-compose.local.yml
 
 # Uploads directory (served via /app/uploads/)
 uploads/

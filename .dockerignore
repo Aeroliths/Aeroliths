@@ -33,7 +33,9 @@ Thumbs.db
 
 # Docker
 Dockerfile
+Dockerfile.dev
 docker-compose.yml
+compose.local.yml
 .dockerignore
 
 # Documentation
