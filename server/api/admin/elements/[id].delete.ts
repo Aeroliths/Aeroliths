@@ -22,6 +22,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Delete the associated sprite image
+    if (existing.sprite) {
+      try {
+        await delete_image(existing.sprite, user)
+      } catch (error: any) {
+        console.warn('Failed to delete sprite image:', existing.sprite, ' error:', error.message)
+      }
+    }
+
     await db.postgres.elements.delete({
       where: { id },
     })

@@ -29,6 +29,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Delete the associated sprite image
+    if (existingLithos.sprite) {
+      try {
+        await delete_image(existingLithos.sprite, user)
+      } catch (error: any) {
+        console.warn('Failed to delete sprite image:', existingLithos.sprite, ' error:', error.message)
+      }
+    }
+
     // Delete the lithos (collections will be deleted by cascade)
     await db.postgres.lithos.delete({
       where: { id },
