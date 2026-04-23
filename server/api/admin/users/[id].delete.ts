@@ -40,6 +40,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Delete the associated profilePicture image
+    if (existingUser.profilePicture) {
+      try {
+        await delete_image(existingUser.profilePicture, user)
+      } catch (error: any) {
+        console.warn('Failed to delete user profile image:', existingUser.profilePicture, ' error:', error.message)
+      }
+    }
+
     // Delete the user (authentication and collections will be deleted by cascade)
     await db.postgres.user.delete({
       where: { id },

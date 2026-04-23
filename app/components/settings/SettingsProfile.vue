@@ -7,9 +7,8 @@
           <img v-if="formData.profilePicture" :src="formData.profilePicture" :alt="formData.username" />
           <span v-else class="profile-card-initials">{{ formData.username ? formData.username[0].toUpperCase() : '?' }}</span>
         </div>
-        <label class="profile-card-avatar-edit" for="profile-picture-input" :class="{ disabled: loading || uploadingProfilePicture }">
-          <span v-if="uploadingProfilePicture" class="avatar-edit-icon spinning">&#x21bb;</span>
-          <span v-else class="avatar-edit-icon">&#x270E;</span>
+        <label class="profile-card-avatar-edit" for="profile-picture-input" :class="{ disabled: loading }">
+          <span class="avatar-edit-icon">&#x270E;</span>
         </label>
       </div>
       <h2 class="profile-card-username">{{ formData.username || 'Username' }}</h2>
@@ -23,7 +22,7 @@
       type="file"
       accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
       @change="handleProfilePictureUpload"
-      :disabled="loading || uploadingProfilePicture"
+      :disabled="loading"
       class="hidden-file-input"
     />
 
@@ -31,7 +30,7 @@
     <form @submit.prevent="handleSubmit" class="settings-form">
       <!-- Profile Picture Actions -->
       <div v-if="formData.profilePicture" class="profile-picture-actions">
-        <label for="profile-picture-input" class="change-picture-btn" :class="{ disabled: loading || uploadingProfilePicture }">
+        <label for="profile-picture-input" class="change-picture-btn" :class="{ disabled: loading }">
           Change Picture
         </label>
         <button type="button" class="remove-picture-btn" @click="removeProfilePicture" :disabled="loading">
@@ -39,7 +38,7 @@
         </button>
       </div>
       <div v-else class="profile-picture-actions">
-        <label for="profile-picture-input" class="change-picture-btn" :class="{ disabled: loading || uploadingProfilePicture }">
+        <label for="profile-picture-input" class="change-picture-btn" :class="{ disabled: loading }">
           Upload Picture
         </label>
       </div>
@@ -91,7 +90,6 @@ const formData = ref({
 })
 
 const loading = ref(false)
-const uploadingProfilePicture = ref(false)
 const error = ref('')
 const success = ref('')
 
@@ -108,29 +106,18 @@ onMounted(async () => {
   }
 })
 
-const handleProfilePictureUpload = async (event: Event) => {
+const handleProfilePictureUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
   if (!file) return
 
-  uploadingProfilePicture.value = true
   error.value = ''
 
-  try {
-    const formDataUpload = new FormData()
-    formDataUpload.append('file', file)
-
-    const response = await $fetch<any>('/api/admin/upload-sprite?type=profile', {
-      method: 'POST',
-      body: formDataUpload,
-    })
-
-    formData.value.profilePicture = response.data.path
-  } catch (err: any) {
-    error.value = err.data?.statusMessage || err.message || 'Failed to upload profile picture'
-  } finally {
-    uploadingProfilePicture.value = false
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    formData.value.profilePicture = e.target?.result as string
   }
+  reader.readAsDataURL(file)
 }
 
 const removeProfilePicture = () => {
@@ -152,7 +139,8 @@ const handleSubmit = async () => {
       body: {
         email: formData.value.email,
         username: formData.value.username,
-        profilePicture: formData.value.profilePicture || null
+        profilePicture: formData.value.profilePicture || null,
+        folder: 'profile'
       }
     })
 

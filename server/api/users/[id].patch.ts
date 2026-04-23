@@ -103,15 +103,31 @@ export default defineEventHandler(async (event) => {
     }
 
     if (body.profilePicture !== undefined) {
-      if (body.profilePicture !== null && body.profilePicture !== '') {
-        if (typeof body.profilePicture !== 'string' || !(body.profilePicture.startsWith('/profile_pictures/') || body.profilePicture.startsWith('/app/uploads/profile_pictures/'))) {
-          throw createError({
-            statusCode: 400,
-            statusMessage: 'Invalid profile picture path',
-          })
+      if (typeof body.profilePicture === 'string' && body.profilePicture.startsWith('data:image/')) {
+        // Upload new image from Base64
+        const matches = body.profilePicture.match(/^data:(image\/\w+);base64,(.+)$/)
+        if (matches) {
+          const fileField = {
+            filename: 'upload',
+            type: matches[1],
+            data: Buffer.from(matches[2], 'base64'),
+            DirName: body.folder || 'profile'
+          }
+          updateData.profilePicture = await upload_image(fileField, authUser)
+
+          // Cleanup old profilePicture if it exists
+          console.log('Existing profilePicture path:', existingUser.profilePicture)
+          if (existingUser.profilePicture) {
+            try { await delete_image(existingUser.profilePicture, authUser) } catch (error: any) {
+              console.warn('Failed to delete old profilePicture:', existingUser.profilePicture, ' error:', error.message)
+            }
+          }
+        } else {
+          throw createError({ statusCode: 400, statusMessage: 'Invalid image format' })
         }
+      } else {
+        updateData.profilePicture = body.profilePicture
       }
-      updateData.profilePicture = body.profilePicture || null
     }
 
     // Check if there's anything to update
