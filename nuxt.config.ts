@@ -46,7 +46,7 @@ export default defineNuxtConfig({
   },
   vite: {
     server: {
-      allowedHosts: ['aeroliths.fr']
+      allowedHosts: ['aeroliths.fr', 'aeroliths.kinator.fr']
     }
   },
   nitro: {

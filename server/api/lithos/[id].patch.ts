@@ -40,7 +40,31 @@ export default defineEventHandler(async (event) => {
         }
 
         if (body.sprite !== undefined) {
-            updateData.sprite = body.sprite
+            if (typeof body.sprite === 'string' && body.sprite.startsWith('data:image/')) {
+                // Upload new image from Base64
+                const matches = body.sprite.match(/^data:(image\/\w+);base64,(.+)$/)
+                if (matches) {
+                    const fileField = {
+                        filename: 'upload',
+                        type: matches[1],
+                        data: Buffer.from(matches[2], 'base64'),
+                        DirName: body.folder || 'lithos'
+                    }
+                    updateData.sprite = await upload_image(fileField, user)
+
+                    // Cleanup old sprite if it exists
+                    console.log('Existing sprite path:', existingLithos.sprite)
+                    if (existingLithos.sprite) {
+                        try { await delete_image(existingLithos.sprite, user) } catch (error: any) {
+                            console.warn('Failed to delete old sprite:', existingLithos.sprite, ' error:', error.message)
+                        }
+                    }
+                } else {
+                    throw createError({ statusCode: 400, statusMessage: 'Invalid image format' })
+                }
+            } else {
+                updateData.sprite = body.sprite
+            }
         }
 
         if (body.rarity !== undefined) {
