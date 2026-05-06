@@ -193,6 +193,15 @@
           Your game data is retained as long as your account remains active. If you delete
           your account, all associated personal data will be permanently removed within 30 days.
         </p>
+        <p>
+          <strong>Development Notice:</strong> As <strong>{{ SITE_INFO.name }}</strong> is still
+          in active development, user accounts may occasionally be deleted, reset, or wiped without
+          prior notice. This may occur during database migrations, schema updates, testing phases,
+          or to address technical issues. By creating an account during this development period,
+          you acknowledge and accept that your account, progress, statistics, and any associated
+          data may be permanently lost at any time. We recommend not relying on the persistence of
+          your data until the game reaches a stable release.
+        </p>
 
         <h3>Your Rights Under GDPR</h3>
         <p>
