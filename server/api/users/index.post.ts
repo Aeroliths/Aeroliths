@@ -39,6 +39,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Reject disposable / suspicious emails (no MX, known temp providers)
+    const emailTrustError = await validateEmailTrust(email)
+    if (emailTrustError) {
+      throw createError({
+        statusCode: 400,
+        message: emailTrustError,
+      })
+    }
+
     // Validate username format (3-30 chars, alphanumeric + underscore/hyphen)
     const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/
     if (!usernameRegex.test(username)) {
