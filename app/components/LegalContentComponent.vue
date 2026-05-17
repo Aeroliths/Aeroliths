@@ -224,16 +224,42 @@
       <h2>6. Cookies and Trackers</h2>
       <div class="legal-content">
         <p>
-          This website may use cookies and local storage for the following purposes:
+          This website uses two categories of cookies and local storage entries:
         </p>
         <ul>
-          <li><strong>Essential Cookies:</strong> For game state management and user preferences</li>
-          <li><strong>Analytics (Optional):</strong> Anonymous technical data may be collected for
-          statistical purposes to improve the gaming experience (e.g., performance metrics, crash reports)</li>
+          <li>
+            <strong>Essential cookies (always active):</strong>
+            required for the site to function — authentication (<code>auth_token</code>),
+            UI preferences, and your cookie-consent choice itself
+            (<code>cookies-consent</code> in local storage). These cannot be disabled
+            because the site would no longer work as expected.
+          </li>
+          <li>
+            <strong>Audience-measurement cookies (optional, opt-in):</strong>
+            when accepted, a long-lived anonymous identifier (<code>aer_vid</code>) is
+            stored in a cookie and the site records an anonymous visit row whenever you
+            open a new session. This lets us count unique visitors and visit volume in
+            the admin dashboard. No third-party trackers, no advertising cookies, and
+            no profiling are involved.
+          </li>
         </ul>
+
+        <h3>Your choice</h3>
         <p>
-          You can manage cookie preferences through your browser settings. Note that disabling certain
-          cookies may affect game functionality.
+          The first time you arrive on the site, a cookie banner asks you to either
+          <strong>"Accept all"</strong> (essential + audience measurement) or
+          <strong>"Essential only"</strong> (no audience measurement). Your choice is
+          remembered in <code>localStorage</code>.
+        </p>
+        <p>
+          You can change this choice at any time using the buttons below:
+        </p>
+        <CookieConsentManager />
+        <p>
+          Choosing "Essential only" or refusing later will stop new visits from being
+          recorded. Visits collected previously remain in our database for statistical
+          purposes; you can request their deletion at
+          <a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a>.
         </p>
       </div>
     </section>

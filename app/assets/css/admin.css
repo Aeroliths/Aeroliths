@@ -1409,6 +1409,10 @@ tr:hover td {
   filter: brightness(1.15);
 }
 
+.login-chart-bar--visits {
+  background: linear-gradient(135deg, #c8a050 0%, #8a6a30 100%);
+}
+
 .login-chart-value {
   position: absolute;
   top: -18px;

@@ -71,6 +71,17 @@ model LoginHistory {
   @@map("login_history")
 }
 
+model SiteVisit {
+  id        String   @id @default(cuid())
+  visitorId String
+  userId    String?
+  visitedAt DateTime @default(now())
+
+  @@index([visitedAt])
+  @@index([visitorId, visitedAt])
+  @@map("site_visits")
+}
+
 model Authentication {
   id           String   @id @default(cuid())
   password     String

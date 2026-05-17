@@ -113,11 +113,26 @@ export default defineEventHandler(async (event) => {
       }),
     ])
 
-    // Login history for chart: fetch last 30 days once, bucket client-side by period
-    const loginRows = await db.postgres.loginHistory.findMany({
-      where: { loggedAt: { gte: loginMonthStart } },
-      select: { loggedAt: true },
-    })
+    // Login & visit history for charts: fetch last 30 days once, bucket by period
+    const [loginRows, visitRows] = await Promise.all([
+      db.postgres.loginHistory.findMany({
+        where: { loggedAt: { gte: loginMonthStart } },
+        select: { loggedAt: true },
+      }),
+      // siteVisit was added later; degrade gracefully if it's not yet available
+      // (e.g., dev server holding an older Prisma client instance)
+      (async () => {
+        try {
+          return await db.postgres.siteVisit.findMany({
+            where: { visitedAt: { gte: loginMonthStart } },
+            select: { visitedAt: true, visitorId: true },
+          })
+        } catch (err) {
+          console.warn('siteVisit query failed, returning empty list:', err instanceof Error ? err.message : err)
+          return [] as { visitedAt: Date; visitorId: string }[]
+        }
+      })(),
+    ])
 
     // Bucket: today by hour (0-23)
     const loginsByHour = new Array(24).fill(0) as number[]
@@ -126,17 +141,19 @@ export default defineEventHandler(async (event) => {
     // Bucket: month by day (index 0 = 29 days ago ... index 29 = today)
     const loginsByDayMonth = new Array(30).fill(0) as number[]
 
+    const visitsByHour = new Array(24).fill(0) as number[]
+    const visitsByDayWeek = new Array(7).fill(0) as number[]
+    const visitsByDayMonth = new Array(30).fill(0) as number[]
+
     const dayMs = 24 * 60 * 60 * 1000
     for (const row of loginRows) {
       const d = row.loggedAt
-      // Month bucket (always fits since we filtered by loginMonthStart)
       const daysFromMonthStart = Math.floor(
         (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginMonthStart.getTime()) / dayMs
       )
       if (daysFromMonthStart >= 0 && daysFromMonthStart < 30) {
         loginsByDayMonth[daysFromMonthStart]++
       }
-      // Week bucket (subset of month)
       if (d.getTime() >= loginWeekStart.getTime()) {
         const daysFromWeekStart = Math.floor(
           (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginWeekStart.getTime()) / dayMs
@@ -145,9 +162,35 @@ export default defineEventHandler(async (event) => {
           loginsByDayWeek[daysFromWeekStart]++
         }
       }
-      // Today hourly bucket
       if (d.getTime() >= todayStart.getTime()) {
         loginsByHour[d.getHours()]++
+      }
+    }
+
+    const uniqueVisitorsToday = new Set<string>()
+    const uniqueVisitorsWeek = new Set<string>()
+    const uniqueVisitorsMonth = new Set<string>()
+    for (const row of visitRows) {
+      const d = row.visitedAt
+      const daysFromMonthStart = Math.floor(
+        (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginMonthStart.getTime()) / dayMs
+      )
+      if (daysFromMonthStart >= 0 && daysFromMonthStart < 30) {
+        visitsByDayMonth[daysFromMonthStart]++
+        uniqueVisitorsMonth.add(row.visitorId)
+      }
+      if (d.getTime() >= loginWeekStart.getTime()) {
+        const daysFromWeekStart = Math.floor(
+          (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginWeekStart.getTime()) / dayMs
+        )
+        if (daysFromWeekStart >= 0 && daysFromWeekStart < 7) {
+          visitsByDayWeek[daysFromWeekStart]++
+          uniqueVisitorsWeek.add(row.visitorId)
+        }
+      }
+      if (d.getTime() >= todayStart.getTime()) {
+        visitsByHour[d.getHours()]++
+        uniqueVisitorsToday.add(row.visitorId)
       }
     }
 
@@ -207,6 +250,17 @@ export default defineEventHandler(async (event) => {
           newThisMonth: usersThisMonth,
           activeToday,
           activeThisWeek,
+        },
+        visits: {
+          uniqueToday: uniqueVisitorsToday.size,
+          uniqueThisWeek: uniqueVisitorsWeek.size,
+          uniqueThisMonth: uniqueVisitorsMonth.size,
+          totalToday: visitsByHour.reduce((s, n) => s + n, 0),
+          totalThisWeek: visitsByDayWeek.reduce((s, n) => s + n, 0),
+          totalThisMonth: visitsByDayMonth.reduce((s, n) => s + n, 0),
+          today: { labels: hourLabels, counts: visitsByHour },
+          week: { labels: weekDayLabels, counts: visitsByDayWeek },
+          month: { labels: monthDayLabels, counts: visitsByDayMonth },
         },
         lithos: {
           total: totalLithos,

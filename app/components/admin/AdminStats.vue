@@ -86,33 +86,57 @@
               <span class="stat-value">{{ stats.users.total }}</span>
               <span class="stat-label">Total Accounts</span>
             </div>
+            <div class="stat-card stat-card--info">
+              <span class="stat-value">{{ visitsPeriodData.unique }}</span>
+              <span class="stat-label">Unique Visitors {{ userPeriodLabel }}</span>
+              <span class="stat-hint">{{ visitsPeriodData.total }} total visit{{ visitsPeriodData.total === 1 ? '' : 's' }}</span>
+            </div>
           </div>
 
-          <!-- Logins Chart -->
+          <!-- Metric Chart (Logins / Visits) -->
           <div class="stats-table-small">
             <div class="stats-table-header">
-              <h4>Logins {{ userPeriodLabel }}</h4>
-              <span class="stats-chart-total">Total: {{ loginChartTotal }}</span>
+              <h4>{{ activityMetric === 'logins' ? 'Logins' : 'Visits' }} {{ userPeriodLabel }}</h4>
+              <div class="stats-sort-toggle">
+                <button
+                  :class="{ active: activityMetric === 'logins' }"
+                  @click="activityMetric = 'logins'"
+                >
+                  Logins
+                </button>
+                <button
+                  :class="{ active: activityMetric === 'visits' }"
+                  @click="activityMetric = 'visits'"
+                >
+                  Visits
+                </button>
+              </div>
+              <span class="stats-chart-total">Total: {{ activityChartTotal }}</span>
             </div>
-            <div v-if="loginChartTotal === 0" class="no-data">
-              No logins recorded for this period yet.
+            <div v-if="activityChartTotal === 0" class="no-data">
+              No {{ activityMetric }} recorded for this period yet.
             </div>
-            <div v-else class="login-chart" :aria-label="`Login chart for ${userPeriodLabel}`">
+            <div
+              v-else
+              class="login-chart"
+              :aria-label="`${activityMetric} chart for ${userPeriodLabel}`"
+            >
               <div
-                v-for="(count, i) in loginChartData.counts"
-                :key="loginChartData.labels[i]"
+                v-for="(count, i) in activityChartData.counts"
+                :key="activityChartData.labels[i]"
                 class="login-chart-col"
-                :title="`${loginChartData.labels[i]}: ${count} login${count === 1 ? '' : 's'}`"
+                :title="`${activityChartData.labels[i]}: ${count} ${activityMetric === 'logins' ? 'login' : 'visit'}${count === 1 ? '' : 's'}`"
               >
                 <div class="login-chart-bar-track">
                   <div
                     class="login-chart-bar"
-                    :style="{ height: getLoginBarHeight(count) + '%' }"
+                    :class="{ 'login-chart-bar--visits': activityMetric === 'visits' }"
+                    :style="{ height: getActivityBarHeight(count) + '%' }"
                   >
                     <span v-if="count > 0" class="login-chart-value">{{ count }}</span>
                   </div>
                 </div>
-                <span class="login-chart-label">{{ formatChartLabel(loginChartData.labels[i], i) }}</span>
+                <span class="login-chart-label">{{ formatChartLabel(activityChartData.labels[i], i) }}</span>
               </div>
             </div>
           </div>
@@ -505,25 +529,42 @@ const filteredActivityUsers = computed(() => {
   return list
 })
 
-// Login chart data (bucketed server-side)
-const loginChartData = computed<{ labels: string[]; counts: number[] }>(() => {
+// Activity metric: logins vs visits
+const activityMetric = ref<'logins' | 'visits'>('logins')
+
+const activityChartData = computed<{ labels: string[]; counts: number[] }>(() => {
   const empty = { labels: [], counts: [] }
-  if (!stats.value?.logins) return empty
-  return stats.value.logins[userPeriod.value] || empty
+  if (!stats.value) return empty
+  const source = activityMetric.value === 'logins' ? stats.value.logins : stats.value.visits
+  return source?.[userPeriod.value] || empty
 })
 
-const loginChartTotal = computed(() =>
-  loginChartData.value.counts.reduce((sum, n) => sum + n, 0)
+const activityChartTotal = computed(() =>
+  activityChartData.value.counts.reduce((sum, n) => sum + n, 0)
 )
 
-const loginChartMax = computed(() =>
-  Math.max(1, ...loginChartData.value.counts)
+const activityChartMax = computed(() =>
+  Math.max(1, ...activityChartData.value.counts)
 )
 
-const getLoginBarHeight = (count: number) => {
-  if (loginChartMax.value === 0) return 0
-  return Math.round((count / loginChartMax.value) * 100)
+const getActivityBarHeight = (count: number) => {
+  if (activityChartMax.value === 0) return 0
+  return Math.round((count / activityChartMax.value) * 100)
 }
+
+const visitsPeriodData = computed(() => {
+  if (!stats.value?.visits) return { unique: 0, total: 0 }
+  switch (userPeriod.value) {
+    case 'today':
+      return { unique: stats.value.visits.uniqueToday, total: stats.value.visits.totalToday }
+    case 'week':
+      return { unique: stats.value.visits.uniqueThisWeek, total: stats.value.visits.totalThisWeek }
+    case 'month':
+      return { unique: stats.value.visits.uniqueThisMonth, total: stats.value.visits.totalThisMonth }
+    default:
+      return { unique: 0, total: 0 }
+  }
+})
 
 const formatChartLabel = (label: string, index: number) => {
   if (userPeriod.value === 'today') {
