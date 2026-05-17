@@ -97,6 +97,22 @@
   color: var(--color-brand-primary-light);
 }
 
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+  background: var(--color-error);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 99px;
+  line-height: 1;
+}
+
 /* =========================================
    TAB CONTENT
    ========================================= */

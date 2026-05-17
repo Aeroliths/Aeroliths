@@ -33,10 +33,22 @@
           </button>
           <span v-else-if="isFriend(result.id)" class="pending-label">Already friends</span>
           <span v-else class="pending-label">Request pending</span>
+          <button class="report-btn" @click="openReport(result)" title="Report user">
+            Report
+          </button>
         </div>
       </div>
     </div>
     <div v-else-if="allUsers.length && searchQuery.trim()" class="empty-state">No players found.</div>
+
+    <FriendsReportModal
+      v-if="reportTarget"
+      :target-user-id="reportTarget.id"
+      :target-username="reportTarget.username"
+      :has-profile-picture="!!reportTarget.profilePicture"
+      @close="reportTarget = null"
+      @submitted="onReportSubmitted"
+    />
   </div>
 </template>
 
@@ -50,6 +62,15 @@ const friends = ref<any[]>([])
 const pendingRequests = ref<{ received: any[]; sent: any[] }>({ received: [], sent: [] })
 const errorMessage = ref('')
 const successMessage = ref('')
+const reportTarget = ref<any | null>(null)
+
+const openReport = (target: any) => {
+  reportTarget.value = target
+}
+
+const onReportSubmitted = () => {
+  showMessage('success', 'Report submitted. Our team will review it.')
+}
 
 const fuzzyMatch = (username: string, query: string): boolean => {
   const a = username.toLowerCase()

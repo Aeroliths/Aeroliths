@@ -18,11 +18,21 @@
           </div>
         </div>
         <div class="item-actions">
+          <button class="report-btn" @click="openReport(friend)" title="Report user">Report</button>
           <button class="remove-btn" @click="removeFriend(friend)">Remove</button>
         </div>
       </div>
     </div>
     <div v-else class="empty-state">You don't have any friends yet. Search for players in the Search tab!</div>
+
+    <FriendsReportModal
+      v-if="reportTarget"
+      :target-user-id="reportTarget.friendId"
+      :target-username="reportTarget.username"
+      :has-profile-picture="!!reportTarget.profilePicture"
+      @close="reportTarget = null"
+      @submitted="onReportSubmitted"
+    />
   </div>
 </template>
 
@@ -32,6 +42,15 @@ import { ref, onMounted } from 'vue'
 const friends = ref<any[]>([])
 const errorMessage = ref('')
 const successMessage = ref('')
+const reportTarget = ref<any | null>(null)
+
+const openReport = (friend: any) => {
+  reportTarget.value = friend
+}
+
+const onReportSubmitted = () => {
+  showMessage('success', 'Report submitted. Our team will review it.')
+}
 
 const showMessage = (type: 'error' | 'success', message: string) => {
   errorMessage.value = type === 'error' ? message : ''

@@ -17,6 +17,10 @@
         <button :class="{ active: activeTab === 'users' }" @click="activeTab = 'users'">
           User Management
         </button>
+        <button :class="{ active: activeTab === 'reports' }" @click="activeTab = 'reports'">
+          Reports
+          <span v-if="pendingReportsCount > 0" class="tab-badge">{{ pendingReportsCount }}</span>
+        </button>
         <button :class="{ active: activeTab === 'elements' }" @click="activeTab = 'elements'">
           Elements Management
         </button>
@@ -32,6 +36,10 @@
       </div>
 
       <AdminUsers v-if="activeTab === 'users'" />
+      <AdminReports
+        v-if="activeTab === 'reports'"
+        @pending-count-changed="pendingReportsCount = $event"
+      />
       <AdminElements v-if="activeTab === 'elements'" />
       <AdminLithos v-if="activeTab === 'lithos'" />
       <AdminCollections v-if="activeTab === 'collections'" />
@@ -47,10 +55,22 @@ import { useAuth } from '~/composables/useAuth'
 const { user, initAuth } = useAuth()
 
 const isAdmin = computed(() => user.value?.role?.name === 'admin')
-const activeTab = ref<'users' | 'elements' | 'lithos' | 'collections' | 'stats'>('users')
+const activeTab = ref<'users' | 'reports' | 'elements' | 'lithos' | 'collections' | 'stats'>('users')
+const pendingReportsCount = ref(0)
+
+const fetchPendingReportsCount = async () => {
+  if (!isAdmin.value) return
+  try {
+    const res = await $fetch<any>('/api/admin/reports', { query: { status: 'pending' } })
+    pendingReportsCount.value = res.data.count
+  } catch {
+    pendingReportsCount.value = 0
+  }
+}
 
 onMounted(async () => {
   await initAuth()
+  await fetchPendingReportsCount()
 })
 </script>
 

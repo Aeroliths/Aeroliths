@@ -150,6 +150,7 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       data: {
+        id: user.id,
         username: user.username,
         profilePicture: user.profilePicture,
         memberSince: user.createdAt,

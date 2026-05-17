@@ -35,8 +35,28 @@ model User {
   collections    Collections[]
   deck           Deck?
   loginHistory   LoginHistory[]
+  reportsMade    UserReport[]    @relation("ReportsMade")
+  reportsAgainst UserReport[]    @relation("ReportsAgainst")
 
   @@map("users")
+}
+
+model UserReport {
+  id        String   @id @default(cuid())
+  type      String
+  reason    String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reporterId       String
+  reporter         User   @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUserId   String
+  reportedUser     User   @relation("ReportsAgainst", fields: [reportedUserId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([reportedUserId])
+  @@map("user_reports")
 }
 
 model LoginHistory {

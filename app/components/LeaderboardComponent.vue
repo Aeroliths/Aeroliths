@@ -193,6 +193,14 @@
               <span class="profile-since">Member since {{ formatDate(profile.memberSince) }}</span>
               <span class="profile-score">{{ profile.score }} points</span>
             </div>
+            <button
+              v-if="profile.username !== currentUsername"
+              class="profile-report-btn"
+              @click="openReport"
+              title="Report this player"
+            >
+              Report
+            </button>
           </div>
 
           <!-- Badges -->
@@ -270,6 +278,19 @@
         </div>
       </div>
     </div>
+
+    <FriendsReportModal
+      v-if="reportTarget"
+      :target-user-id="reportTarget.id"
+      :target-username="reportTarget.username"
+      :has-profile-picture="!!reportTarget.profilePicture"
+      @close="reportTarget = null"
+      @submitted="onReportSubmitted"
+    />
+
+    <Transition name="fade">
+      <div v-if="reportFlash" class="report-flash">{{ reportFlash }}</div>
+    </Transition>
   </div>
 </template>
 
@@ -293,6 +314,24 @@ const showProfile = ref(false)
 const profile = ref<any>(null)
 const profileLoading = ref(false)
 const profileError = ref('')
+
+// Report
+const reportTarget = ref<any | null>(null)
+const reportFlash = ref('')
+
+const openReport = () => {
+  if (!profile.value) return
+  reportTarget.value = {
+    id: profile.value.id,
+    username: profile.value.username,
+    profilePicture: profile.value.profilePicture,
+  }
+}
+
+const onReportSubmitted = () => {
+  reportFlash.value = 'Report submitted. Our team will review it.'
+  setTimeout(() => (reportFlash.value = ''), 4000)
+}
 
 const fetchLeaderboard = async () => {
   loading.value = true
