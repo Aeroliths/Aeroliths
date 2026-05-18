@@ -84,3 +84,4 @@ docker-compose up -d --build
 ```
 
 The application connects to external PostgreSQL and ArangoDB servers.
+
