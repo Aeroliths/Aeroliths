@@ -224,41 +224,30 @@
       <h2>6. Cookies and Trackers</h2>
       <div class="legal-content">
         <p>
-          This website uses two categories of cookies and local storage entries:
+          This website uses cookies and local storage entries that are
+          <strong>strictly required</strong> for the site to function. There is no
+          opt-out, because removing them would break the features they support.
         </p>
         <ul>
           <li>
-            <strong>Essential cookies (always active):</strong>
-            required for the site to function — authentication (<code>auth_token</code>),
-            UI preferences, and your cookie-consent choice itself
-            (<code>cookies-consent</code> in local storage). These cannot be disabled
-            because the site would no longer work as expected.
+            <strong>Authentication (<code>auth_token</code>):</strong> keeps you
+            signed in to your account.
           </li>
           <li>
-            <strong>Audience-measurement cookies (optional, opt-in):</strong>
-            when accepted, a long-lived anonymous identifier (<code>aer_vid</code>) is
-            stored in a cookie and the site records an anonymous visit row whenever you
-            open a new session. This lets us count unique visitors and visit volume in
-            the admin dashboard. No third-party trackers, no advertising cookies, and
-            no profiling are involved.
+            <strong>Audience measurement (<code>aer_vid</code>):</strong> a
+            long-lived anonymous identifier used to count unique visitors and
+            visit volume in the admin dashboard. No third-party trackers, no
+            advertising cookies, and no profiling are involved.
+          </li>
+          <li>
+            <strong>UI state (local storage):</strong> small flags such as your
+            cookie-banner dismissal (<code>cookies-info-dismissed</code>) and
+            interface preferences.
           </li>
         </ul>
-
-        <h3>Your choice</h3>
         <p>
-          The first time you arrive on the site, a cookie banner asks you to either
-          <strong>"Accept all"</strong> (essential + audience measurement) or
-          <strong>"Essential only"</strong> (no audience measurement). Your choice is
-          remembered in <code>localStorage</code>.
-        </p>
-        <p>
-          You can change this choice at any time using the buttons below:
-        </p>
-        <CookieConsentManager />
-        <p>
-          Choosing "Essential only" or refusing later will stop new visits from being
-          recorded. Visits collected previously remain in our database for statistical
-          purposes; you can request their deletion at
+          By using the site you accept that these cookies are set. You may still
+          request deletion of visit data linked to your account at
           <a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a>.
         </p>
       </div>

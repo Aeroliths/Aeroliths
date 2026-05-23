@@ -33,7 +33,7 @@ export const SITE_INFO = {
 
   // Legal
   copyright: `© ${new Date().getFullYear()} Aeroliths. All rights reserved.`,
-  lastUpdated: 'March 2026'
+  lastUpdated: 'May 2026'
 } as const
 
 export const EXTERNAL_LINKS = {

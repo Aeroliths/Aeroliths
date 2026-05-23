@@ -2,15 +2,15 @@
   <Transition name="cookie-banner">
     <div v-if="showBanner" class="cookie-banner">
       <div class="cookie-banner-content">
-        <h4 class="cookie-banner-title">Cookies &amp; analytics</h4>
+        <h4 class="cookie-banner-title">Cookies</h4>
         <p>
-          We use essential cookies for authentication. With your permission, we also record
-          anonymous visits to measure traffic. You can change this choice anytime from the
+          This site uses cookies to function. They are required both to keep you signed in
+          and to measure anonymous traffic. By continuing to use the site you accept this.
+          Details on the
           <NuxtLink href="/legal" class="cookie-link" @click="dismiss">legal page</NuxtLink>.
         </p>
         <div class="cookie-banner-actions">
-          <button class="cookie-refuse-btn" @click="refuse">Essential only</button>
-          <button class="cookie-accept-btn" @click="accept">Accept all</button>
+          <button class="cookie-accept-btn" @click="dismiss">Got it</button>
         </div>
       </div>
     </div>
@@ -19,27 +19,19 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useCookieConsent } from '~/composables/useCookieConsent'
 
+const STORAGE_KEY = 'cookies-info-dismissed'
 const showBanner = ref(false)
-const { consent, loadFromStorage, setConsent } = useCookieConsent()
 
 onMounted(() => {
-  loadFromStorage()
-  if (!consent.value) showBanner.value = true
+  if (typeof window === 'undefined') return
+  if (!localStorage.getItem(STORAGE_KEY)) showBanner.value = true
 })
 
-const accept = () => {
-  setConsent('accepted')
-  showBanner.value = false
-}
-
-const refuse = () => {
-  setConsent('refused')
-  showBanner.value = false
-}
-
 const dismiss = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEY, '1')
+  }
   showBanner.value = false
 }
 </script>
@@ -91,22 +83,18 @@ const dismiss = () => {
 
 .cookie-banner-actions {
   display: flex;
+  justify-content: flex-end;
   gap: var(--spacing-sm);
 }
 
-.cookie-accept-btn,
-.cookie-refuse-btn {
-  flex: 1;
-  padding: var(--spacing-sm) var(--spacing-md);
+.cookie-accept-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-md);
   font-size: var(--font-sm);
   font-weight: var(--font-semibold);
   cursor: pointer;
   transition: all var(--transition-fast);
   border: none;
-}
-
-.cookie-accept-btn {
   background: var(--gradient-primary);
   color: var(--color-bg-base);
 }
@@ -114,17 +102,6 @@ const dismiss = () => {
 .cookie-accept-btn:hover {
   background: var(--gradient-primary-hover);
   box-shadow: var(--shadow-hover-brand);
-}
-
-.cookie-refuse-btn {
-  background: var(--bg-glass-medium);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border-light);
-}
-
-.cookie-refuse-btn:hover {
-  color: var(--color-text-primary);
-  border-color: var(--color-border-subtle);
 }
 
 .cookie-banner-enter-active {
