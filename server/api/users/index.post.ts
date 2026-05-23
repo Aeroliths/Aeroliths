@@ -20,7 +20,10 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const { email, username, password } = body
+    const { email, username, password, captchaToken } = body
+
+    // Verify captcha before any DB work
+    await verifyCaptcha(captchaToken, event)
 
     // Validate required fields
     if (!email || !username || !password) {

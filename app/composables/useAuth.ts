@@ -16,12 +16,14 @@ interface User {
 interface LoginCredentials {
   email: string
   password: string
+  captchaToken: string
 }
 
 interface RegisterData {
   email: string
   username: string
   password: string
+  captchaToken: string
 }
 
 export const useAuth = () => {

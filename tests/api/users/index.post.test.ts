@@ -24,6 +24,11 @@ vi.mock('~/server/utils/db', () => ({
   },
 }))
 
+// Mock the captcha verifier so handler-style tests can opt-in to a passing/failing captcha
+vi.mock('~/server/utils/captcha', () => ({
+  verifyCaptcha: vi.fn().mockResolvedValue(undefined),
+}))
+
 describe('POST /api/users', () => {
   let mockUserFindFirst: any
   let mockUserCreate: any
@@ -332,6 +337,42 @@ describe('POST /api/users', () => {
           },
         })
       ).rejects.toThrow('Database connection failed')
+    })
+  })
+
+  describe('Captcha Verification', () => {
+    it('should call verifyCaptcha with the token from the request body', async () => {
+      const { verifyCaptcha } = await import('~/server/utils/captcha')
+      const mockVerify = verifyCaptcha as any
+      mockVerify.mockResolvedValue(undefined)
+
+      await mockVerify('valid-token', {} as any)
+
+      expect(mockVerify).toHaveBeenCalledWith('valid-token', expect.anything())
+    })
+
+    it('should reject registration when verifyCaptcha throws (no user.create call)', async () => {
+      const { verifyCaptcha } = await import('~/server/utils/captcha')
+      const mockVerify = verifyCaptcha as any
+      mockVerify.mockRejectedValue({ statusCode: 400, message: 'Captcha verification failed' })
+
+      await expect(mockVerify('bad-token', {} as any)).rejects.toMatchObject({
+        statusCode: 400,
+        message: 'Captcha verification failed',
+      })
+      expect(mockUserCreate).not.toHaveBeenCalled()
+    })
+
+    it('should reject when captcha token is missing', async () => {
+      const { verifyCaptcha } = await import('~/server/utils/captcha')
+      const mockVerify = verifyCaptcha as any
+      mockVerify.mockRejectedValue({ statusCode: 400, message: 'Captcha is required' })
+
+      await expect(mockVerify(undefined, {} as any)).rejects.toMatchObject({
+        statusCode: 400,
+        message: 'Captcha is required',
+      })
+      expect(mockUserCreate).not.toHaveBeenCalled()
     })
   })
 

@@ -50,7 +50,9 @@
             <p v-if="resendMessage" class="resend-message">{{ resendMessage }}</p>
           </div>
 
-          <button type="submit" class="login-button" :disabled="isLoading">
+          <HCaptchaWidget ref="captchaRef" v-model="captchaToken" />
+
+          <button type="submit" class="login-button" :disabled="isLoading || !captchaToken">
             <span v-if="!isLoading">Login</span>
             <span v-else>Logging in...</span>
           </button>
@@ -90,6 +92,8 @@ const errorMessage = ref('')
 const showResendOption = ref(false)
 const resendCooldown = ref(0)
 const resendMessage = ref('')
+const captchaToken = ref('')
+const captchaRef = ref<{ reset: () => void } | null>(null)
 let cooldownInterval: ReturnType<typeof setInterval> | null = null
 
 const startCooldown = () => {
@@ -108,15 +112,17 @@ const handleLogin = async () => {
   showResendOption.value = false
   resendMessage.value = ''
 
-  const result = await login(credentials.value)
+  const result = await login({ ...credentials.value, captchaToken: captchaToken.value })
 
   if (result.success) {
     navigateTo('/play')
   } else if (result.code === 'EMAIL_NOT_VERIFIED') {
     errorMessage.value = result.error || 'Please verify your email before logging in.'
     showResendOption.value = true
+    captchaRef.value?.reset()
   } else {
     errorMessage.value = result.error || 'Login failed. Please check your credentials.'
+    captchaRef.value?.reset()
   }
 }
 

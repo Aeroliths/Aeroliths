@@ -236,13 +236,23 @@
           <li>
             <strong>Audience measurement (<code>aer_vid</code>):</strong> a
             long-lived anonymous identifier used to count unique visitors and
-            visit volume in the admin dashboard. No third-party trackers, no
-            advertising cookies, and no profiling are involved.
+            visit volume in the admin dashboard. No third-party advertising
+            trackers and no profiling are involved (hCaptcha — described below —
+            is used solely for bot protection on the sign-in and sign-up forms).
           </li>
           <li>
             <strong>UI state (local storage):</strong> small flags such as your
             cookie-banner dismissal (<code>cookies-info-dismissed</code>) and
             interface preferences.
+          </li>
+          <li>
+            <strong>hCaptcha bot protection:</strong> on the sign-in and sign-up
+            forms, the hCaptcha widget from Intuition Machines, Inc. is loaded
+            to verify that submissions are made by a human. hCaptcha may set
+            technical cookies on its own domain (<code>hcaptcha.com</code>) and
+            process minimal request metadata (IP address, browser signals)
+            strictly for that purpose. See
+            <a href="https://www.hcaptcha.com/privacy" target="_blank" rel="noopener noreferrer">hcaptcha.com/privacy</a>.
           </li>
         </ul>
         <p>

@@ -22,6 +22,7 @@
     "test:coverage:ui": "vitest --ui --coverage"
   },
   "dependencies": {
+    "@hcaptcha/vue3-hcaptcha": "^1.3.0",
     "@nuxt/icon": "^2.2.1",
     "@nuxt/ui": "^4.6.0",
     "@prisma/adapter-pg": "^7.6.0",

@@ -9,7 +9,10 @@ export default defineEventHandler(async (event) => {
     rateLimit(event, { key: 'login', limit: 10, windowMs: 15 * 60 * 1000 })
 
     const body = await readBody(event)
-    const { email, password } = body || {}
+    const { email, password, captchaToken } = body || {}
+
+    // Verify captcha before any DB work
+    await verifyCaptcha(captchaToken, event)
 
     // Validate required fields
     if (!email || !password) {

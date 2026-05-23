@@ -89,7 +89,9 @@
             {{ errorMessage }}
           </div>
 
-          <button type="submit" class="register-button" :disabled="isLoading">
+          <HCaptchaWidget ref="captchaRef" v-model="captchaToken" />
+
+          <button type="submit" class="register-button" :disabled="isLoading || !captchaToken">
             <span v-if="!isLoading">Create Account</span>
             <span v-else>Creating account...</span>
           </button>
@@ -129,6 +131,8 @@ const registrationComplete = ref(false)
 const registeredEmail = ref('')
 const resendCooldown = ref(0)
 const resendMessage = ref('')
+const captchaToken = ref('')
+const captchaRef = ref<{ reset: () => void } | null>(null)
 let cooldownInterval: ReturnType<typeof setInterval> | null = null
 
 const startCooldown = () => {
@@ -159,6 +163,7 @@ const handleRegister = async () => {
     email: formData.value.email,
     username: formData.value.username,
     password: formData.value.password,
+    captchaToken: captchaToken.value,
   }
 
   const result = await register(registrationData)
@@ -169,6 +174,7 @@ const handleRegister = async () => {
     startCooldown()
   } else if (!result.success) {
     errorMessage.value = result.error || 'Registration failed. Please try again.'
+    captchaRef.value?.reset()
   }
 }
 

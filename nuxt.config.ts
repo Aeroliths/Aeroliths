@@ -8,6 +8,12 @@ export default defineNuxtConfig({
     resendApiKey: process.env.RESEND_API_KEY || '',
     emailFrom: process.env.EMAIL_FROM || 'noreply@aeroliths.fr',
     appUrl: process.env.APP_URL || 'http://localhost:3000',
+    // hCaptcha test secret (always validates) — replace in production
+    hcaptchaSecret: process.env.HCAPTCHA_SECRET || '0x0000000000000000000000000000000000000000',
+    public: {
+      // hCaptcha test site key (always passes) — replace in production
+      hcaptchaSiteKey: process.env.HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001',
+    },
   },
   app: {
     baseURL: '/',
@@ -65,11 +71,12 @@ export default defineNuxtConfig({
           'Content-Security-Policy': [
             "default-src 'self'",
             // 'unsafe-inline' kept for Nuxt hydration scripts; tighten with nonces later
-            "script-src 'self' 'unsafe-inline'",
-            "style-src 'self' 'unsafe-inline'",
+            "script-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
+            "style-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
             "img-src 'self' data: blob: https:",
             "font-src 'self' data:",
-            "connect-src 'self'",
+            "connect-src 'self' https://hcaptcha.com https://*.hcaptcha.com",
+            "frame-src https://hcaptcha.com https://*.hcaptcha.com",
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",
