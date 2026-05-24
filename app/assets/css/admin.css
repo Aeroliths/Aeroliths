@@ -1610,6 +1610,11 @@ tr:hover td {
   pointer-events: none;
 }
 
+/* Status cell: keep dot and label on the same line */
+.status-cell {
+  white-space: nowrap;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .stats-cards {
@@ -1647,5 +1652,29 @@ tr:hover td {
 
   .stats-bar-wrapper {
     min-width: 80px;
+  }
+}
+
+/* Recent Activity table: horizontal scroll on small screens with hint */
+.stats-activity-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stats-activity-table table {
+  min-width: 480px;
+}
+
+.stats-activity-table th,
+.stats-activity-table td {
+  white-space: nowrap;
+}
+
+/* Subtle right-edge fade to hint scrollability on mobile */
+@media (max-width: 640px) {
+  .stats-activity-table {
+    position: relative;
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
+            mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 24px), transparent 100%);
   }
 }

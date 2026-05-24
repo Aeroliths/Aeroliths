@@ -334,7 +334,7 @@
             <span class="search-icon">&#x1F50D;</span>
           </div>
 
-          <div class="stats-table-small">
+          <div class="stats-table-small stats-activity-table">
             <table>
               <thead>
                 <tr>
@@ -358,7 +358,7 @@
                   <td>{{ u.username }}</td>
                   <td>{{ formatDate(u.createdAt) }}</td>
                   <td>{{ formatRelative(u.lastActiveAt) }}</td>
-                  <td>
+                  <td class="status-cell">
                     <span :class="['status-dot', getStatusClass(u.lastActiveAt)]"></span>
                     {{ getStatusLabel(u.lastActiveAt) }}
                   </td>
