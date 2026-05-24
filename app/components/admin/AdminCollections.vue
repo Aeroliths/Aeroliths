@@ -2,15 +2,23 @@
   <div class="tab-content">
     <h2>Collections Management</h2>
 
-    <div class="search-bar">
-      <input
-        v-model="userSearchQuery"
-        type="text"
-        placeholder="Search a user by username or email..."
-        class="search-input"
-      />
-      <span class="search-icon">🔍</span>
+    <div class="collections-header">
+      <button @click="openGiveAllModal" class="btn-create" :disabled="actionLoading">
+        Give a Lithos to all users
+      </button>
+      <div class="search-bar">
+        <input
+          v-model="userSearchQuery"
+          type="text"
+          placeholder="Search a user by username or email..."
+          class="search-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
     </div>
+
+    <div v-if="giveAllSuccess" class="success-message" style="margin-bottom: 1rem;">{{ giveAllSuccess }}</div>
+    <div v-if="giveAllError" class="error-message" style="margin-bottom: 1rem;">{{ giveAllError }}</div>
 
     <div v-if="usersLoading" class="loading">Loading users...</div>
 
@@ -140,6 +148,64 @@
     </div>
   </Teleport>
 
+  <!-- Give to all users Modal -->
+  <Teleport to="body">
+    <div v-if="showGiveAllModal" class="col-overlay" @click.self="closeGiveAllModal">
+      <div class="col-modal">
+        <div class="col-modal-header">
+          <h3>Give a Lithos to all users</h3>
+          <button class="col-close-btn" @click="closeGiveAllModal">✕</button>
+        </div>
+
+        <div v-if="giveAllModalError" class="error-message">{{ giveAllModalError }}</div>
+
+        <div class="col-section">
+          <div class="col-section-header">
+            <h4>Select a Lithos</h4>
+            <input v-model="giveAllPickerSearch" type="text" placeholder="Search..." class="picker-search-input" />
+          </div>
+
+          <div class="lithos-picker-grid">
+            <div
+              v-for="lithos in filteredGiveAllLithos"
+              :key="lithos.id"
+              class="picker-card"
+              :class="{ selected: giveAllForm.lithosId === lithos.id, [`rarity-${lithos.rarity}`]: true }"
+              @click="giveAllForm.lithosId = lithos.id"
+            >
+              <img :src="lithos.sprite" :alt="lithos.name" class="picker-sprite" />
+              <span class="picker-name">{{ lithos.name }}</span>
+              <span class="picker-rarity">{{ lithos.rarity }}</span>
+            </div>
+            <div v-if="filteredGiveAllLithos.length === 0" class="no-data" style="grid-column:1/-1">
+              No lithos found.
+            </div>
+          </div>
+
+          <div v-if="giveAllForm.lithosId" class="add-confirm">
+            <span class="add-confirm-name">
+              {{ lithosList.find(l => l.id === giveAllForm.lithosId)?.name }}
+            </span>
+            <label>Qty</label>
+            <input v-model.number="giveAllForm.quantity" type="number" min="1" class="qty-input" />
+            <button
+              @click="confirmGiveAll"
+              class="btn-create"
+              :disabled="giveAllForm.quantity < 1 || giveAllLoading"
+            >
+              {{ giveAllLoading ? 'Giving...' : `Give to all (${users.length})` }}
+            </button>
+            <button @click="giveAllForm.lithosId = ''" class="btn-clear">✕</button>
+          </div>
+        </div>
+
+        <div class="col-modal-footer">
+          <button @click="closeGiveAllModal" :disabled="giveAllLoading">Close</button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
+
   <!-- Confirmation Modal -->
   <Teleport to="body">
     <div v-if="showConfirmModal" class="col-overlay" @click.self="cancelConfirm">
@@ -197,6 +263,69 @@ const filteredPickerLithos = computed(() => {
     l.name?.toLowerCase().includes(q) || l.rarity?.toLowerCase().includes(q)
   )
 })
+
+// Give to all users modal
+const showGiveAllModal = ref(false)
+const giveAllForm = ref({ lithosId: '', quantity: 1 })
+const giveAllPickerSearch = ref('')
+const giveAllLoading = ref(false)
+const giveAllModalError = ref('')
+const giveAllSuccess = ref('')
+const giveAllError = ref('')
+
+const filteredGiveAllLithos = computed(() => {
+  if (!giveAllPickerSearch.value) return lithosList.value
+  const q = giveAllPickerSearch.value.toLowerCase()
+  return lithosList.value.filter(l =>
+    l.name?.toLowerCase().includes(q) || l.rarity?.toLowerCase().includes(q)
+  )
+})
+
+const openGiveAllModal = () => {
+  giveAllForm.value = { lithosId: '', quantity: 1 }
+  giveAllPickerSearch.value = ''
+  giveAllModalError.value = ''
+  showGiveAllModal.value = true
+}
+
+const closeGiveAllModal = () => {
+  if (giveAllLoading.value) return
+  showGiveAllModal.value = false
+  giveAllForm.value = { lithosId: '', quantity: 1 }
+  giveAllPickerSearch.value = ''
+  giveAllModalError.value = ''
+}
+
+const confirmGiveAll = () => {
+  const lithos = lithosList.value.find(l => l.id === giveAllForm.value.lithosId)
+  if (!lithos) return
+  openConfirmModal(
+    'Give Lithos to all users',
+    `Give ${giveAllForm.value.quantity}× ${lithos.name} to all ${users.value.length} users? This cannot be undone.`,
+    async () => {
+      giveAllLoading.value = true
+      giveAllModalError.value = ''
+      giveAllError.value = ''
+      try {
+        const response = await $fetch<any>('/api/admin/collections/all', {
+          method: 'POST',
+          body: { lithosId: giveAllForm.value.lithosId, quantity: giveAllForm.value.quantity },
+        })
+        giveAllSuccess.value = response.message || 'Lithos given to all users successfully'
+        showGiveAllModal.value = false
+        giveAllForm.value = { lithosId: '', quantity: 1 }
+        await fetchUsers()
+        setTimeout(() => { giveAllSuccess.value = '' }, 4000)
+      } catch (error: any) {
+        giveAllModalError.value = error.data?.statusMessage || 'Failed to give lithos to all users'
+        throw error
+      } finally {
+        giveAllLoading.value = false
+      }
+    },
+    'Give to all'
+  )
+}
 
 const showConfirmModal = ref(false)
 const confirmTitle = ref('')
@@ -350,6 +479,38 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* ---- Header bar ---- */
+.collections-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.collections-header .search-bar {
+  flex: 1;
+  margin-bottom: 0;
+  max-width: 400px;
+}
+
+.collections-header .btn-create {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .collections-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .collections-header .search-bar {
+    max-width: 100%;
+  }
+}
+
 /* ---- Overlay ---- */
 .col-overlay {
   position: fixed;
@@ -665,6 +826,30 @@ onMounted(async () => {
   position: sticky;
   bottom: 0;
   background: #0f1923;
+}
+
+.col-modal-footer button {
+  padding: 0.55rem 1.25rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.col-modal-footer button:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.col-modal-footer button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* ---- Messages ---- */
