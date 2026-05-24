@@ -407,11 +407,17 @@ onMounted(() => fetchReports())
   gap: var(--spacing-sm);
   flex-wrap: wrap;
   font-size: var(--font-sm);
+  color: var(--color-text-primary);
 }
 
 .report-label {
   color: var(--color-text-subtle);
   min-width: 110px;
+}
+
+.user-mini > div > div {
+  color: var(--color-text-primary);
+  font-weight: var(--font-medium);
 }
 
 .user-mini {
@@ -441,7 +447,7 @@ onMounted(() => fetchReports())
 }
 
 .user-mini small {
-  color: var(--color-text-subtle);
+  color: var(--color-text-secondary);
   font-size: var(--font-xs);
 }
 
