@@ -184,8 +184,14 @@
 
   .footer-content {
     flex-direction: column;
+    align-items: center;
     gap: var(--spacing-2xl);
     padding-bottom: var(--spacing-xl);
+    text-align: center;
+  }
+
+  .footer-info {
+    align-items: center;
   }
 
   .footer-desc {
@@ -193,11 +199,17 @@
   }
 
   .footer-counters {
-    justify-content: space-between;
+    justify-content: center;
   }
 
   .footer-groups {
     gap: var(--spacing-3xl);
+    justify-content: center;
+    width: 100%;
+  }
+
+  .footer-group {
+    align-items: center;
   }
 
   .footer-bottom {
@@ -212,5 +224,6 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-lg);
+    justify-items: center;
   }
 }
