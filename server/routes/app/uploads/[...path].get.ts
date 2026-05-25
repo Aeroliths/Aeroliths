@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid path' })
   }
 
-  const allowedDirs = ['lithos', 'elements', 'profile', 'profile_pictures']
+  const allowedDirs = ['lithos', 'elements', 'profile', 'profile_pictures', 'news']
   const firstSegment = path.split('/')[0]
   if (!firstSegment || !allowedDirs.includes(firstSegment)) {
     throw createError({ statusCode: 403, statusMessage: 'Access denied' })

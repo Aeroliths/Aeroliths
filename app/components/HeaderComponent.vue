@@ -15,6 +15,7 @@
       <nav class="nav" :class="{ 'nav-open': mobileMenuOpen }">
         <NuxtLink href="/" @click="mobileMenuOpen = false">Home</NuxtLink>
         <NuxtLink href="/rules" @click="mobileMenuOpen = false">Rules</NuxtLink>
+        <NuxtLink href="/news" @click="mobileMenuOpen = false">News</NuxtLink>
 
         <!-- Protected links - only visible when authenticated -->
         <template v-if="isAuthenticated">

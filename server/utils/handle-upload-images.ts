@@ -13,16 +13,16 @@ export const upload_image = async (fileField: any | undefined, user: globalThis.
   }
 
   // Validate upload type
-  const validTypes = ['lithos', 'elements', 'profile']
+  const validTypes = ['lithos', 'elements', 'profile', 'news']
   if (!validTypes.includes(fileField.DirName)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid upload type. Must be: lithos, elements, or profile',
+      statusMessage: 'Invalid upload type. Must be: lithos, elements, profile, or news',
     })
   }
 
-  // Verify user has admin role for lithos and elements uploads
-  if (fileField.DirName === 'lithos' || fileField.DirName === 'elements') {
+  // Verify user has admin role for lithos, elements and news uploads
+  if (fileField.DirName === 'lithos' || fileField.DirName === 'elements' || fileField.DirName === 'news') {
     requireRole(user, ['admin'])
   }
 
@@ -112,16 +112,16 @@ export const delete_image = async (imagePath: string, user: globalThis.JWTPayloa
   const fileName : string = typeof pathParts[4] === 'string' ? pathParts[4] : ''
 
   // Validate upload type
-  const validTypes = ['lithos', 'elements', 'profile']
+  const validTypes = ['lithos', 'elements', 'profile', 'news']
   if (!validTypes.includes(dirName)) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Invalid upload type. Must be: lithos, elements, or profile : ' + pathParts[3],
+      statusMessage: 'Invalid upload type. Must be: lithos, elements, profile, or news : ' + pathParts[3],
     })
   }
 
-  // Verify user has admin role for lithos and elements uploads
-  if (dirName === 'lithos' || dirName === 'elements') {
+  // Verify user has admin role for lithos, elements and news uploads
+  if (dirName === 'lithos' || dirName === 'elements' || dirName === 'news') {
     requireRole(user, ['admin'])
   }
 
