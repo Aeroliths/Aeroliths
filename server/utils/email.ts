@@ -137,7 +137,7 @@ export async function sendInactivityWarningEmail(
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
       <h1 style="color: #7ab8d4; text-align: center;">Aeroliths</h1>
       <h2 style="color: ${isUrgent ? '#e57373' : '#333'}; text-align: center;">
-        ${isUrgent ? '⚠️ ' : ''}Compte inactif — suppression dans ${label}
+        ${isUrgent ? '⚠️ ' : ''}Compte inactif - suppression dans ${label}
       </h2>
       <p style="color: #555; font-size: 16px; line-height: 1.6;">
         Bonjour <strong>${username}</strong>,

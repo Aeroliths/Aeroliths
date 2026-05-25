@@ -85,7 +85,7 @@ onMounted(async () => {
     animateCounter(animatedCollections, data.collections)
     animateCounter(animatedGames, data.games)
   } catch {
-    // Silently fail — counters stay at 0
+    // Silently fail - counters stay at 0
   }
 })
 </script>

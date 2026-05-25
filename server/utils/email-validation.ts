@@ -31,7 +31,7 @@ async function domainHasMx(domain: string): Promise<boolean | null> {
  * Validate that an email is not from a disposable provider and that its
  * domain has at least one MX record.
  *
- * Returns null if the email passes both checks (or input is malformed —
+ * Returns null if the email passes both checks (or input is malformed -
  * the caller's regex check handles format errors), or a user-facing error
  * message string if it fails.
  */

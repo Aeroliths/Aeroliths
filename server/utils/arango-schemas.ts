@@ -9,7 +9,7 @@
 //            has_stats    (players → stats)
 
 // --- Vertex: players ---
-// Mirror of the PostgreSQL user — _key = PostgreSQL user ID
+// Mirror of the PostgreSQL user - _key = PostgreSQL user ID
 export interface PlayerVertex {
   _key: string   // PostgreSQL user ID
   username: string

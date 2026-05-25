@@ -24,16 +24,16 @@
           <p>
             Build a deck that fits your playstyle, learn the strengths and weaknesses of the four
             elements (Fire, Water, Earth and Air), and climb the ranked leaderboard against players
-            from around the world. The game runs entirely in your browser — no download required.
+            from around the world. The game runs entirely in your browser - no download required.
           </p>
 
           <h2>Key Features</h2>
           <ul class="home-about__features">
-            <li><strong>Free to play</strong> — no ads, no paywalls, no microtransactions.</li>
-            <li><strong>Strategic depth</strong> — every placement matters and elements counter each other.</li>
-            <li><strong>Deck building</strong> — collect Lithos and assemble your perfect deck.</li>
-            <li><strong>Online matches</strong> — challenge friends or climb the ranked ladder.</li>
-            <li><strong>Browser-based</strong> — play instantly on desktop or mobile, no install needed.</li>
+            <li><strong>Free to play</strong> - no ads, no paywalls, no microtransactions.</li>
+            <li><strong>Strategic depth</strong> - every placement matters and elements counter each other.</li>
+            <li><strong>Deck building</strong> - collect Lithos and assemble your perfect deck.</li>
+            <li><strong>Online matches</strong> - challenge friends or climb the ranked ladder.</li>
+            <li><strong>Browser-based</strong> - play instantly on desktop or mobile, no install needed.</li>
           </ul>
         </div>
       </div>
@@ -55,7 +55,7 @@ useSeoMeta({
   twitterDescription: 'Build your deck, master the four elements, and dominate the leaderboard in this free fan-made strategy game inspired by Skylanders Skystones.',
 })
 
-// Structured data — WebSite + VideoGame
+// Structured data - WebSite + VideoGame
 useHead({
   script: [
     {

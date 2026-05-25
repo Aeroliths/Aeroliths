@@ -1,6 +1,6 @@
 <template>
   <div class="app-layout">
-    <!-- Ambient glows — stone & sky theme -->
+    <!-- Ambient glows - stone & sky theme -->
     <div class="ambient-glow ambient-glow--sky"></div>
     <div class="ambient-glow ambient-glow--stone"></div>
     <div class="ambient-glow ambient-glow--ember"></div>
@@ -42,7 +42,7 @@ useHead({
   z-index: 1;
 }
 
-/* Ambient glows — subtle, thematic */
+/* Ambient glows - subtle, thematic */
 .ambient-glow {
   position: fixed;
   border-radius: 50%;
@@ -50,7 +50,7 @@ useHead({
   z-index: 0;
 }
 
-/* Cerulean blue — sky / atmosphere */
+/* Cerulean blue - sky / atmosphere */
 .ambient-glow--sky {
   width: 600px;
   height: 600px;
@@ -60,7 +60,7 @@ useHead({
   animation: drift 16s ease-in-out infinite alternate;
 }
 
-/* Warm slate — stone / earth */
+/* Warm slate - stone / earth */
 .ambient-glow--stone {
   width: 500px;
   height: 500px;
@@ -70,7 +70,7 @@ useHead({
   animation: drift 20s ease-in-out infinite alternate-reverse;
 }
 
-/* Amber ember — elemental warmth */
+/* Amber ember - elemental warmth */
 .ambient-glow--ember {
   width: 400px;
   height: 400px;

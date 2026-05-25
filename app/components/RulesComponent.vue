@@ -61,8 +61,8 @@
             are compared:
           </p>
           <ul>
-            <li><strong>Your side value &gt; opponent's opposite side value</strong> — the opponent's Lithos is <strong>captured</strong> and becomes yours.</li>
-            <li><strong>Your side value &le; opponent's opposite side value</strong> — nothing happens on that side.</li>
+            <li><strong>Your side value &gt; opponent's opposite side value</strong> - the opponent's Lithos is <strong>captured</strong> and becomes yours.</li>
+            <li><strong>Your side value &le; opponent's opposite side value</strong> - nothing happens on that side.</li>
           </ul>
           <p>
             A single Lithos can capture <strong>multiple opponent Lithos at once</strong>

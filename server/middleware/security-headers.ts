@@ -21,7 +21,7 @@ export default defineEventHandler((event) => {
     'camera=(), microphone=(), geolocation=(), payment=()'
   )
 
-  // HSTS — force HTTPS (only in production)
+  // HSTS - force HTTPS (only in production)
   if (process.env.NODE_ENV === 'production') {
     headers.setHeader(
       'Strict-Transport-Security',

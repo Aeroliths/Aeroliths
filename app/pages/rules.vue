@@ -16,7 +16,7 @@ useSeoMeta({
   twitterDescription: 'Lithos placement, captures, elemental matchups and strategy. Everything you need to start winning at Aeroliths.',
 })
 
-// FAQPage structured data — eligible for Google rich results
+// FAQPage structured data - eligible for Google rich results
 useHead({
   script: [
     {

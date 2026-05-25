@@ -11,7 +11,7 @@
     <section class="news-list-wrapper">
       <div v-if="pending" class="news-state">Loading news...</div>
       <div v-else-if="error" class="news-state news-state--error">Failed to load news.</div>
-      <div v-else-if="items.length === 0" class="news-state">No news yet — stay tuned!</div>
+      <div v-else-if="items.length === 0" class="news-state">No news yet - stay tuned!</div>
 
       <div v-else class="news-grid">
         <NuxtLink

@@ -92,7 +92,7 @@ async function main() {
             console.log('[Seed] Admin account updated')
         }
     } else {
-        console.warn('[Seed] ADMIN_USERNAME, ADMIN_EMAIL or ADMIN_PASSWORD not set in .env — skipping admin creation')
+        console.warn('[Seed] ADMIN_USERNAME, ADMIN_EMAIL or ADMIN_PASSWORD not set in .env - skipping admin creation')
     }
 }
 

@@ -8,10 +8,10 @@ export default defineNuxtConfig({
     resendApiKey: process.env.RESEND_API_KEY || '',
     emailFrom: process.env.EMAIL_FROM || 'noreply@aeroliths.fr',
     appUrl: process.env.APP_URL || 'http://localhost:3000',
-    // hCaptcha test secret (always validates) — replace in production
+    // hCaptcha test secret (always validates) - replace in production
     hcaptchaSecret: process.env.HCAPTCHA_SECRET || '0x0000000000000000000000000000000000000000',
     public: {
-      // hCaptcha test site key (always passes) — replace in production
+      // hCaptcha test site key (always passes) - replace in production
       hcaptchaSiteKey: process.env.HCAPTCHA_SITE_KEY || '10000000-ffff-ffff-ffff-000000000001',
     },
   },
@@ -67,7 +67,7 @@ export default defineNuxtConfig({
           'X-Frame-Options': 'DENY',
           'Referrer-Policy': 'strict-origin-when-cross-origin',
           'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-          // Content Security Policy — restrict script/style/connect sources
+          // Content Security Policy - restrict script/style/connect sources
           'Content-Security-Policy': [
             "default-src 'self'",
             // 'unsafe-inline' kept for Nuxt hydration scripts; tighten with nonces later

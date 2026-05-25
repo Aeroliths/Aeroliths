@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
     // Get authenticated user from token
     const user = getAuthUser(event)
 
-    // Fetch user details (only fields needed by the frontend — internal flags excluded)
+    // Fetch user details (only fields needed by the frontend - internal flags excluded)
     const userDetails = await db.postgres.user.findUnique({
       where: { id: user.userId },
       select: {

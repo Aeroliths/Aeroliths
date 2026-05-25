@@ -1,12 +1,12 @@
 /* =========================================
    DESIGN SYSTEM - CSS VARIABLES
-   Thème Aeroliths — Pierre & Ciel
+   Thème Aeroliths - Pierre & Ciel
    ========================================= */
 
 :root {
   /* =========================================
      BRAND COLORS
-     Bleu céruléen — ciel clair, azur atmosphérique
+     Bleu céruléen - ciel clair, azur atmosphérique
      ========================================= */
   --color-brand-primary: #7ab8d4;
   --color-brand-primary-light: #9dd0e8;
@@ -21,7 +21,7 @@
 
   /* =========================================
      BACKGROUND COLORS
-     Pierres sombres — obsidienne, ardoise, granit
+     Pierres sombres - obsidienne, ardoise, granit
      ========================================= */
   --color-bg-base: #1e2028;
   --color-bg-primary: #252830;
@@ -42,7 +42,7 @@
 
   /* =========================================
      TEXT COLORS
-     Calcaire pâle — blanc cassé, brume de pierre
+     Calcaire pâle - blanc cassé, brume de pierre
      ========================================= */
   --color-text-primary: #ece8e0;
   --color-text-secondary: rgba(236, 232, 224, 0.9);
@@ -58,7 +58,7 @@
 
   /* =========================================
      BORDER COLORS
-     Ciel teinté — bordures subtiles bleues
+     Ciel teinté - bordures subtiles bleues
      ========================================= */
   --color-border-light: rgba(122, 184, 212, 0.12);
   --color-border-lighter: rgba(122, 184, 212, 0.06);
@@ -97,7 +97,7 @@
   --color-warning-border: rgba(241, 196, 15, 0.3);
   --color-warning-border-hover: rgba(241, 196, 15, 0.5);
 
-  /* Info — bleu acier, reflet de ciel */
+  /* Info - bleu acier, reflet de ciel */
   --color-info: #6ba5c8;
   --color-info-dark: #4a7fa5;
   --color-info-bg: rgba(107, 165, 200, 0.10);

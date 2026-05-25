@@ -1,4 +1,4 @@
-// Dynamic sitemap — static routes + published news
+// Dynamic sitemap - static routes + published news
 
 const SITE_URL = 'https://aeroliths.fr'
 

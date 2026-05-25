@@ -31,5 +31,5 @@ docker-entrypoint-dev.sh
 coverage
 *.tsbuildinfo
 
-# Uploads directory (served via /app/uploads/) — root only, not the server handler folder
+# Uploads directory (served via /app/uploads/) - root only, not the server handler folder
 /uploads/

@@ -2,7 +2,7 @@ import { join } from 'path'
 import { createReadStream, existsSync, statSync } from 'fs'
 import { sendStream, setHeader, createError } from 'h3'
 
-// Serve uploaded files at /app/uploads/<dir>/<file> — matches the path stored in DB by handle-upload-images.ts
+// Serve uploaded files at /app/uploads/<dir>/<file> - matches the path stored in DB by handle-upload-images.ts
 export default defineEventHandler(async (event) => {
   const path = getRouterParam(event, 'path')
 

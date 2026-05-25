@@ -237,7 +237,7 @@
             <strong>Audience measurement (<code>aer_vid</code>):</strong> a
             long-lived anonymous identifier used to count unique visitors and
             visit volume in the admin dashboard. No third-party advertising
-            trackers and no profiling are involved (hCaptcha — described below —
+            trackers and no profiling are involved (hCaptcha - described below -
             is used solely for bot protection on the sign-in and sign-up forms).
           </li>
           <li>

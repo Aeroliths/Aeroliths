@@ -51,7 +51,7 @@ services:
     restart: always
     environment:
       - ARANGO_ROOT_PASSWORD=${ARANGO_PASSWORD}
-    # Ports not exposed to host in production — accessible only via internal network
+    # Ports not exposed to host in production - accessible only via internal network
     # Uncomment below for local development access:
     # ports:
     #   - "${ARANGO_PORT}:8529"

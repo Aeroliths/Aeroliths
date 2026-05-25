@@ -57,7 +57,7 @@
     <div v-if="showCollectionModal" class="col-overlay" @click.self="closeCollectionModal">
       <div class="col-modal">
         <div class="col-modal-header">
-          <h3>Collection — {{ selectedUser?.username }}</h3>
+          <h3>Collection - {{ selectedUser?.username }}</h3>
           <button class="col-close-btn" @click="closeCollectionModal">✕</button>
         </div>
 
