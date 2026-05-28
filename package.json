@@ -41,6 +41,7 @@
     "isomorphic-dompurify": "^3.14.0",
     "jsonwebtoken": "^9.0.3",
     "nuxt": "^4.4.6",
+    "nuxt-auth-utils": "^0.5.29",
     "pg": "^8.20.0",
     "prisma": "^7.6.0",
     "typescript": "^5.9.3",

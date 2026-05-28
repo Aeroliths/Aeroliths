@@ -97,6 +97,8 @@
           </button>
         </form>
 
+        <OAuthButtons />
+
         <div class="register-footer">
           <p>
             Already have an account?

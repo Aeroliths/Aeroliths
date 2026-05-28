@@ -1,6 +1,4 @@
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import type { SignOptions } from 'jsonwebtoken'
 
 // API route to authenticate user and return JWT token
 export default defineEventHandler(async (event) => {
@@ -57,59 +55,13 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Get JWT secret from environment
-    const jwtSecret = process.env.JWT_SECRET
-    if (!jwtSecret) {
-      console.error('JWT_SECRET is not defined in environment variables')
-      throw createError({
-        statusCode: 500,
-        message: 'Server configuration error',
-      })
-    }
-
-    // Generate JWT token
-    const expiresIn = process.env.JWT_EXPIRES_IN || '7d'
-    const signOptions: SignOptions = {
-      expiresIn: expiresIn as SignOptions['expiresIn'],
-    }
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-        username: user.username,
-        role: user.role.name,
-        tokenVersion: user.authentication.tokenVersion,
-      },
-      jwtSecret,
-      signOptions
-    )
-
-    // Update last active date, cancel any pending deletion request, and reset inactivity warning flags
-    await db.postgres.user.update({
-      where: { id: user.id },
-      data: {
-        lastActiveAt: new Date(),
-        deletionRequestedAt: null,
-        deletionReminderSent: false,
-        warning6MonthsSent: false,
-        warning2MonthsSent: false,
-        warning1MonthSent: false,
-        warning1WeekSent: false,
-      },
-    })
-
-    // Record login in history for admin stats
-    await db.postgres.loginHistory.create({
-      data: { userId: user.id },
-    })
-
-    // Set token in httpOnly cookie for secure authentication
-    setCookie(event, 'auth_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
+    // Sign JWT, set the auth cookie, and record the login
+    await issueAuthSession(event, {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: { name: user.role.name },
+      tokenVersion: user.authentication.tokenVersion,
     })
 
     // Only expose fields needed by the frontend (internal flags excluded)

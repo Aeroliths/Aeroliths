@@ -58,6 +58,8 @@
           </button>
         </form>
 
+        <OAuthButtons />
+
         <div class="login-footer">
           <p>
             <NuxtLink to="/forgot-password">Forgot your password?</NuxtLink>
@@ -82,13 +84,23 @@ definePageMeta({
 })
 
 const { login, resendVerification, isLoading } = useAuth()
+const route = useRoute()
+
+const oauthErrorMessages: Record<string, string> = {
+  oauth_email_unverified:
+    'Your Google/Discord email is not verified. Verify it with your provider, or sign in with email and password.',
+  oauth_failed: 'Social sign-in failed. Please try again.',
+}
 
 const credentials = ref({
   email: '',
   password: ''
 })
 
-const errorMessage = ref('')
+const initialErrorCode = Array.isArray(route.query.error) ? route.query.error[0] : route.query.error
+const errorMessage = ref(
+  (initialErrorCode && oauthErrorMessages[initialErrorCode]) || ''
+)
 const showResendOption = ref(false)
 const resendCooldown = ref(0)
 const resendMessage = ref('')
