@@ -57,9 +57,7 @@ if (!data.value?.pending) {
 
 const pendingEmail = computed(() => data.value?.email ?? '')
 const pendingProvider = computed(() => data.value?.provider ?? '')
-const providerLabel = computed(() =>
-  pendingProvider.value === 'google' ? 'Google' : pendingProvider.value === 'discord' ? 'Discord' : ''
-)
+const providerLabel = computed(() => (pendingProvider.value === 'discord' ? 'Discord' : ''))
 
 const username = ref(data.value?.suggestedUsername ?? '')
 const errorMessage = ref('')

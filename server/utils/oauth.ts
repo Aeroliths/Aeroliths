@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import type { H3Event } from 'h3'
 
-export type OAuthProvider = 'google' | 'discord'
+export type OAuthProvider = 'discord'
 
 export interface NormalizedOAuthProfile {
   provider: OAuthProvider

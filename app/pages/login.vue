@@ -88,7 +88,7 @@ const route = useRoute()
 
 const oauthErrorMessages: Record<string, string> = {
   oauth_email_unverified:
-    'Your Google/Discord email is not verified. Verify it with your provider, or sign in with email and password.',
+    'Your Discord email is not verified. Verify it with your provider, or sign in with email and password.',
   oauth_failed: 'Social sign-in failed. Please try again.',
 }
 

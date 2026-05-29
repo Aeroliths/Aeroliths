@@ -44,7 +44,7 @@ model User {
 
 model OAuthAccount {
   id                String   @id @default(cuid())
-  provider          String // "google" | "discord"
+  provider          String // "discord"
   providerAccountId String // unique id from the provider
   createdAt         DateTime @default(now())
 

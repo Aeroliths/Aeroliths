@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     if (!pending) {
       throw createError({
         statusCode: 400,
-        message: 'No pending sign-in. Please start again with Google or Discord.',
+        message: 'No pending sign-in. Please start again with Discord.',
       })
     }
 
