@@ -43,9 +43,31 @@ cp .env.example .env
 | `ARANGO_USER` | ArangoDB username |
 | `ARANGO_PASSWORD` | ArangoDB password |
 | `JWT_SECRET` | JWT secret key |
+| `JWT_EXPIRES_IN` | JWT lifetime (e.g. `7d`) |
+| `RESEND_API_KEY` | [Resend](https://resend.com/) API key for transactional email |
+| `EMAIL_FROM` | Sender address for outgoing email |
+| `APP_URL` | Public base URL of the app (used in email links) |
+| `ADMIN_USERNAME` | Default admin account username (created on seed) |
+| `ADMIN_EMAIL` | Default admin account email |
+| `ADMIN_PASSWORD` | Default admin account password |
+| `HCAPTCHA_SITE_KEY` | hCaptcha site key (test keys in `.env.example` always pass) |
+| `HCAPTCHA_SECRET` | hCaptcha secret key |
 | `DISCORD_WEBHOOK_URL` | Discord webhook (notifications) |
 
 ## Development
+
+### Local databases (Docker)
+
+A Docker stack with the development databases is provided in `docker/`. It runs
+PostgreSQL (`localhost:5544`), ArangoDB (`localhost:8530`), and Adminer (a DB
+GUI at `localhost:8080`). Start it before running Prisma or the dev server, and
+point your `.env` connection variables at it:
+
+```bash
+docker compose -f docker/docker-compose.yml up -d
+```
+
+### Dev server
 
 ```bash
 npm run dev
@@ -84,4 +106,14 @@ docker-compose up -d --build
 ```
 
 The application connects to external PostgreSQL and ArangoDB servers.
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to set
+up your environment, run the tests, and open a pull request.
+
+## Security
+
+To report a security vulnerability, please follow the process described in
+[SECURITY.md](SECURITY.md).
 
