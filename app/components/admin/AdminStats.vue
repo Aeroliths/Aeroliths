@@ -577,7 +577,7 @@ const formatChartLabel = (label: string, index: number) => {
     return d.toLocaleDateString(undefined, { weekday: 'short' })
   }
   // month: show day number, every 3rd for readability
-  if (index % 3 !== 0 && index !== loginChartData.value.labels.length - 1) return ''
+  if (index % 3 !== 0 && index !== activityChartData.value.labels.length - 1) return ''
   const d = new Date(label + 'T00:00:00')
   return String(d.getDate())
 }
