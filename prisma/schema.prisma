@@ -35,10 +35,25 @@ model User {
   collections    Collections[]
   deck           Deck?
   loginHistory   LoginHistory[]
+  oauthAccounts  OAuthAccount[]
   reportsMade    UserReport[]    @relation("ReportsMade")
   reportsAgainst UserReport[]    @relation("ReportsAgainst")
 
   @@map("users")
+}
+
+model OAuthAccount {
+  id                String   @id @default(cuid())
+  provider          String // "discord"
+  providerAccountId String // unique id from the provider
+  createdAt         DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("oauth_accounts")
 }
 
 model UserReport {
