@@ -60,9 +60,24 @@ if (error.value || !data.value?.data) {
 
 const news = computed(() => data.value!.data)
 
+const SITE_URL = 'https://aeroliths.fr'
+// og:image needs an absolute URL; coverImage is stored as a relative path.
+// Fall back to undefined so the global site og:image applies when there's no cover.
+const shareImage = computed(() =>
+  news.value.coverImage ? `${SITE_URL}${news.value.coverImage}` : undefined
+)
+
 useSeoMeta({
-  title: () => `${news.value.title} – Aeroliths News`,
+  title: () => `${news.value.title} - Aeroliths News`,
   description: () => news.value.excerpt || 'Aeroliths news article.',
+  ogTitle: () => news.value.title,
+  ogDescription: () => news.value.excerpt || 'Aeroliths news article.',
+  ogType: 'article',
+  ogUrl: () => `${SITE_URL}/news/${news.value.slug}`,
+  ogImage: () => shareImage.value,
+  twitterTitle: () => news.value.title,
+  twitterDescription: () => news.value.excerpt || 'Aeroliths news article.',
+  twitterImage: () => shareImage.value,
 })
 
 const formatDate = (iso: string | null) => {

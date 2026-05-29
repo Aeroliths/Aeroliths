@@ -142,7 +142,7 @@ onUnmounted(() => {
 })
 
 useSeoMeta({
-  title: 'Login – Access Your Aeroliths Account',
+  title: 'Login - Access Your Aeroliths Account',
   description: 'Sign in to your Aeroliths account to play, build your deck, manage your collection and challenge other players online.',
   ogTitle: 'Login to Aeroliths',
   ogDescription: 'Sign in to play Aeroliths, build your deck and challenge other players online.',

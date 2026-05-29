@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Play – Aeroliths',
+  title: 'Play - Aeroliths',
   description: 'Play Aeroliths online.',
   robots: 'noindex, nofollow',
 })

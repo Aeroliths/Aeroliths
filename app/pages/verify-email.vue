@@ -57,7 +57,7 @@ onMounted(async () => {
 })
 
 useSeoMeta({
-  title: 'Verify Email – Aeroliths',
+  title: 'Verify Email - Aeroliths',
   description: 'Verify your email address for Aeroliths.',
   robots: 'noindex, nofollow',
 })

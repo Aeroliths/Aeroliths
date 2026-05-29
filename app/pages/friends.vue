@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Friends – Aeroliths',
+  title: 'Friends - Aeroliths',
   description: 'Manage your Aeroliths friends list.',
   robots: 'noindex, nofollow',
 })

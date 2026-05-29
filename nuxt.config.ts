@@ -21,7 +21,7 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'en' },
       titleTemplate: (title?: string) =>
-        title ? `${title} | Aeroliths` : 'Aeroliths – Strategy Board Game Inspired by Skystones',
+        title ? `${title} | Aeroliths` : 'Aeroliths - Strategy Board Game Inspired by Skystones',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -30,7 +30,7 @@ export default defineNuxtConfig({
         { property: 'og:site_name', content: 'Aeroliths' },
         { property: 'og:type', content: 'website' },
         { property: 'og:locale', content: 'en_US' },
-        { property: 'og:title', content: 'Aeroliths – Strategy Board Game Inspired by Skystones' },
+        { property: 'og:title', content: 'Aeroliths - Strategy Board Game Inspired by Skystones' },
         { property: 'og:description', content: 'Free online strategy game inspired by Skylanders Skystones. Build your deck, master the elements, dominate the board.' },
         { property: 'og:url', content: 'https://aeroliths.fr' },
         { property: 'og:image', content: 'https://aeroliths.fr/placeholder-background.jpg' },
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
         { property: 'og:image:height', content: '630' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:title', content: 'Aeroliths – Strategy Board Game Inspired by Skystones' },
+        { name: 'twitter:title', content: 'Aeroliths - Strategy Board Game Inspired by Skystones' },
         { name: 'twitter:description', content: 'Free online strategy game inspired by Skylanders Skystones. Build your deck, master the elements, dominate the board.' },
         { name: 'twitter:image', content: 'https://aeroliths.fr/placeholder-background.jpg' },
         // Theme

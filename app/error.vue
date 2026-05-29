@@ -154,7 +154,7 @@ const handleError = () => {
 }
 
 useSeoMeta({
-  title: `Error ${props.error.statusCode} – Aeroliths`,
+  title: `Error ${props.error.statusCode} - Aeroliths`,
   description: errorDescription.value,
   robots: 'noindex, nofollow',
 })

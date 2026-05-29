@@ -47,7 +47,7 @@ type NewsListItem = {
 }
 
 useSeoMeta({
-  title: 'News – Aeroliths',
+  title: 'News - Aeroliths',
   description: 'Project updates, changelog and announcements about Aeroliths.',
 })
 

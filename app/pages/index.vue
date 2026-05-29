@@ -47,11 +47,11 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Aeroliths – Free Online Strategy Board Game Inspired by Skystones',
+  title: 'Aeroliths - Free Online Strategy Board Game Inspired by Skystones',
   description: 'Aeroliths is a free fan-made online strategy board game inspired by Skylanders Skystones. Build your deck, master the four elements, and dominate the leaderboard.',
-  ogTitle: 'Aeroliths – Free Online Strategy Board Game',
+  ogTitle: 'Aeroliths - Free Online Strategy Board Game',
   ogDescription: 'Build your deck, master the four elements, and dominate the leaderboard in this free fan-made strategy game inspired by Skylanders Skystones.',
-  twitterTitle: 'Aeroliths – Free Online Strategy Board Game',
+  twitterTitle: 'Aeroliths - Free Online Strategy Board Game',
   twitterDescription: 'Build your deck, master the four elements, and dominate the leaderboard in this free fan-made strategy game inspired by Skylanders Skystones.',
 })
 

@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Admin Panel – Aeroliths',
+  title: 'Admin Panel - Aeroliths',
   description: 'Admin panel for managing users and lithos.',
   robots: 'noindex, nofollow',
 })

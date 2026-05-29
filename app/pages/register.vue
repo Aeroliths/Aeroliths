@@ -194,9 +194,9 @@ onUnmounted(() => {
 })
 
 useSeoMeta({
-  title: 'Create an Account – Join the Aeroliths Community for Free',
+  title: 'Create an Account - Join the Aeroliths Community for Free',
   description: 'Sign up for a free Aeroliths account in seconds. Build your deck, collect Lithos, climb the ranked leaderboard and join the community.',
-  ogTitle: 'Join Aeroliths – Create Your Free Account',
+  ogTitle: 'Join Aeroliths - Create Your Free Account',
   ogDescription: 'Sign up for free, build your deck, collect Lithos and join the Aeroliths community.',
   robots: 'noindex, follow',
 })

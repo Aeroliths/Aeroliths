@@ -12,9 +12,9 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Legal Notice & Terms of Use – Aeroliths',
+  title: 'Legal Notice & Terms of Use - Aeroliths',
   description: 'Legal notice, terms of use, privacy policy and GDPR information for Aeroliths, the free fan-made strategy game inspired by Skystones.',
-  ogTitle: 'Legal Notice & Terms of Use – Aeroliths',
+  ogTitle: 'Legal Notice & Terms of Use - Aeroliths',
   ogDescription: 'Terms of use, privacy policy and GDPR information for the Aeroliths game.',
   robots: 'noindex, follow',
 })

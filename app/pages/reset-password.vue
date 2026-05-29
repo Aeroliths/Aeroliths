@@ -101,7 +101,7 @@ const handleReset = async () => {
 }
 
 useSeoMeta({
-  title: 'Reset Password – Aeroliths',
+  title: 'Reset Password - Aeroliths',
   description: 'Set a new password for your Aeroliths account.',
   robots: 'noindex, follow',
 })

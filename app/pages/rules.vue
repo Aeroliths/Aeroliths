@@ -8,11 +8,11 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Rules of Aeroliths – How to Play, Captures, Elements & Strategy Guide',
+  title: 'Rules of Aeroliths - How to Play, Captures, Elements & Strategy Guide',
   description: 'Learn how to play Aeroliths: lithos placement, capture mechanics, elemental matchups, and winning strategies. Master the game in just a few minutes.',
-  ogTitle: 'How to Play Aeroliths – Complete Rules & Strategy Guide',
+  ogTitle: 'How to Play Aeroliths - Complete Rules & Strategy Guide',
   ogDescription: 'Lithos placement, captures, elemental matchups and strategy. Everything you need to start winning at Aeroliths.',
-  twitterTitle: 'How to Play Aeroliths – Complete Rules Guide',
+  twitterTitle: 'How to Play Aeroliths - Complete Rules Guide',
   twitterDescription: 'Lithos placement, captures, elemental matchups and strategy. Everything you need to start winning at Aeroliths.',
 })
 

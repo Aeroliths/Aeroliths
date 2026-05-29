@@ -42,7 +42,7 @@ export interface StatsVertex {
   losses: number
   draws: number
   totalGames: number
-  winRate: number      // 0–100
+  winRate: number      // 0-100
   currentStreak: number
   bestStreak: number
   updatedAt: string

@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Leaderboard – Aeroliths',
+  title: 'Leaderboard - Aeroliths',
   description: 'View the top players on the Aeroliths ranked leaderboard.',
   robots: 'noindex, nofollow',
 })
