@@ -1,0 +1,107 @@
+import { describe, it, expect } from 'vitest'
+import { createMatch, placeStone } from '~/app/game/engine/match'
+import type { Stone } from '~/app/game/engine/types'
+
+function stone(id: string, spikes: Partial<Stone> = {}): Stone {
+  return {
+    id,
+    elementId: null,
+    spikeUp: 1,
+    spikeDown: 1,
+    spikeLeft: 1,
+    spikeRight: 1,
+    ...spikes,
+  }
+}
+
+describe('createMatch', () => {
+  it('creates an empty NxN board with the given size', () => {
+    const match = createMatch({
+      size: 3,
+      hands: { A: [stone('a1')], B: [stone('b1')] },
+    })
+
+    expect(match.size).toBe(3)
+    expect(match.board).toHaveLength(3)
+    expect(match.board.every((row) => row.length === 3)).toBe(true)
+    expect(match.board.flat().every((cell) => cell === null)).toBe(true)
+  })
+
+  it('starts with player A by default and status playing', () => {
+    const match = createMatch({
+      size: 3,
+      hands: { A: [stone('a1')], B: [stone('b1')] },
+    })
+
+    expect(match.current).toBe('A')
+    expect(match.status).toBe('playing')
+    expect(match.winner).toBeNull()
+  })
+})
+
+describe('placeStone', () => {
+  it('places the chosen hand stone on an empty cell owned by the current player', () => {
+    const match = createMatch({
+      size: 3,
+      hands: { A: [stone('a1')], B: [stone('b1')] },
+    })
+
+    const next = placeStone(match, 0, 1, 2)
+
+    expect(next.board[2]![1]).toEqual({ owner: 'A', stone: stone('a1') })
+  })
+
+  it('removes the played stone from the hand and passes the turn', () => {
+    const match = createMatch({
+      size: 3,
+      hands: { A: [stone('a1'), stone('a2')], B: [stone('b1')] },
+    })
+
+    const next = placeStone(match, 0, 0, 0)
+
+    expect(next.hands.A).toEqual([stone('a2')])
+    expect(next.current).toBe('B')
+  })
+
+  it('does not mutate the original state', () => {
+    const match = createMatch({
+      size: 3,
+      hands: { A: [stone('a1')], B: [stone('b1')] },
+    })
+
+    placeStone(match, 0, 0, 0)
+
+    expect(match.board[0]![0]).toBeNull()
+    expect(match.hands.A).toHaveLength(1)
+    expect(match.current).toBe('A')
+  })
+
+  it('throws when the target cell is already occupied', () => {
+    const match = createMatch({
+      size: 3,
+      hands: { A: [stone('a1')], B: [stone('b1')] },
+    })
+
+    const next = placeStone(match, 0, 0, 0)
+
+    expect(() => placeStone(next, 0, 0, 0)).toThrow(/occupied/i)
+  })
+
+  it('throws when the hand index is out of range', () => {
+    const match = createMatch({
+      size: 3,
+      hands: { A: [stone('a1')], B: [stone('b1')] },
+    })
+
+    expect(() => placeStone(match, 5, 0, 0)).toThrow(/hand/i)
+  })
+
+  it('throws when the coordinates are off the board', () => {
+    const match = createMatch({
+      size: 3,
+      hands: { A: [stone('a1')], B: [stone('b1')] },
+    })
+
+    expect(() => placeStone(match, 0, 3, 0)).toThrow(/board/i)
+  })
+})
