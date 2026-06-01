@@ -30,9 +30,9 @@
       </div>
 
       <p class="hint">
-        Pick {{ handSize(editingPlayer) }} stones for
+        Pick {{ handSize(editingPlayer) }} Lithos for
         <strong>{{ editingPlayer === 'A' ? 'Player 1' : 'Player 2' }}</strong>.
-        Click a stone in your hand to remove it.
+        Click a Lithos in your hand to remove it.
       </p>
 
       <!-- Selected hand preview -->
@@ -51,7 +51,7 @@
       </div>
 
       <!-- Catalog -->
-      <div v-if="loading" class="empty">Loading lithos...</div>
+      <div v-if="loading" class="empty">Loading Lithos...</div>
       <div v-else class="catalog">
         <button
           v-for="stone in catalog"
@@ -78,7 +78,27 @@
         @select-hand="selectHand"
         @place-at="play"
       />
-      <button class="ghost-btn rematch" @click="reset">New game</button>
+      <button v-if="match.status !== 'finished'" class="ghost-btn rematch" @click="reset">
+        New game
+      </button>
+
+      <!-- End-of-game overlay: position:absolute inside .play (which is
+           position:relative). No Teleport, scoped styles, so it renders
+           reliably and is not trapped by .play-container's backdrop-filter. -->
+      <div v-if="match.status === 'finished'" class="end-overlay" @click.self="reset">
+        <div class="end-modal" role="dialog" aria-modal="true">
+          <div class="end-result" :class="resultClass">{{ resultTitle }}</div>
+          <div class="end-score">
+            <span class="es-a">Player 1 : {{ finalScore.A }}</span>
+            <span class="es-sep">/</span>
+            <span class="es-b">Player 2 : {{ finalScore.B }}</span>
+          </div>
+          <div class="end-actions">
+            <button class="end-btn end-btn-primary" @click="start">Play again</button>
+            <button class="end-btn" @click="reset">Back to Play</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -87,11 +107,15 @@
 import { ref, computed, onMounted } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
-import { createMatch, placeStone } from '~/game/engine/match'
+import { createMatch, placeStone, getScore } from '~/game/engine/match'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
 import type { ElementGraph, MatchState, Player, Stone } from '~/game/engine/types'
 
 type Phase = 'setup' | 'play'
+
+const emit = defineEmits<{
+  (e: 'activeChange', active: boolean): void
+}>()
 
 const phase = ref<Phase>('setup')
 const loading = ref(true)
@@ -104,6 +128,19 @@ const hands = ref<Record<Player, Stone[]>>({ A: [], B: [] })
 
 const match = ref<MatchState | null>(null)
 const selectedHandIndex = ref<number | null>(null)
+
+const finalScore = computed(() => (match.value ? getScore(match.value) : { A: 0, B: 0 }))
+const resultTitle = computed(() => {
+  const w = match.value?.winner
+  if (w === 'draw') return "It's a draw!"
+  if (w === 'A') return 'Player 1 wins!'
+  if (w === 'B') return 'Player 2 wins!'
+  return ''
+})
+const resultClass = computed(() => {
+  const w = match.value?.winner
+  return w === 'draw' ? 'is-draw' : `is-${w}`
+})
 
 const cellCount = computed(() => size.value * size.value)
 function handSize(player: Player): number {
@@ -138,12 +175,14 @@ function start() {
   })
   selectedHandIndex.value = null
   phase.value = 'play'
+  emit('activeChange', true)
 }
 
 function reset() {
   match.value = null
   selectedHandIndex.value = null
   phase.value = 'setup'
+  emit('activeChange', false)
 }
 
 function selectHand(index: number) {
@@ -340,6 +379,7 @@ onMounted(loadData)
 
 /* ---- Play ---- */
 .play {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -350,4 +390,95 @@ onMounted(loadData)
 
 .owner-A {}
 .owner-B {}
+
+/* ---- End-of-game overlay (absolute inside .play, scoped) ---- */
+.end-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 12, 18, 0.72);
+  backdrop-filter: blur(2px);
+  border-radius: var(--radius-2xl, 1rem);
+  animation: end-fade 0.18s ease-out;
+}
+
+.end-modal {
+  width: min(90%, 360px);
+  background: var(--color-bg-primary, #252830);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-2xl, 1rem);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: end-pop 0.22s ease-out;
+}
+
+.end-result {
+  font-size: var(--font-2xl, 1.6rem);
+  font-weight: var(--font-bold);
+  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.end-result.is-A { color: var(--owner-a, #3b82f6); }
+.end-result.is-B { color: var(--owner-b, #ef4444); }
+.end-result.is-draw { color: var(--color-text-muted); }
+
+.end-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: var(--font-base);
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.end-score .es-a { color: var(--owner-a, #3b82f6); }
+.end-score .es-b { color: var(--owner-b, #ef4444); }
+.end-score .es-sep { color: var(--color-text-muted); }
+
+.end-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.end-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+  background: var(--bg-glass-light);
+  color: var(--color-text-primary);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.end-btn:hover { background: var(--bg-glass-medium); transform: translateY(-1px); }
+
+.end-btn-primary {
+  background: var(--color-primary, #6366f1);
+  border-color: var(--color-primary, #6366f1);
+  color: #fff;
+}
+
+.end-btn-primary:hover { filter: brightness(1.08); }
+
+@keyframes end-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes end-pop {
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .end-overlay, .end-modal { animation: none; }
+}
 </style>

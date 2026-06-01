@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     where: { userId: user.userId },
     include: {
       entries: {
-        include: { lithos: true },
+        include: { lithos: { include: { element: true } } },
       },
     },
   })

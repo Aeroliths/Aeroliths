@@ -6,7 +6,7 @@
         <p>Welcome, <strong>{{ user?.username }}</strong>!</p>
       </div>
 
-      <div class="play-tabs">
+      <div v-if="!matchActive" class="play-tabs">
         <button
           class="play-tab"
           :class="{ active: tab === 'deck' }"
@@ -24,7 +24,7 @@
       </div>
 
       <DeckBuilder v-if="tab === 'deck'" />
-      <LocalMatch v-else />
+      <LocalMatch v-else @active-change="matchActive = $event" />
     </div>
   </div>
 </template>
@@ -37,6 +37,7 @@ import LocalMatch from '~/components/game/LocalMatch.vue'
 
 const { user } = useAuth()
 const tab = ref<'deck' | 'local'>('deck')
+const matchActive = ref(false)
 </script>
 
 <style scoped src="~/assets/css/play.css"></style>

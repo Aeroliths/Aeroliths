@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { toStone, toElementGraph } from '~/app/game/engine/adapters'
 
 describe('toStone', () => {
-  it('maps a lithos API record to an engine stone', () => {
+  it('maps a lithos API record to an engine stone, including the element name', () => {
     const litho = {
       id: 'l1',
       name: 'Ember',
@@ -13,6 +13,7 @@ describe('toStone', () => {
       spikeRight: 3,
       rarity: 'common',
       elementId: 'fire',
+      element: { id: 'fire', name: 'Fire' },
     }
 
     expect(toStone(litho)).toEqual({
@@ -20,6 +21,7 @@ describe('toStone', () => {
       name: 'Ember',
       sprite: '/img/ember.png',
       elementId: 'fire',
+      elementName: 'Fire',
       spikeUp: 4,
       spikeDown: 1,
       spikeLeft: 2,
@@ -27,7 +29,7 @@ describe('toStone', () => {
     })
   })
 
-  it('keeps elementId null when the lithos has no element', () => {
+  it('keeps element fields null when the lithos has no element', () => {
     const litho = {
       id: 'l2',
       name: 'Plain',
@@ -38,9 +40,12 @@ describe('toStone', () => {
       spikeRight: 1,
       rarity: 'common',
       elementId: null,
+      element: null,
     }
 
-    expect(toStone(litho).elementId).toBeNull()
+    const stone = toStone(litho)
+    expect(stone.elementId).toBeNull()
+    expect(stone.elementName).toBeNull()
   })
 })
 

@@ -10,6 +10,8 @@ export interface Stone {
   sprite?: string
   /** Element id, or null for elementless stones. Drives the +1/-1 combat bonus. */
   elementId: string | null
+  /** Human-readable element name, for display (tooltips). Null when elementless. */
+  elementName?: string | null
   spikeUp: number
   spikeDown: number
   spikeLeft: number

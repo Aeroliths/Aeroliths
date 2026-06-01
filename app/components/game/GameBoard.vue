@@ -9,13 +9,7 @@
       </div>
 
       <div class="status-center">
-        <template v-if="state.status === 'finished'">
-          <span v-if="state.winner === 'draw'" class="result">Draw</span>
-          <span v-else class="result">
-            {{ state.winner === 'A' ? 'Player 1' : 'Player 2' }} wins!
-          </span>
-        </template>
-        <span v-else class="turn">
+        <span v-if="state.status === 'playing'" class="turn">
           {{ state.current === 'A' ? 'Player 1' : 'Player 2' }} to play
         </span>
       </div>
@@ -39,8 +33,10 @@
           class="cell"
           :class="[
             cell ? `owner-${cell.owner}` : 'empty',
-            { placeable: !cell && canPlace },
+            { placeable: !cell && canPlace, capturing: captured.has(`${x}-${y}`) },
           ]"
+          :data-cx="x"
+          :data-cy="y"
           :disabled="!!cell || !canPlace || state.status === 'finished'"
           @click="$emit('placeAt', x, y)"
         >
@@ -57,29 +53,46 @@
           v-for="(stone, i) in state.hands[state.current]"
           :key="stone.id + '-' + i"
           class="hand-card"
-          :class="[`owner-${state.current}`, { selected: i === selectedHandIndex }]"
-          @click="$emit('selectHand', i)"
+          :class="[
+            `owner-${state.current}`,
+            { selected: i === selectedHandIndex, dragging: drag?.index === i },
+          ]"
+          @pointerdown="onPointerDown($event, i)"
+          @dragstart.prevent
         >
           <GameStone :stone="stone" :owner="state.current" />
         </button>
-        <div v-if="state.hands[state.current].length === 0" class="empty-hand">No stones left</div>
+        <div v-if="state.hands[state.current].length === 0" class="empty-hand">No Lithos left</div>
       </div>
     </div>
+
+    <!-- Floating Lithos that follows the cursor while dragging -->
+    <Teleport to="body">
+      <div
+        v-if="drag"
+        class="drag-ghost"
+        :style="{ left: `${drag.x}px`, top: `${drag.y}px` }"
+      >
+        <div class="ghost-card" :class="`owner-${state.current}`">
+          <GameStone :stone="drag.stone" :owner="state.current" />
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import GameStone from './GameStone.vue'
 import { getScore } from '~/game/engine/match'
-import type { MatchState } from '~/game/engine/types'
+import type { MatchState, Stone } from '~/game/engine/types'
 
 const props = defineProps<{
   state: MatchState
   selectedHandIndex: number | null
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'selectHand', index: number): void
   (e: 'placeAt', x: number, y: number): void
 }>()
@@ -87,6 +100,116 @@ defineEmits<{
 const score = computed(() => getScore(props.state))
 const canPlace = computed(
   () => props.selectedHandIndex !== null && props.state.status === 'playing'
+)
+
+/* ---------- Custom drag & drop (so the full Lithos follows the cursor) ---------- */
+
+interface DragState {
+  index: number
+  stone: Stone
+  x: number
+  y: number
+}
+
+const drag = ref<DragState | null>(null)
+const DRAG_THRESHOLD = 6
+let startX = 0
+let startY = 0
+let pendingIndex: number | null = null
+
+function onPointerDown(e: PointerEvent, index: number) {
+  if (props.state.status !== 'playing') return
+  e.preventDefault()
+  startX = e.clientX
+  startY = e.clientY
+  pendingIndex = index
+  window.addEventListener('pointermove', onPointerMove)
+  window.addEventListener('pointerup', onPointerUp)
+  window.addEventListener('pointercancel', onPointerCancel)
+}
+
+function onPointerMove(e: PointerEvent) {
+  if (pendingIndex === null) return
+
+  if (!drag.value) {
+    const moved = Math.hypot(e.clientX - startX, e.clientY - startY)
+    if (moved < DRAG_THRESHOLD) return
+    const stone = props.state.hands[props.state.current][pendingIndex]
+    if (!stone) return
+    emit('selectHand', pendingIndex) // enables placeable cells
+    drag.value = { index: pendingIndex, stone, x: e.clientX, y: e.clientY }
+  } else {
+    drag.value.x = e.clientX
+    drag.value.y = e.clientY
+  }
+}
+
+function removeDragListeners() {
+  window.removeEventListener('pointermove', onPointerMove)
+  window.removeEventListener('pointerup', onPointerUp)
+  window.removeEventListener('pointercancel', onPointerCancel)
+}
+
+function onPointerCancel() {
+  removeDragListeners()
+  drag.value = null
+  pendingIndex = null
+}
+
+function onPointerUp(e: PointerEvent) {
+  removeDragListeners()
+
+  if (drag.value) {
+    const target = document.elementFromPoint(e.clientX, e.clientY)
+    const cellEl = target?.closest('[data-cx]') as HTMLElement | null
+    if (cellEl) {
+      const x = Number(cellEl.dataset.cx)
+      const y = Number(cellEl.dataset.cy)
+      if (!props.state.board[y]?.[x]) emit('placeAt', x, y)
+    }
+    drag.value = null
+  } else if (pendingIndex !== null) {
+    // No movement: treat as a click to select the Lithos.
+    emit('selectHand', pendingIndex)
+  }
+
+  pendingIndex = null
+}
+
+onBeforeUnmount(removeDragListeners)
+
+/* ---------- Capture animation ---------- */
+
+const captured = ref<Set<string>>(new Set())
+let prevOwners: (string | null)[][] = []
+
+watch(
+  () => props.state.board,
+  (board) => {
+    const justCaptured: string[] = []
+    board.forEach((row, y) => {
+      row.forEach((cell, x) => {
+        const owner = cell?.owner ?? null
+        const before = prevOwners[y]?.[x] ?? null
+        // A flip: the cell was owned by someone and now belongs to the other player.
+        if (owner && before && owner !== before) justCaptured.push(`${x}-${y}`)
+      })
+    })
+
+    prevOwners = board.map((row) => row.map((cell) => cell?.owner ?? null))
+
+    if (justCaptured.length > 0) {
+      const next = new Set(captured.value)
+      justCaptured.forEach((k) => next.add(k))
+      captured.value = next
+      setTimeout(() => {
+        const cleared = new Set(captured.value)
+        justCaptured.forEach((k) => cleared.delete(k))
+        captured.value = cleared
+      }, 600)
+    }
+  },
+  { immediate: true }
 )
 </script>
 
@@ -170,6 +293,7 @@ const canPlace = computed(
   width: 100%;
   max-width: 520px;
   aspect-ratio: 1;
+  perspective: 700px;
 }
 
 .cell {
@@ -198,6 +322,18 @@ const canPlace = computed(
 .owner-A { border-color: var(--owner-a, #3b82f6); }
 .owner-B { border-color: var(--owner-b, #ef4444); }
 
+/* Capture: the Lithos flips over to its new owner with a glow. */
+.cell.capturing {
+  z-index: 1;
+  animation: lithos-captured 0.6s ease;
+}
+
+@keyframes lithos-captured {
+  0% { transform: rotateY(0deg) scale(1); box-shadow: none; }
+  50% { transform: rotateY(180deg) scale(1.14); box-shadow: 0 0 22px rgba(99, 102, 241, 0.75); }
+  100% { transform: rotateY(360deg) scale(1); box-shadow: none; }
+}
+
 /* ---- Hand ---- */
 .hand {
   width: 100%;
@@ -223,19 +359,55 @@ const canPlace = computed(
   border: 2px solid var(--color-border-light);
   background: var(--bg-glass-medium);
   padding: 0;
-  cursor: pointer;
-  transition: transform 0.12s, border-color 0.12s;
+  cursor: grab;
+  touch-action: none;
+  transition: transform 0.12s, border-color 0.12s, opacity 0.12s;
 }
 
+.hand-card:active { cursor: grabbing; }
 .hand-card:hover { transform: translateY(-3px); }
 .hand-card.selected { border-color: var(--color-primary, #6366f1); transform: translateY(-3px); }
 .hand-card.owner-A { border-color: var(--owner-a, #3b82f6); }
 .hand-card.owner-B { border-color: var(--owner-b, #ef4444); }
 .hand-card.selected { box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3); }
 
+/* The picked-up card is dimmed in place while its clone follows the cursor. */
+.hand-card.dragging { opacity: 0.35; transform: none; }
+
 .empty-hand {
   color: var(--color-text-muted);
   font-size: var(--font-sm);
   padding: 0.5rem;
+}
+
+/* ---- Drag ghost ---- */
+.drag-ghost {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2000;
+}
+
+.ghost-card {
+  width: 86px;
+  height: 86px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-primary, #6366f1);
+  background: var(--bg-glass-medium);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.45);
+  animation: lithos-pickup 0.16s ease-out;
+}
+
+.ghost-card.owner-A { border-color: var(--owner-a, #3b82f6); }
+.ghost-card.owner-B { border-color: var(--owner-b, #ef4444); }
+
+@keyframes lithos-pickup {
+  0% { transform: scale(0.7) rotate(-6deg); opacity: 0.4; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell.capturing { animation: none; box-shadow: 0 0 18px rgba(99, 102, 241, 0.6); }
+  .ghost-card { animation: none; }
 }
 </style>
