@@ -60,6 +60,15 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Reject usernames containing profanity (multilingual)
+    const usernameContentError = validateUsernameContent(username)
+    if (usernameContentError) {
+      throw createError({
+        statusCode: 400,
+        message: usernameContentError,
+      })
+    }
+
     // Validate password strength
     const passwordError = validatePassword(password)
     if (passwordError) {

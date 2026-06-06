@@ -84,6 +84,15 @@ export default defineEventHandler(async (event) => {
         })
       }
 
+      // Reject usernames containing profanity (multilingual)
+      const usernameContentError = validateUsernameContent(body.username)
+      if (usernameContentError) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: usernameContentError,
+        })
+      }
+
       // Check if username is already taken by another user
       const usernameExists = await db.postgres.user.findFirst({
         where: {
