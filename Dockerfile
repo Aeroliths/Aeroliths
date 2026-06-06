@@ -9,8 +9,9 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install ALL dependencies (including dev for the build)
-RUN npm install --no-package-lock --legacy-peer-deps
+# Install ALL dependencies (including dev for the build) from the lockfile
+# for deterministic, reproducible builds matching what was tested locally.
+RUN npm ci --legacy-peer-deps
 
 # Copy the rest of the code
 COPY . .

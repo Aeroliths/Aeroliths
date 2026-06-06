@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
         email: true,
         username: true,
         profilePicture: true,
+        emailVerified: true,
         createdAt: true,
         updatedAt: true,
         role: {

@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
   const users = await db.postgres.user.findMany({
     where: {
       NOT: { id: user.userId },
+      emailVerified: true,
       ...(search.length >= 2 && {
         username: { contains: search, mode: 'insensitive' },
       }),

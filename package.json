@@ -33,7 +33,7 @@
     "@tiptap/starter-kit": "^3.23.6",
     "@tiptap/vue-3": "^3.23.6",
     "@vueuse/nuxt": "^14.2.1",
-    "arangojs": "^10.2.2",
+    "arangojs": "^10.3.1",
     "bcrypt": "^6.0.0",
     "disposable-email-domains": "^1.0.62",
     "dotenv": "^17.3.1",

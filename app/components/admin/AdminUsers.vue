@@ -24,6 +24,7 @@
           <tr>
             <th>Username</th>
             <th>Email</th>
+            <th>Verified</th>
             <th>Role</th>
             <th>Created</th>
             <th>Actions</th>
@@ -33,6 +34,11 @@
           <tr v-for="userItem in filteredUsers" :key="userItem.id">
             <td>{{ userItem.username }}</td>
             <td>{{ userItem.email }}</td>
+            <td>
+              <span :class="['verified-badge', userItem.emailVerified ? 'verified' : 'unverified']">
+                {{ userItem.emailVerified ? '✓ Verified' : '✗ Unverified' }}
+              </span>
+            </td>
             <td>
               <span :class="['role-badge', userItem.role.name]">
                 {{ userItem.role.name }}
@@ -364,3 +370,22 @@ onMounted(async () => {
   await fetchUsers()
 })
 </script>
+
+<style scoped>
+.verified-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.verified-badge.verified {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+.verified-badge.unverified {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+</style>
