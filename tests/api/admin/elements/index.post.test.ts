@@ -89,7 +89,7 @@ describe('POST /api/admin/elements', () => {
     })
 
     it('should reject missing element name', () => {
-      const body = { sprite: '/sprites/fire.png' }
+      const body: { name?: string; sprite: string } = { sprite: '/sprites/fire.png' }
       expect(body.name).toBeUndefined()
     })
 
@@ -99,7 +99,7 @@ describe('POST /api/admin/elements', () => {
     })
 
     it('should reject missing sprite', () => {
-      const body = { name: 'Fire' }
+      const body: { name: string; sprite?: string } = { name: 'Fire' }
       expect(body.sprite).toBeUndefined()
     })
 

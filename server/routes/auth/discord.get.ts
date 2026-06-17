@@ -24,7 +24,7 @@ export default defineOAuthDiscordEventHandler({
       email: profile.email ?? null,
       emailVerified: profile.verified === true,
       displayName:
-        profile.global_name || profile.username || (profile.email ? profile.email.split('@')[0] : 'player'),
+        profile.global_name || profile.username || profile.email?.split('@')[0] || 'player',
       avatarUrl,
     })
   },

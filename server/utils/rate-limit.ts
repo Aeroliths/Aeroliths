@@ -57,7 +57,7 @@ export function rateLimit(
   setHeader(event, 'X-RateLimit-Reset', String(entry.resetAt))
 
   if (entry.count > options.limit) {
-    setHeader(event, 'Retry-After', String(retryAfter))
+    setHeader(event, 'Retry-After', retryAfter)
     throw createError({
       statusCode: 429,
       statusMessage: 'Too many requests. Please try again later.',

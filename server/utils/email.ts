@@ -115,14 +115,14 @@ export async function sendInactivityWarningEmail(
   const appUrl = process.env.APP_URL || 'http://localhost:3000'
   const formattedDate = deletionDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
-  const warningLabels: Record<string, string> = {
+  const warningLabels: Record<typeof warningType, string> = {
     '6months': '6 mois',
     '2months': '2 mois',
     '1month': '1 mois',
     '1week': '7 jours',
   }
 
-  const subjects: Record<string, string> = {
+  const subjects: Record<typeof warningType, string> = {
     '6months': 'Votre compte Aeroliths est inactif depuis 6 mois',
     '2months': 'Votre compte Aeroliths sera supprimé dans 2 mois',
     '1month': 'Votre compte Aeroliths sera supprimé dans 1 mois',

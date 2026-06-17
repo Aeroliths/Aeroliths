@@ -289,7 +289,7 @@ describe('POST /api/auth/login', () => {
       expect(expectedResponse.success).toBe(true)
       expect(expectedResponse.message).toBe('Login successful')
       expect(expectedResponse.data.token).toBe(mockToken)
-      expect(expectedResponse.data.user.authentication).toBeUndefined()
+      expect((expectedResponse.data.user as any).authentication).toBeUndefined()
       expect(expectedResponse.data.user.email).toBe('user@test.com')
       expect(expectedResponse.data.expiresIn).toBeDefined()
     })
@@ -313,7 +313,7 @@ describe('POST /api/auth/login', () => {
       // Verify authentication is removed
       const { authentication, ...userWithoutAuth } = mockUser
 
-      expect(userWithoutAuth.authentication).toBeUndefined()
+      expect((userWithoutAuth as any).authentication).toBeUndefined()
       expect((userWithoutAuth as any).password).toBeUndefined()
     })
   })

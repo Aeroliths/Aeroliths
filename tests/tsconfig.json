@@ -1,0 +1,25 @@
+{
+  // Dedicated TS config for the test suite. The editor picks this up for files
+  // under tests/ so module resolution matches the vitest runtime aliases
+  // (vitest.config.*), where `~`/`@` point at the project root - not at app/
+  // like Nuxt's generated tsconfig does.
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    // Tests are written loosely (any-heavy mocks); keep checking lenient so the
+    // editor doesn't flag strict-only issues the suite was never written for.
+    "strict": false,
+    "noImplicitAny": false,
+    "paths": {
+      "~/*": ["../*"],
+      "@/*": ["../*"],
+      "~~/*": ["../*"],
+      "@@/*": ["../*"]
+    },
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["./**/*.ts"]
+}

@@ -1,26 +1,26 @@
 #!/bin/sh
 set -e
 
-# ── Wait for PostgreSQL ──────────────────────────────────────────────
+# -- Wait for PostgreSQL ----------------------------------------
 echo "[Dev] Waiting for PostgreSQL..."
 until pg_isready -h postgres -p 5432 2>/dev/null; do
   sleep 2
 done
 echo "[Dev] PostgreSQL ready"
 
-# ── Prisma : generate + migrate ──────────────────────────────────────
+# -- Prisma : generate + migrate --------------------------------
 echo "[Dev] Running Prisma generate..."
 npm run prisma:generate
 echo "[Dev] Running Prisma migrations..."
 npm run prisma:migrate:prod
 echo "[Dev] Migrations done"
 
-# ── Seed ─────────────────────────────────────────────────────────────
+# -- Seed -------------------------------------------------------
 echo "[Dev] Running seed..."
 npm run prisma:seed
 echo "[Dev] Seed done"
 
-# ── Wait for ArangoDB ────────────────────────────────────────────────
+# -- Wait for ArangoDB -------------------------------------------
 echo "[Dev] Waiting for ArangoDB..."
 until curl -sf "http://arangodb:8529/_api/version" \
   -u "root:${ARANGO_PASSWORD}" > /dev/null 2>&1; do

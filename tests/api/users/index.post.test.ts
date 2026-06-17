@@ -410,7 +410,7 @@ describe('POST /api/users', () => {
 
       expect(expectedResponse.success).toBe(true)
       expect(expectedResponse.message).toBe('User created successfully')
-      expect(expectedResponse.data.authentication).toBeUndefined()
+      expect((expectedResponse.data as any).authentication).toBeUndefined()
       expect(expectedResponse.data.email).toBe('user@test.com')
       expect(expectedResponse.data.username).toBe('user')
     })

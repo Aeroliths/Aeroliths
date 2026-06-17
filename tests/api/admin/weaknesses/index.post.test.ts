@@ -94,7 +94,7 @@ describe('POST /api/admin/weaknesses', () => {
     })
 
     it('should reject missing elementId', () => {
-      const body = { weakAgainstId: 'element-2' }
+      const body: { elementId?: string; weakAgainstId: string } = { weakAgainstId: 'element-2' }
       expect(body.elementId).toBeUndefined()
     })
 
@@ -104,7 +104,7 @@ describe('POST /api/admin/weaknesses', () => {
     })
 
     it('should reject missing weakAgainstId', () => {
-      const body = { elementId: 'element-1' }
+      const body: { elementId: string; weakAgainstId?: string } = { elementId: 'element-1' }
       expect(body.weakAgainstId).toBeUndefined()
     })
 

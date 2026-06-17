@@ -134,7 +134,7 @@ describe('PATCH /api/admin/reports/[id]', () => {
     })
 
     it('should not clear field when status is not "resolved"', () => {
-      const status = 'dismissed'
+      const status: string = 'dismissed'
       const clearOffendingField = true
       const shouldClear = clearOffendingField === true && status === 'resolved'
       expect(shouldClear).toBe(false)
