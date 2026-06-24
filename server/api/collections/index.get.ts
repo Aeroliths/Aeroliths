@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
         userId: user.userId,
       },
       include: {
-        lithos: true,
+        lithos: { include: { element: true } },
       },
       orderBy: {
         createdAt: 'desc',

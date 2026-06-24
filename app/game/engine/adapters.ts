@@ -10,7 +10,7 @@ export interface LithosRecord {
   spikeLeft: number
   spikeRight: number
   elementId: string | null
-  element?: { id: string; name: string } | null
+  element?: { id: string; name: string; sprite?: string | null } | null
 }
 
 /** Shape of an element record as returned by `/api/elements`. */
@@ -26,6 +26,7 @@ export function toStone(litho: LithosRecord): Stone {
     sprite: litho.sprite,
     elementId: litho.elementId,
     elementName: litho.element?.name ?? null,
+    elementSprite: litho.element?.sprite ?? null,
     spikeUp: litho.spikeUp,
     spikeDown: litho.spikeDown,
     spikeLeft: litho.spikeLeft,

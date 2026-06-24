@@ -12,6 +12,8 @@ export interface Stone {
   elementId: string | null
   /** Human-readable element name, for display (tooltips). Null when elementless. */
   elementName?: string | null
+  /** Element icon/logo sprite URL, for display. Null when elementless. */
+  elementSprite?: string | null
   spikeUp: number
   spikeDown: number
   spikeLeft: number

@@ -11,54 +11,55 @@
             <option :value="5">5 x 5</option>
           </select>
         </label>
+      </div>
 
-        <div class="player-tabs">
-          <button
-            v-for="p in (['A', 'B'] as const)"
-            :key="p"
-            class="player-tab"
-            :class="[`owner-${p}`, { active: editingPlayer === p }]"
-            @click="editingPlayer = p"
-          >
-            {{ p === 'A' ? 'Player 1' : 'Player 2' }}
-            <span class="tab-count">{{ hands[p].length }}/{{ handSize(p) }}</span>
-          </button>
+      <!-- Both players side by side: drop Lithos from the shared catalog. -->
+      <div class="players">
+        <div
+          v-for="p in (['A', 'B'] as const)"
+          :key="p"
+          class="player-col"
+          :class="[`owner-${p}`, { 'drop-target': dragOverPlayer === p, full: handFull(p) }]"
+          :data-hand-owner="p"
+        >
+          <div class="player-col-header">
+            <span class="player-name">{{ p === 'A' ? 'Player 1' : 'Player 2' }}</span>
+            <span class="player-count">{{ hands[p].length }}/{{ handSize(p) }}</span>
+            <button class="ghost-btn sm" @click="autoFill(p)">Auto-fill</button>
+            <button class="ghost-btn sm" @click="hands[p] = []">Clear</button>
+          </div>
+
+          <div class="player-hand">
+            <button
+              v-for="(stone, i) in hands[p]"
+              :key="stone.id + '-' + i"
+              class="mini-card"
+              :class="`owner-${p}`"
+              title="Remove"
+              @click="removeFromHand(p, i)"
+            >
+              <GameStone :stone="stone" />
+            </button>
+            <div v-if="hands[p].length === 0" class="drop-hint">Drag Lithos here</div>
+          </div>
         </div>
-
-        <button class="ghost-btn" @click="autoFill(editingPlayer)">Auto-fill</button>
-        <button class="ghost-btn" @click="hands[editingPlayer] = []">Clear</button>
       </div>
 
       <p class="hint">
-        Pick {{ handSize(editingPlayer) }} Lithos for
-        <strong>{{ editingPlayer === 'A' ? 'Player 1' : 'Player 2' }}</strong>.
-        Click a Lithos in your hand to remove it.
+        Drag Lithos from the catalog into each player's column.
+        Click a Lithos in a hand to remove it.
       </p>
 
-      <!-- Selected hand preview -->
-      <div class="selected-hand">
-        <button
-          v-for="(stone, i) in hands[editingPlayer]"
-          :key="stone.id + '-' + i"
-          class="mini-card"
-          :class="`owner-${editingPlayer}`"
-          title="Remove"
-          @click="removeFromHand(editingPlayer, i)"
-        >
-          <GameStone :stone="stone" />
-        </button>
-        <div v-if="hands[editingPlayer].length === 0" class="empty">Hand empty</div>
-      </div>
-
-      <!-- Catalog -->
+      <!-- Shared catalog -->
       <div v-if="loading" class="empty">Loading Lithos...</div>
       <div v-else class="catalog">
         <button
           v-for="stone in catalog"
           :key="stone.id"
           class="catalog-card"
-          :disabled="handFull(editingPlayer)"
-          @click="addToHand(editingPlayer, stone)"
+          :class="{ dragging: drag?.stone.id === stone.id }"
+          @pointerdown="onCatalogPointerDown($event, stone)"
+          @dragstart.prevent
         >
           <GameStone :stone="stone" />
           <span class="catalog-name">{{ stone.name }}</span>
@@ -68,6 +69,19 @@
       <button class="start-btn" :disabled="!canStart" @click="start">
         Start game
       </button>
+
+      <!-- Floating Lithos that follows the cursor while dragging from the catalog -->
+      <Teleport to="body">
+        <div
+          v-if="drag"
+          class="drag-ghost"
+          :style="{ left: `${drag.x}px`, top: `${drag.y}px` }"
+        >
+          <div class="ghost-card">
+            <GameStone :stone="drag.stone" />
+          </div>
+        </div>
+      </Teleport>
     </div>
 
     <!-- ========== PLAY ========== -->
@@ -104,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
 import { createMatch, placeStone, getScore } from '~/game/engine/match'
@@ -120,7 +134,6 @@ const emit = defineEmits<{
 const phase = ref<Phase>('setup')
 const loading = ref(true)
 const size = ref(3)
-const editingPlayer = ref<Player>('A')
 
 const catalog = ref<Stone[]>([])
 const elements = ref<ElementGraph>({ strongAgainst: {} })
@@ -165,6 +178,79 @@ function autoFill(player: Player) {
     hands.value[player].push(pick)
   }
 }
+
+/* ---------- Drag a Lithos from the catalog onto a player column ----------
+   Same pointer-based pattern as GameBoard: a Teleported ghost follows the
+   cursor, and the drop target is resolved via document.elementFromPoint. */
+
+interface CatalogDrag {
+  stone: Stone
+  x: number
+  y: number
+}
+
+const drag = ref<CatalogDrag | null>(null)
+const dragOverPlayer = ref<Player | null>(null)
+const DRAG_THRESHOLD = 6
+let startX = 0
+let startY = 0
+let pendingStone: Stone | null = null
+
+function onCatalogPointerDown(e: PointerEvent, stone: Stone) {
+  e.preventDefault()
+  startX = e.clientX
+  startY = e.clientY
+  pendingStone = stone
+  window.addEventListener('pointermove', onPointerMove)
+  window.addEventListener('pointerup', onPointerUp)
+  window.addEventListener('pointercancel', onPointerCancel)
+}
+
+function playerAtPoint(x: number, y: number): Player | null {
+  const zone = document.elementFromPoint(x, y)?.closest('[data-hand-owner]') as HTMLElement | null
+  const owner = zone?.dataset.handOwner
+  return owner === 'A' || owner === 'B' ? owner : null
+}
+
+function onPointerMove(e: PointerEvent) {
+  if (!pendingStone) return
+  if (!drag.value) {
+    const moved = Math.hypot(e.clientX - startX, e.clientY - startY)
+    if (moved < DRAG_THRESHOLD) return
+    drag.value = { stone: pendingStone, x: e.clientX, y: e.clientY }
+  } else {
+    drag.value.x = e.clientX
+    drag.value.y = e.clientY
+  }
+  dragOverPlayer.value = playerAtPoint(e.clientX, e.clientY)
+}
+
+function removeDragListeners() {
+  window.removeEventListener('pointermove', onPointerMove)
+  window.removeEventListener('pointerup', onPointerUp)
+  window.removeEventListener('pointercancel', onPointerCancel)
+}
+
+function endDrag() {
+  removeDragListeners()
+  drag.value = null
+  dragOverPlayer.value = null
+  pendingStone = null
+}
+
+function onPointerCancel() {
+  endDrag()
+}
+
+function onPointerUp(e: PointerEvent) {
+  if (drag.value && pendingStone) {
+    const player = playerAtPoint(e.clientX, e.clientY)
+    if (player && !handFull(player)) addToHand(player, pendingStone)
+  }
+  endDrag()
+}
+
+onBeforeUnmount(removeDragListeners)
 
 function start() {
   if (!canStart.value) return
@@ -261,29 +347,73 @@ onMounted(loadData)
   padding: 0.35rem 0.5rem;
 }
 
-.player-tabs {
-  display: flex;
-  gap: 0.5rem;
+/* ---- Two player columns ---- */
+.players {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
 }
 
-.player-tab {
+.player-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-xl, 1rem);
+  border: 2px solid var(--color-border-light);
+  background: var(--bg-glass-light);
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.player-col.owner-A { border-color: color-mix(in srgb, var(--owner-a, #3b82f6) 45%, transparent); }
+.player-col.owner-B { border-color: color-mix(in srgb, var(--owner-b, #ef4444) 45%, transparent); }
+
+/* Highlight the column currently hovered while dragging. */
+.player-col.drop-target.owner-A {
+  border-color: var(--owner-a, #3b82f6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+.player-col.drop-target.owner-B {
+  border-color: var(--owner-b, #ef4444);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+}
+
+/* A full column refuses further drops. */
+.player-col.full.drop-target {
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.player-col-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 999px;
-  border: 2px solid var(--color-border-light);
-  background: var(--bg-glass-light);
-  color: var(--color-text-primary);
-  cursor: pointer;
+  flex-wrap: wrap;
 }
 
-.player-tab.active.owner-A { border-color: var(--owner-a, #3b82f6); }
-.player-tab.active.owner-B { border-color: var(--owner-b, #ef4444); }
+.player-name { font-weight: var(--font-semibold); }
+.player-col.owner-A .player-name { color: var(--owner-a, #3b82f6); }
+.player-col.owner-B .player-name { color: var(--owner-b, #ef4444); }
 
-.tab-count {
+.player-count {
   font-size: var(--font-sm);
   color: var(--color-text-muted);
+  margin-right: auto;
+}
+
+.player-hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 64px;
+  align-items: center;
+  align-content: flex-start;
+}
+
+.drop-hint {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  opacity: 0.7;
 }
 
 .ghost-btn {
@@ -298,18 +428,12 @@ onMounted(loadData)
 
 .ghost-btn:hover { background: var(--bg-glass-medium); }
 
+.ghost-btn.sm { padding: 0.25rem 0.55rem; font-size: 0.72rem; }
+
 .hint {
   font-size: var(--font-sm);
   color: var(--color-text-muted);
   margin: 0;
-}
-
-.selected-hand {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  min-height: 64px;
-  align-items: center;
 }
 
 .mini-card {
@@ -345,13 +469,16 @@ onMounted(loadData)
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border-light);
   background: var(--bg-glass-medium);
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
+  transition: transform 0.12s, opacity 0.12s;
 }
 
 .catalog-card { aspect-ratio: auto; }
 .catalog-card > :first-child { width: 64px; height: 64px; }
-.catalog-card:hover:not(:disabled) { transform: translateY(-2px); }
-.catalog-card:disabled { opacity: 0.4; cursor: not-allowed; }
+.catalog-card:active { cursor: grabbing; }
+.catalog-card:hover { transform: translateY(-2px); }
+.catalog-card.dragging { opacity: 0.4; }
 
 .catalog-name {
   font-size: 0.7rem;
@@ -375,6 +502,32 @@ onMounted(loadData)
 .empty {
   color: var(--color-text-muted);
   font-size: var(--font-sm);
+}
+
+/* ---- Catalog drag ghost (follows the cursor, Teleported to body) ---- */
+.drag-ghost {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2000;
+}
+
+.ghost-card {
+  width: 76px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-primary, #6366f1);
+  background: var(--bg-glass-medium);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.45);
+}
+
+.ghost-card > :first-child { width: 60px; height: 60px; }
+
+@media (max-width: 720px) {
+  .players { grid-template-columns: 1fr; }
 }
 
 /* ---- Play ---- */
