@@ -297,7 +297,10 @@ watch(
 }
 
 .cell {
+  position: relative;
   aspect-ratio: 1;
+  min-width: 0;
+  min-height: 0;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border-light);
   background: var(--bg-glass-light);
@@ -307,6 +310,15 @@ watch(
   align-items: center;
   justify-content: center;
   overflow: hidden;
+}
+
+/* The Lithos fills the cell but is taken out of flow, so its image size can
+   never feed back into the cell/row height. This keeps every cell an exact
+   square (from aspect-ratio) whether or not it holds a stone — the board
+   stays the same size before and after a Lithos is placed. */
+.cell > * {
+  position: absolute;
+  inset: 0;
 }
 
 .cell.placeable {
