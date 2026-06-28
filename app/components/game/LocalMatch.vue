@@ -11,6 +11,19 @@
             <option :value="5">5 x 5</option>
           </select>
         </label>
+        <div class="rule-toggles">
+          <label><input type="checkbox" v-model="rules.same" /> Same</label>
+          <label><input type="checkbox" v-model="rules.plus" /> Plus</label>
+          <label><input type="checkbox" v-model="rules.combo" /> Combo</label>
+        </div>
+        <label class="size-picker">
+          First player
+          <select v-model="startingChoice">
+            <option value="random">Random</option>
+            <option value="A">Player 1</option>
+            <option value="B">Player 2</option>
+          </select>
+        </label>
       </div>
 
       <!-- Both players side by side: drop Lithos from the shared catalog. -->
@@ -121,9 +134,9 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
-import { createMatch, placeStone, getScore } from '~/game/engine/match'
+import { createMatch, placeStone, getScore, handSizeFor } from '~/game/engine/match'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
-import type { ElementGraph, MatchState, Player, Stone } from '~/game/engine/types'
+import type { CaptureRules, ElementGraph, MatchState, Player, Stone } from '~/game/engine/types'
 
 type Phase = 'setup' | 'play'
 
@@ -134,6 +147,14 @@ const emit = defineEmits<{
 const phase = ref<Phase>('setup')
 const loading = ref(true)
 const size = ref(3)
+
+const rules = ref<CaptureRules>({ same: false, plus: false, combo: false })
+const startingChoice = ref<'A' | 'B' | 'random'>('random')
+
+function resolveStartingPlayer(): Player {
+  if (startingChoice.value === 'random') return Math.random() < 0.5 ? 'A' : 'B'
+  return startingChoice.value
+}
 
 const catalog = ref<Stone[]>([])
 const elements = ref<ElementGraph>({ strongAgainst: {} })
@@ -157,8 +178,10 @@ const resultClass = computed(() => {
 
 const cellCount = computed(() => size.value * size.value)
 function handSize(player: Player): number {
-  // Player A plays first and (on odd boards) one extra stone.
-  return player === 'A' ? Math.ceil(cellCount.value / 2) : Math.floor(cellCount.value / 2)
+  // While the starter is random, size both hands to the larger half so either
+  // assignment is valid; hands are trimmed to the real sizes when the game starts.
+  if (startingChoice.value === 'random') return Math.ceil(cellCount.value / 2)
+  return handSizeFor(size.value, player, startingChoice.value)
 }
 function handFull(player: Player): boolean {
   return hands.value[player].length >= handSize(player)
@@ -254,10 +277,15 @@ onBeforeUnmount(removeDragListeners)
 
 function start() {
   if (!canStart.value) return
+  const startingPlayer = resolveStartingPlayer()
+  const handA = [...hands.value.A].slice(0, handSizeFor(size.value, 'A', startingPlayer))
+  const handB = [...hands.value.B].slice(0, handSizeFor(size.value, 'B', startingPlayer))
   match.value = createMatch({
     size: size.value,
-    hands: { A: [...hands.value.A], B: [...hands.value.B] },
+    hands: { A: handA, B: handB },
     elements: elements.value,
+    rules: { ...rules.value },
+    startingPlayer,
   })
   selectedHandIndex.value = null
   phase.value = 'play'
@@ -345,6 +373,20 @@ onMounted(loadData)
   border-radius: var(--radius-md);
   color: var(--color-text-primary);
   padding: 0.35rem 0.5rem;
+}
+
+.rule-toggles {
+  display: flex;
+  gap: 0.75rem;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.rule-toggles label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
 }
 
 /* ---- Two player columns ---- */
