@@ -16,9 +16,10 @@
         <section>
           <h2>Setup</h2>
           <ul>
-            <li>The board size is chosen before the game starts (e.g. 3x3, 4x4, 5x5...).</li>
-            <li>Each player receives a <strong>deck</strong> of Lithos to play with.</li>
-            <li>The first player is chosen <strong>randomly</strong>.</li>
+            <li>The board size is chosen before the game starts (3x3, 4x4 or 5x5).</li>
+            <li>Each player fills a hand of Lithos for the match.</li>
+            <li>The first player is <strong>chosen or randomized</strong> in the setup screen.</li>
+            <li>On odd boards the player who goes <strong>second</strong> receives one extra Lithos to offset the first-move advantage.</li>
             <li>Players then take turns placing one Lithos per turn on any empty cell.</li>
           </ul>
         </section>
@@ -122,17 +123,46 @@
             </p>
           </div>
           <p>
-            If the elements are equal or if the attacker has a <strong>weak</strong> element,
-            no bonus is applied and the raw values are compared directly.
+            Conversely, when the <strong>defending</strong> Lithos has the stronger
+            element, the attacker <strong>loses 1 point</strong> on that side before the
+            comparison. When the elements are equal (or neither is strong against the
+            other), the raw values are compared directly.
           </p>
+        </section>
+
+        <section>
+          <h2>Optional Rules</h2>
+          <p>
+            These rules can be toggled on in the match setup. They add depth to combat:
+          </p>
+          <ul>
+            <li>
+              <strong>Same</strong> &mdash; if your placed Lithos touches two or more Lithos
+              whose facing value <strong>equals</strong> yours on that side (your own
+              Lithos count toward the two), every <strong>opponent</strong> Lithos among
+              those sides is captured, even without winning the comparison.
+            </li>
+            <li>
+              <strong>Plus</strong> &mdash; if two or more sides share the <strong>same sum</strong>
+              of your value plus the touching opponent value, those opponent Lithos are
+              captured.
+            </li>
+            <li>
+              <strong>Combo</strong> &mdash; any Lithos captured by Same or Plus immediately
+              attacks its own neighbours with the normal comparison, which can chain into
+              further captures.
+            </li>
+          </ul>
         </section>
 
         <section>
           <h2>End of the Game</h2>
           <p>
             The game ends when <strong>every cell on the board is filled</strong>.
-            The player who <strong>owns the most Lithos</strong> on the board wins.
-            If both players own the same number, the game is a <strong>draw</strong>.
+            The player who <strong>owns the most Lithos</strong> wins. If both own the
+            same number, the winner is the one whose controlled Lithos have the highest
+            <strong>total side values</strong>; if those are equal too, the game is a
+            <strong>draw</strong>.
           </p>
         </section>
 
