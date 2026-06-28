@@ -37,12 +37,31 @@ export interface ElementGraph {
   strongAgainst: Record<string, string[]>
 }
 
+export interface CaptureRules {
+  same: boolean
+  plus: boolean
+  combo: boolean
+}
+
+export type Edge = 'up' | 'down' | 'left' | 'right'
+
+export interface CaptureEvent {
+  x: number
+  y: number
+  type: 'basic' | 'same' | 'plus' | 'combo'
+  /** Edge of the duel that caused the capture (for UI highlighting). */
+  edge: Edge
+  /** Element bonus applied to the attack; only meaningful for `basic`. */
+  elementDelta: -1 | 0 | 1
+}
+
 export interface MatchConfig {
   /** Board is size x size. */
   size: number
   hands: Record<Player, Stone[]>
   elements?: ElementGraph
   startingPlayer?: Player
+  rules?: CaptureRules
 }
 
 export interface MatchState {
@@ -52,6 +71,8 @@ export interface MatchState {
   hands: Record<Player, Stone[]>
   current: Player
   elements: ElementGraph
+  rules: CaptureRules
+  lastMove: { x: number; y: number } | null
   status: 'playing' | 'finished'
   winner: Player | 'draw' | null
 }

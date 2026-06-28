@@ -1,4 +1,14 @@
-import type { Cell, ElementGraph, MatchState, MatchConfig, Player, Stone } from './types'
+import type {
+  Cell,
+  CaptureEvent,
+  CaptureRules,
+  Edge,
+  ElementGraph,
+  MatchState,
+  MatchConfig,
+  Player,
+  Stone,
+} from './types'
 
 function isStrongAgainst(elements: ElementGraph, a: string | null, b: string | null): boolean {
   if (!a || !b) return false
@@ -15,10 +25,10 @@ function elementBonus(elements: ElementGraph, attacker: Stone, defender: Stone):
 
 /** The four neighbours and which spike of each stone faces the other across the edge. */
 const ADJACENCY = [
-  { dx: 1, dy: 0, attackerSide: 'spikeRight', defenderSide: 'spikeLeft' },
-  { dx: -1, dy: 0, attackerSide: 'spikeLeft', defenderSide: 'spikeRight' },
-  { dx: 0, dy: -1, attackerSide: 'spikeUp', defenderSide: 'spikeDown' },
-  { dx: 0, dy: 1, attackerSide: 'spikeDown', defenderSide: 'spikeUp' },
+  { dx: 1, dy: 0, attackerSide: 'spikeRight', defenderSide: 'spikeLeft', edge: 'right' },
+  { dx: -1, dy: 0, attackerSide: 'spikeLeft', defenderSide: 'spikeRight', edge: 'left' },
+  { dx: 0, dy: -1, attackerSide: 'spikeUp', defenderSide: 'spikeDown', edge: 'up' },
+  { dx: 0, dy: 1, attackerSide: 'spikeDown', defenderSide: 'spikeUp', edge: 'down' },
 ] as const
 
 function emptyBoard(size: number): Cell[][] {
@@ -34,7 +44,7 @@ function cloneBoard(board: Cell[][]): Cell[][] {
 }
 
 export function createMatch(config: MatchConfig): MatchState {
-  const { size, hands, elements, startingPlayer } = config
+  const { size, hands, elements, startingPlayer, rules } = config
 
   return {
     size,
@@ -42,9 +52,46 @@ export function createMatch(config: MatchConfig): MatchState {
     hands: { A: [...hands.A], B: [...hands.B] },
     current: startingPlayer ?? 'A',
     elements: elements ?? { strongAgainst: {} },
+    rules: rules ?? { same: false, plus: false, combo: false },
+    lastMove: null,
     status: 'playing',
     winner: null,
   }
+}
+
+/**
+ * Resolve all captures triggered by `stone` placed at (x, y) by `player`.
+ * Pure: returns a fresh board plus the capture events. Task 1 = Basic only.
+ */
+export function resolveCaptures(
+  board: Cell[][],
+  x: number,
+  y: number,
+  stone: Stone,
+  player: Player,
+  elements: ElementGraph,
+  rules: CaptureRules,
+): { board: Cell[][]; events: CaptureEvent[] } {
+  const size = board.length
+  const next = cloneBoard(board)
+  const events: CaptureEvent[] = []
+
+  for (const { dx, dy, attackerSide, defenderSide, edge } of ADJACENCY) {
+    const nx = x + dx
+    const ny = y + dy
+    if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue
+
+    const neighbour = next[ny]![nx]
+    if (!neighbour || neighbour.owner === player) continue
+
+    const delta = elementBonus(elements, stone, neighbour.stone)
+    if (stone[attackerSide] + delta > neighbour.stone[defenderSide]) {
+      next[ny]![nx] = { ...neighbour, owner: player }
+      events.push({ x: nx, y: ny, type: 'basic', edge, elementDelta: delta as -1 | 0 | 1 })
+    }
+  }
+
+  return { board: next, events }
 }
 
 /**
@@ -68,23 +115,10 @@ export function placeStone(state: MatchState, handIndex: number, x: number, y: n
     throw new Error(`Cell (${x}, ${y}) is already occupied`)
   }
 
-  const board = cloneBoard(state.board)
-  board[y]![x] = { owner: player, stone }
+  const placedBoard = cloneBoard(state.board)
+  placedBoard[y]![x] = { owner: player, stone }
 
-  // Resolve captures from the just-placed stone only (no chaining).
-  for (const { dx, dy, attackerSide, defenderSide } of ADJACENCY) {
-    const nx = x + dx
-    const ny = y + dy
-    if (nx < 0 || ny < 0 || nx >= state.size || ny >= state.size) continue
-
-    const neighbour = board[ny]![nx]
-    if (!neighbour || neighbour.owner === player) continue
-
-    const attack = stone[attackerSide] + elementBonus(state.elements, stone, neighbour.stone)
-    if (attack > neighbour.stone[defenderSide]) {
-      board[ny]![nx] = { ...neighbour, owner: player }
-    }
-  }
+  const { board } = resolveCaptures(placedBoard, x, y, stone, player, state.elements, state.rules)
 
   const hands: Record<Player, typeof hand> = {
     A: [...state.hands.A],
@@ -97,6 +131,7 @@ export function placeStone(state: MatchState, handIndex: number, x: number, y: n
     board,
     hands,
     current: other(player),
+    lastMove: { x, y },
   }
 
   if (isBoardFull(next)) {
