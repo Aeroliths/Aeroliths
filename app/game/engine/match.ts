@@ -76,6 +76,7 @@ export function resolveCaptures(
   const next = cloneBoard(board)
   const events: CaptureEvent[] = []
   const capturedKeys = new Set<string>()
+  const comboQueue: { x: number; y: number }[] = []
 
   // Snapshot the four sides against the board *before* any flip.
   const sides = ADJACENCY.map(({ dx, dy, attackerSide, defenderSide, edge }) => {
@@ -114,7 +115,10 @@ export function resolveCaptures(
     const matching = sides.filter((s) => s.neighbour && s.defend === s.attack)
     if (matching.length >= 2) {
       for (const s of matching) {
-        if (s.neighbour!.owner !== player) capture(s.nx, s.ny, s.edge, 'same', 0)
+        if (s.neighbour!.owner !== player) {
+          capture(s.nx, s.ny, s.edge, 'same', 0)
+          comboQueue.push({ x: s.nx, y: s.ny })
+        }
       }
     }
   }
@@ -132,7 +136,31 @@ export function resolveCaptures(
     for (const group of sums.values()) {
       if (group.length < 2) continue
       for (const s of group) {
-        if (s.neighbour!.owner !== player) capture(s.nx, s.ny, s.edge, 'plus', 0)
+        if (s.neighbour!.owner !== player) {
+          capture(s.nx, s.ny, s.edge, 'plus', 0)
+          comboQueue.push({ x: s.nx, y: s.ny })
+        }
+      }
+    }
+  }
+
+  // Combo: each Same/Plus-flipped stone runs a Basic-only pass on its neighbours; cascades.
+  if (rules.combo) {
+    while (comboQueue.length > 0) {
+      const { x: cx, y: cy } = comboQueue.shift()!
+      const cell = next[cy]![cx]!
+      for (const { dx, dy, attackerSide, defenderSide, edge } of ADJACENCY) {
+        const nx = cx + dx
+        const ny = cy + dy
+        if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue
+        const neighbour = next[ny]![nx]
+        if (!neighbour || neighbour.owner === player) continue
+        if (capturedKeys.has(`${nx}-${ny}`)) continue
+        const delta = elementBonus(elements, cell.stone, neighbour.stone) as -1 | 0 | 1
+        if (cell.stone[attackerSide] + delta > neighbour.stone[defenderSide]) {
+          capture(nx, ny, edge, 'combo', delta)
+          comboQueue.push({ x: nx, y: ny })
+        }
       }
     }
   }

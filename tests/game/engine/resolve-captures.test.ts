@@ -134,3 +134,38 @@ describe('resolveCaptures - plus', () => {
     expect(events.filter((e) => e.type === 'plus')).toHaveLength(0)
   })
 })
+
+describe('resolveCaptures - combo', () => {
+  const SAME_COMBO: CaptureRules = { same: true, plus: false, combo: true }
+
+  it('a Same-flipped stone then basic-captures its own weaker enemy neighbour', () => {
+    const board = emptyBoard(3)
+    // A placed at (0,0): right=4 (matches B top-left enemy) and down=4 (matches another) -> Same.
+    // The Same-flipped stone at (1,0) has right=9 and beats enemy at (2,0) left=1 via combo.
+    board[0][1] = { owner: 'B', stone: stone({ id: 'b1', spikeLeft: 4, spikeRight: 9 }) }
+    board[1][0] = { owner: 'B', stone: stone({ id: 'b2', spikeUp: 4 }) }
+    board[0][2] = { owner: 'B', stone: stone({ id: 'b3', spikeLeft: 1 }) }
+    const placed = stone({ id: 'a', spikeRight: 4, spikeDown: 4, spikeUp: 1, spikeLeft: 1 })
+
+    const { board: next, events } = resolveCaptures(board, 0, 0, placed, 'A', NO_ELEMENTS, SAME_COMBO)
+
+    expect(next[0][1]!.owner).toBe('A') // captured by Same
+    expect(next[1][0]!.owner).toBe('A') // captured by Same
+    expect(next[0][2]!.owner).toBe('A') // captured by Combo from b1's right=9 > 1
+    expect(events.some((e) => e.type === 'combo' && e.x === 2 && e.y === 0)).toBe(true)
+  })
+
+  it('combo does not run when rules.combo is false', () => {
+    const board = emptyBoard(3)
+    board[0][1] = { owner: 'B', stone: stone({ id: 'b1', spikeLeft: 4, spikeRight: 9 }) }
+    board[1][0] = { owner: 'B', stone: stone({ id: 'b2', spikeUp: 4 }) }
+    board[0][2] = { owner: 'B', stone: stone({ id: 'b3', spikeLeft: 1 }) }
+    const placed = stone({ id: 'a', spikeRight: 4, spikeDown: 4, spikeUp: 1, spikeLeft: 1 })
+
+    const { board: next } = resolveCaptures(board, 0, 0, placed, 'A', NO_ELEMENTS, {
+      same: true, plus: false, combo: false,
+    })
+
+    expect(next[0][2]!.owner).toBe('B') // no cascade
+  })
+})
