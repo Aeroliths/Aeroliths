@@ -22,6 +22,7 @@ describe('toStone', () => {
       sprite: '/img/ember.png',
       elementId: 'fire',
       elementName: 'Fire',
+      elementSprite: null,
       spikeUp: 4,
       spikeDown: 1,
       spikeLeft: 2,
