@@ -8,6 +8,14 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./tests/setup.ts'],
+    // Run every test file in a single child process. Vitest 4 + happy-dom on
+    // Node 24 / Windows intermittently crashes worker spawns, which surfaces as
+    // whole files failing to collect ("Cannot read properties of undefined
+    // (reading 'config')"). A single fork removes the worker-spawn race.
+    pool: 'forks',
+    poolOptions: {
+      forks: { singleFork: true },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
