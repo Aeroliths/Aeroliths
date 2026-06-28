@@ -199,9 +199,15 @@ export function previewCaptures(
 
 /**
  * Play the hand stone at `handIndex` on cell (x, y) for the current player.
- * Returns a new state, leaving the input untouched. Throws on illegal moves.
+ * Returns the new state and the capture events, leaving the input untouched.
+ * Throws on illegal moves.
  */
-export function placeStone(state: MatchState, handIndex: number, x: number, y: number): MatchState {
+export function placeStoneWithEvents(
+  state: MatchState,
+  handIndex: number,
+  x: number,
+  y: number,
+): { state: MatchState; events: CaptureEvent[] } {
   const player = state.current
   const hand = state.hands[player]
 
@@ -221,7 +227,7 @@ export function placeStone(state: MatchState, handIndex: number, x: number, y: n
   const placedBoard = cloneBoard(state.board)
   placedBoard[y]![x] = { owner: player, stone }
 
-  const { board } = resolveCaptures(placedBoard, x, y, stone, player, state.elements, state.rules)
+  const { board, events } = resolveCaptures(placedBoard, x, y, stone, player, state.elements, state.rules)
 
   const hands: Record<Player, typeof hand> = {
     A: [...state.hands.A],
@@ -243,7 +249,12 @@ export function placeStone(state: MatchState, handIndex: number, x: number, y: n
     next.current = player
   }
 
-  return next
+  return { state: next, events }
+}
+
+/** Convenience wrapper returning only the next state. */
+export function placeStone(state: MatchState, handIndex: number, x: number, y: number): MatchState {
+  return placeStoneWithEvents(state, handIndex, x, y).state
 }
 
 /** Cells controlled by each player. */

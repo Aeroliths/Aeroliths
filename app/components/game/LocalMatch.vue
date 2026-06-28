@@ -102,6 +102,7 @@
       <GameBoard
         :state="match"
         :selected-hand-index="selectedHandIndex"
+        :last-events="lastEvents"
         @select-hand="selectHand"
         @place-at="play"
       />
@@ -135,9 +136,9 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
-import { createMatch, placeStone, getScore, handSizeFor } from '~/game/engine/match'
+import { createMatch, placeStoneWithEvents, getScore, handSizeFor } from '~/game/engine/match'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
-import type { CaptureRules, ElementGraph, MatchState, Player, Stone } from '~/game/engine/types'
+import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone } from '~/game/engine/types'
 
 type Phase = 'setup' | 'play'
 
@@ -165,6 +166,7 @@ const match = ref<MatchState | null>(null)
 const selectedHandIndex = ref<number | null>(null)
 const history = ref<MatchState[]>([])
 const canUndo = computed(() => history.value.length > 0 && match.value?.status === 'playing')
+const lastEvents = ref<CaptureEvent[]>([])
 
 const finalScore = computed(() => (match.value ? getScore(match.value) : { A: 0, B: 0 }))
 const resultTitle = computed(() => {
@@ -324,7 +326,9 @@ function playAgain() {
 function play(x: number, y: number) {
   if (!match.value || selectedHandIndex.value === null) return
   history.value.push(match.value)
-  match.value = placeStone(match.value, selectedHandIndex.value, x, y)
+  const { state, events } = placeStoneWithEvents(match.value, selectedHandIndex.value, x, y)
+  match.value = state
+  lastEvents.value = events
   selectedHandIndex.value = null
 }
 

@@ -12,6 +12,7 @@
         <span v-if="state.status === 'playing'" class="turn">
           {{ state.current === 'A' ? 'Player 1' : 'Player 2' }} to play
         </span>
+        <span v-if="state.status === 'playing' && emptyCells === 1" class="final-move">Final move!</span>
       </div>
 
       <div class="score" :class="{ active: state.current === 'B' && state.status === 'playing' }">
@@ -37,6 +38,7 @@
               placeable: !cell && canPlace,
               capturing: captured.has(`${x}-${y}`),
               'preview-capture': previewKeys.has(`${x}-${y}`),
+              'last-move': state.lastMove && state.lastMove.x === x && state.lastMove.y === y,
             },
           ]"
           :data-cx="x"
@@ -47,9 +49,18 @@
           @click="$emit('placeAt', x, y)"
         >
           <GameStone v-if="cell" :stone="cell.stone" :owner="cell.owner" />
+          <span
+            v-if="edgeBadges[`${x}-${y}`] && edgeBadges[`${x}-${y}`].delta !== 0"
+            class="elem-badge"
+            :class="[`edge-${edgeBadges[`${x}-${y}`].edge}`, edgeBadges[`${x}-${y}`].delta > 0 ? 'pos' : 'neg']"
+          >{{ edgeBadges[`${x}-${y}`].delta > 0 ? '+1' : '-1' }}</span>
         </button>
       </template>
     </div>
+
+    <Transition name="cap-label">
+      <div v-if="captureLabel" class="capture-label">{{ captureLabel }}</div>
+    </Transition>
 
     <!-- Current player's hand -->
     <div v-if="state.status === 'playing'" class="hand">
@@ -91,11 +102,12 @@
 import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import GameStone from './GameStone.vue'
 import { getScore, previewCaptures } from '~/game/engine/match'
-import type { MatchState, Stone } from '~/game/engine/types'
+import type { CaptureEvent, MatchState, Stone } from '~/game/engine/types'
 
 const props = defineProps<{
   state: MatchState
   selectedHandIndex: number | null
+  lastEvents?: CaptureEvent[]
 }>()
 
 const emit = defineEmits<{
@@ -240,10 +252,44 @@ watch(
   },
   { immediate: true }
 )
+
+/* ---------- Capture feedback (type label + element/edge badges) ---------- */
+
+const captureLabel = ref('')
+const edgeBadges = ref<Record<string, { edge: string; delta: number }>>({})
+
+const emptyCells = computed(() =>
+  props.state.board.reduce((n, row) => n + row.filter((c) => c === null).length, 0)
+)
+
+watch(
+  () => props.lastEvents,
+  (events) => {
+    if (!events || events.length === 0) return
+    // Centered label: Combo > Plus > Same.
+    const types = new Set(events.map((e) => e.type))
+    captureLabel.value = types.has('combo')
+      ? 'Combo!'
+      : types.has('plus')
+        ? 'Plus!'
+        : types.has('same')
+          ? 'Same!'
+          : ''
+    // Per-cell edge + element badge.
+    const badges: Record<string, { edge: string; delta: number }> = {}
+    for (const e of events) badges[`${e.x}-${e.y}`] = { edge: e.edge, delta: e.elementDelta }
+    edgeBadges.value = badges
+    window.setTimeout(() => {
+      captureLabel.value = ''
+      edgeBadges.value = {}
+    }, 700)
+  }
+)
 </script>
 
 <style scoped>
 .game-board {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -362,6 +408,56 @@ watch(
 
 .cell.preview-capture {
   box-shadow: inset 0 0 0 2px #22c55e, 0 0 12px rgba(34, 197, 94, 0.45);
+}
+
+.cell.last-move {
+  box-shadow: inset 0 0 0 2px var(--color-primary, #6366f1);
+}
+
+/* Ephemeral element bonus badge on the contested edge of a captured cell. */
+.elem-badge {
+  position: absolute;
+  font-size: 0.7rem;
+  font-weight: var(--font-bold);
+  padding: 0 0.25rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  animation: badge-fade 0.7s ease forwards;
+}
+.elem-badge.pos { color: #22c55e; }
+.elem-badge.neg { color: #ef4444; }
+.elem-badge.edge-up { top: 2px; left: 50%; transform: translateX(-50%); }
+.elem-badge.edge-down { bottom: 2px; left: 50%; transform: translateX(-50%); }
+.elem-badge.edge-left { left: 2px; top: 50%; transform: translateY(-50%); }
+.elem-badge.edge-right { right: 2px; top: 50%; transform: translateY(-50%); }
+
+@keyframes badge-fade {
+  0% { opacity: 0; transform: scale(0.6) translateY(0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1) translateY(-6px); }
+}
+
+/* Centered Same!/Plus!/Combo! flash. */
+.capture-label {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: var(--font-2xl, 1.6rem);
+  font-weight: var(--font-bold);
+  color: var(--color-primary, #6366f1);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: 2;
+}
+.cap-label-enter-active, .cap-label-leave-active { transition: opacity 0.2s, transform 0.2s; }
+.cap-label-enter-from, .cap-label-leave-to { opacity: 0; transform: translate(-50%, -30%); }
+
+.final-move {
+  color: var(--owner-b, #ef4444);
+  font-weight: var(--font-semibold);
+  margin-left: 0.5rem;
 }
 
 .owner-A { border-color: var(--owner-a, #3b82f6); }

@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { createMatch, placeStone, previewCaptures, handSizeFor, decideWinner } from '~/app/game/engine/match'
+import {
+  createMatch,
+  placeStone,
+  placeStoneWithEvents,
+  previewCaptures,
+  handSizeFor,
+  decideWinner,
+} from '~/app/game/engine/match'
 import type { CaptureRules, MatchState, Stone } from '~/app/game/engine/types'
 
 const RULES: CaptureRules = { same: false, plus: false, combo: false }
@@ -177,5 +184,21 @@ describe('decideWinner tie-break', () => {
 
   it('returns draw when cells and spike totals are equal', () => {
     expect(decideWinner(tiedState(2, 2))).toBe('draw')
+  })
+})
+
+describe('placeStoneWithEvents', () => {
+  it('returns the same state as placeStone plus the capture events', () => {
+    const attacker = stone('a', { spikeRight: 5 })
+    const base = createMatch({
+      size: 3,
+      hands: { A: [attacker], B: [stone('b', { spikeLeft: 3 })] },
+      rules: RULES,
+      startingPlayer: 'B',
+    })
+    const afterB = placeStone(base, 0, 1, 0)
+    const { state, events } = placeStoneWithEvents(afterB, 0, 0, 0)
+    expect(state.board[0][1]!.owner).toBe('A')
+    expect(events).toEqual([{ x: 1, y: 0, type: 'basic', edge: 'right', elementDelta: 0 }])
   })
 })
