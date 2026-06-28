@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { createMatch, placeStone, previewCaptures } from '~/app/game/engine/match'
-import type { CaptureRules, Stone } from '~/app/game/engine/types'
+import { createMatch, placeStone, previewCaptures, handSizeFor, decideWinner } from '~/app/game/engine/match'
+import type { CaptureRules, MatchState, Stone } from '~/app/game/engine/types'
 
 const RULES: CaptureRules = { same: false, plus: false, combo: false }
 
@@ -135,5 +135,47 @@ describe('previewCaptures', () => {
     })
     const after = placeStone(state, 0, 0, 0)
     expect(previewCaptures(after, 0, 0, 0)).toEqual([])
+  })
+})
+
+describe('handSizeFor', () => {
+  it('gives the non-starter the extra stone on odd boards', () => {
+    expect(handSizeFor(3, 'A', 'A')).toBe(4) // starter A: floor(9/2)=4
+    expect(handSizeFor(3, 'B', 'A')).toBe(5) // non-starter B: ceil(9/2)=5
+    expect(handSizeFor(3, 'B', 'B')).toBe(4) // starter B
+    expect(handSizeFor(3, 'A', 'B')).toBe(5) // non-starter A
+  })
+
+  it('splits evenly on even boards', () => {
+    expect(handSizeFor(4, 'A', 'A')).toBe(8)
+    expect(handSizeFor(4, 'B', 'A')).toBe(8)
+  })
+})
+
+describe('decideWinner tie-break', () => {
+  // 2x2 board, owned 2-2, so the cell count is tied and the spike sum decides.
+  function tiedState(aTotalEdge: number, bTotalEdge: number): MatchState {
+    const a = { owner: 'A' as const, stone: stone('a', { spikeUp: aTotalEdge, spikeDown: aTotalEdge, spikeLeft: aTotalEdge, spikeRight: aTotalEdge }) }
+    const b = { owner: 'B' as const, stone: stone('b', { spikeUp: bTotalEdge, spikeDown: bTotalEdge, spikeLeft: bTotalEdge, spikeRight: bTotalEdge }) }
+    return {
+      size: 2,
+      board: [[a, b], [b, a]],
+      hands: { A: [], B: [] },
+      current: 'A',
+      elements: { strongAgainst: {} },
+      rules: RULES,
+      lastMove: null,
+      status: 'playing',
+      winner: null,
+    }
+  }
+
+  it('breaks a 2-2 game by total spike values', () => {
+    expect(decideWinner(tiedState(3, 1))).toBe('A') // A: 12 each cell, B: 4 each
+    expect(decideWinner(tiedState(1, 3))).toBe('B')
+  })
+
+  it('returns draw when cells and spike totals are equal', () => {
+    expect(decideWinner(tiedState(2, 2))).toBe('draw')
   })
 })

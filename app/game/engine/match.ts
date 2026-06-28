@@ -261,9 +261,31 @@ export function isBoardFull(state: MatchState): boolean {
   return state.board.every((row) => row.every((cell) => cell !== null))
 }
 
-function decideWinner(state: MatchState): Player | 'draw' {
+/** The starter plays first and so receives one fewer stone on odd boards. */
+export function handSizeFor(size: number, player: Player, startingPlayer: Player): number {
+  const cells = size * size
+  return player === startingPlayer ? Math.floor(cells / 2) : Math.ceil(cells / 2)
+}
+
+function spikeTotal(state: MatchState, player: Player): number {
+  let total = 0
+  for (const row of state.board) {
+    for (const cell of row) {
+      if (cell && cell.owner === player) {
+        total += cell.stone.spikeUp + cell.stone.spikeDown + cell.stone.spikeLeft + cell.stone.spikeRight
+      }
+    }
+  }
+  return total
+}
+
+export function decideWinner(state: MatchState): Player | 'draw' {
   const { A, B } = getScore(state)
   if (A > B) return 'A'
   if (B > A) return 'B'
+  const sa = spikeTotal(state, 'A')
+  const sb = spikeTotal(state, 'B')
+  if (sa > sb) return 'A'
+  if (sb > sa) return 'B'
   return 'draw'
 }
