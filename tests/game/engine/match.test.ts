@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { createMatch, placeStone } from '~/app/game/engine/match'
-import type { Stone } from '~/app/game/engine/types'
+import { createMatch, placeStone, previewCaptures } from '~/app/game/engine/match'
+import type { CaptureRules, Stone } from '~/app/game/engine/types'
+
+const RULES: CaptureRules = { same: false, plus: false, combo: false }
 
 function stone(id: string, spikes: Partial<Stone> = {}): Stone {
   return {
@@ -103,5 +105,35 @@ describe('placeStone', () => {
     })
 
     expect(() => placeStone(match, 0, 3, 0)).toThrow(/board/i)
+  })
+})
+
+describe('previewCaptures', () => {
+  it('matches the captures that placeStone actually performs', () => {
+    const attacker = stone('a', { spikeRight: 5 })
+    const state = createMatch({
+      size: 3,
+      hands: { A: [attacker], B: [stone('b', { spikeLeft: 3 })] },
+      rules: RULES,
+      startingPlayer: 'B',
+    })
+    // B plays the defender at (1,0) first.
+    const afterB = placeStone(state, 0, 1, 0)
+    // Now A is to move; preview placing the attacker at (0,0).
+    const preview = previewCaptures(afterB, 0, 0, 0)
+    const real = placeStone(afterB, 0, 0, 0)
+
+    expect(preview).toEqual([{ x: 1, y: 0, type: 'basic', edge: 'right', elementDelta: 0 }])
+    expect(real.board[0][1]!.owner).toBe('A')
+  })
+
+  it('returns [] for an occupied cell', () => {
+    const state = createMatch({
+      size: 3,
+      hands: { A: [stone('a')], B: [stone('b')] },
+      rules: RULES,
+    })
+    const after = placeStone(state, 0, 0, 0)
+    expect(previewCaptures(after, 0, 0, 0)).toEqual([])
   })
 })

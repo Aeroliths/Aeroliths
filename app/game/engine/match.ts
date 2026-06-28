@@ -169,6 +169,35 @@ export function resolveCaptures(
 }
 
 /**
+ * Events the given move would produce, without mutating state.
+ * Returns [] when the move is illegal (bad index, out of bounds, occupied).
+ */
+export function previewCaptures(
+  state: MatchState,
+  handIndex: number,
+  x: number,
+  y: number,
+): CaptureEvent[] {
+  const stone = state.hands[state.current][handIndex]
+  if (!stone) return []
+  if (x < 0 || y < 0 || x >= state.size || y >= state.size) return []
+  if (state.board[y]![x]) return []
+
+  const placedBoard = cloneBoard(state.board)
+  placedBoard[y]![x] = { owner: state.current, stone }
+  const { events } = resolveCaptures(
+    placedBoard,
+    x,
+    y,
+    stone,
+    state.current,
+    state.elements,
+    state.rules,
+  )
+  return events
+}
+
+/**
  * Play the hand stone at `handIndex` on cell (x, y) for the current player.
  * Returns a new state, leaving the input untouched. Throws on illegal moves.
  */
