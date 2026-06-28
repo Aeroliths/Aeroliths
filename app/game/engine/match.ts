@@ -119,6 +119,24 @@ export function resolveCaptures(
     }
   }
 
+  // Plus (raw values; group sides by edge-sum, capture enemies in any group of size >= 2).
+  if (rules.plus) {
+    const present = sides.filter((s) => s.neighbour && s.defend !== null)
+    const sums = new Map<number, typeof present>()
+    for (const s of present) {
+      const sum = s.attack + (s.defend as number)
+      const list = sums.get(sum) ?? []
+      list.push(s)
+      sums.set(sum, list)
+    }
+    for (const group of sums.values()) {
+      if (group.length < 2) continue
+      for (const s of group) {
+        if (s.neighbour!.owner !== player) capture(s.nx, s.ny, s.edge, 'plus', 0)
+      }
+    }
+  }
+
   return { board: next, events }
 }
 

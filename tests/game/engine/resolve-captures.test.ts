@@ -105,3 +105,32 @@ describe('resolveCaptures - same', () => {
     expect(events.filter((e) => e.type === 'same')).toHaveLength(0)
   })
 })
+
+describe('resolveCaptures - plus', () => {
+  const PLUS_ONLY: CaptureRules = { same: false, plus: true, combo: false }
+
+  it('captures two enemies sharing the same edge-sum', () => {
+    const board = emptyBoard(3)
+    // Place A at (1,1) up=2 right=3. Top enemy down=4 (sum 6); right enemy left=3 (sum 6).
+    board[0][1] = { owner: 'B', stone: stone({ id: 'top', spikeDown: 4 }) }
+    board[1][2] = { owner: 'B', stone: stone({ id: 'right', spikeLeft: 3 }) }
+    const placed = stone({ id: 'a', spikeUp: 2, spikeRight: 3, spikeDown: 1, spikeLeft: 1 })
+
+    const { board: next, events } = resolveCaptures(board, 1, 1, placed, 'A', NO_ELEMENTS, PLUS_ONLY)
+
+    expect(next[0][1]!.owner).toBe('A')
+    expect(next[1][2]!.owner).toBe('A')
+    expect(events.filter((e) => e.type === 'plus')).toHaveLength(2)
+  })
+
+  it('does nothing when no two sums match', () => {
+    const board = emptyBoard(3)
+    board[0][1] = { owner: 'B', stone: stone({ id: 'top', spikeDown: 4 }) } // sum 6
+    board[1][2] = { owner: 'B', stone: stone({ id: 'right', spikeLeft: 9 }) } // sum 12
+    const placed = stone({ id: 'a', spikeUp: 2, spikeRight: 3, spikeDown: 1, spikeLeft: 1 })
+
+    const { events } = resolveCaptures(board, 1, 1, placed, 'A', NO_ELEMENTS, PLUS_ONLY)
+
+    expect(events.filter((e) => e.type === 'plus')).toHaveLength(0)
+  })
+})
