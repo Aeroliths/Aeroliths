@@ -33,11 +33,17 @@
           class="cell"
           :class="[
             cell ? `owner-${cell.owner}` : 'empty',
-            { placeable: !cell && canPlace, capturing: captured.has(`${x}-${y}`) },
+            {
+              placeable: !cell && canPlace,
+              capturing: captured.has(`${x}-${y}`),
+              'preview-capture': previewKeys.has(`${x}-${y}`),
+            },
           ]"
           :data-cx="x"
           :data-cy="y"
           :disabled="!!cell || !canPlace || state.status === 'finished'"
+          @mouseenter="showPreview(x, y)"
+          @mouseleave="clearPreview"
           @click="$emit('placeAt', x, y)"
         >
           <GameStone v-if="cell" :stone="cell.stone" :owner="cell.owner" />
@@ -84,7 +90,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import GameStone from './GameStone.vue'
-import { getScore } from '~/game/engine/match'
+import { getScore, previewCaptures } from '~/game/engine/match'
 import type { MatchState, Stone } from '~/game/engine/types'
 
 const props = defineProps<{
@@ -101,6 +107,23 @@ const score = computed(() => getScore(props.state))
 const canPlace = computed(
   () => props.selectedHandIndex !== null && props.state.status === 'playing'
 )
+
+/* ---------- Hover preview of would-be captures ---------- */
+
+const previewKeys = ref<Set<string>>(new Set())
+
+function showPreview(x: number, y: number) {
+  if (props.selectedHandIndex === null || props.state.status !== 'playing') {
+    previewKeys.value = new Set()
+    return
+  }
+  const events = previewCaptures(props.state, props.selectedHandIndex, x, y)
+  previewKeys.value = new Set(events.map((e) => `${e.x}-${e.y}`))
+}
+
+function clearPreview() {
+  previewKeys.value = new Set()
+}
 
 /* ---------- Custom drag & drop (so the full Lithos follows the cursor) ---------- */
 
@@ -142,6 +165,10 @@ function onPointerMove(e: PointerEvent) {
     drag.value.x = e.clientX
     drag.value.y = e.clientY
   }
+
+  const el = document.elementFromPoint(e.clientX, e.clientY)
+  const cellEl = el?.closest('[data-cx]') as HTMLElement | null
+  if (cellEl) showPreview(Number(cellEl.dataset.cx), Number(cellEl.dataset.cy))
 }
 
 function removeDragListeners() {
@@ -154,6 +181,7 @@ function onPointerCancel() {
   removeDragListeners()
   drag.value = null
   pendingIndex = null
+  clearPreview()
 }
 
 function onPointerUp(e: PointerEvent) {
@@ -174,6 +202,7 @@ function onPointerUp(e: PointerEvent) {
   }
 
   pendingIndex = null
+  clearPreview()
 }
 
 onBeforeUnmount(removeDragListeners)
@@ -329,6 +358,10 @@ watch(
 
 .cell.placeable:hover {
   background: rgba(99, 102, 241, 0.12);
+}
+
+.cell.preview-capture {
+  box-shadow: inset 0 0 0 2px #22c55e, 0 0 12px rgba(34, 197, 94, 0.45);
 }
 
 .owner-A { border-color: var(--owner-a, #3b82f6); }
