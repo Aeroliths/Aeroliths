@@ -105,9 +105,10 @@
         @select-hand="selectHand"
         @place-at="play"
       />
-      <button v-if="match.status !== 'finished'" class="ghost-btn rematch" @click="reset">
-        New game
-      </button>
+      <div v-if="match.status !== 'finished'" class="play-actions">
+        <button class="ghost-btn" :disabled="!canUndo" @click="undo">Undo</button>
+        <button class="ghost-btn" @click="reset">Edit config</button>
+      </div>
 
       <!-- End-of-game overlay: position:absolute inside .play (which is
            position:relative). No Teleport, scoped styles, so it renders
@@ -121,8 +122,8 @@
             <span class="es-b">Player 2 : {{ finalScore.B }}</span>
           </div>
           <div class="end-actions">
-            <button class="end-btn end-btn-primary" @click="start">Play again</button>
-            <button class="end-btn" @click="reset">Back to Play</button>
+            <button class="end-btn end-btn-primary" @click="playAgain">Play again</button>
+            <button class="end-btn" @click="reset">Edit config</button>
           </div>
         </div>
       </div>
@@ -162,6 +163,8 @@ const hands = ref<Record<Player, Stone[]>>({ A: [], B: [] })
 
 const match = ref<MatchState | null>(null)
 const selectedHandIndex = ref<number | null>(null)
+const history = ref<MatchState[]>([])
+const canUndo = computed(() => history.value.length > 0 && match.value?.status === 'playing')
 
 const finalScore = computed(() => (match.value ? getScore(match.value) : { A: 0, B: 0 }))
 const resultTitle = computed(() => {
@@ -277,6 +280,7 @@ onBeforeUnmount(removeDragListeners)
 
 function start() {
   if (!canStart.value) return
+  history.value = []
   const startingPlayer = resolveStartingPlayer()
   const handA = [...hands.value.A].slice(0, handSizeFor(size.value, 'A', startingPlayer))
   const handB = [...hands.value.B].slice(0, handSizeFor(size.value, 'B', startingPlayer))
@@ -303,8 +307,23 @@ function selectHand(index: number) {
   selectedHandIndex.value = index
 }
 
+function undo() {
+  const prev = history.value.pop()
+  if (prev) {
+    match.value = prev
+    selectedHandIndex.value = null
+  }
+}
+
+function playAgain() {
+  // Re-run start() with the same hands/rules/starter already in the setup state.
+  history.value = []
+  start()
+}
+
 function play(x: number, y: number) {
   if (!match.value || selectedHandIndex.value === null) return
+  history.value.push(match.value)
   match.value = placeStone(match.value, selectedHandIndex.value, x, y)
   selectedHandIndex.value = null
 }
@@ -581,7 +600,11 @@ onMounted(loadData)
   align-items: center;
 }
 
-.rematch { align-self: center; }
+.play-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
 
 .owner-A {}
 .owner-B {}
