@@ -60,3 +60,48 @@ describe('resolveCaptures - basic', () => {
     ])
   })
 })
+
+describe('resolveCaptures - same', () => {
+  const SAME_ONLY: CaptureRules = { same: true, plus: false, combo: false }
+
+  it('captures two enemies whose opposite edges equal the placed edges (raw)', () => {
+    const board = emptyBoard(3)
+    // Place A at (1,1) with up=4, right=6.
+    // Enemy above (1,0) has down=4; enemy right (2,1) has left=6 → both match.
+    board[0][1] = { owner: 'B', stone: stone({ id: 'top', spikeDown: 4 }) }
+    board[1][2] = { owner: 'B', stone: stone({ id: 'right', spikeLeft: 6 }) }
+    const placed = stone({ id: 'a', spikeUp: 4, spikeRight: 6, spikeDown: 9, spikeLeft: 9 })
+
+    const { board: next, events } = resolveCaptures(board, 1, 1, placed, 'A', NO_ELEMENTS, SAME_ONLY)
+
+    expect(next[0][1]!.owner).toBe('A')
+    expect(next[1][2]!.owner).toBe('A')
+    const sames = events.filter((e) => e.type === 'same').map((e) => `${e.x}-${e.y}`).sort()
+    expect(sames).toEqual(['1-0', '2-1'])
+  })
+
+  it('an allied matching side counts toward the threshold of 2', () => {
+    const board = emptyBoard(3)
+    // Ally above with down=4 (matches up=4) supplies the 2nd matching side;
+    // single enemy on the right with left=6 (matches right=6) is captured.
+    board[0][1] = { owner: 'A', stone: stone({ id: 'ally', spikeDown: 4 }) }
+    board[1][2] = { owner: 'B', stone: stone({ id: 'enemy', spikeLeft: 6 }) }
+    const placed = stone({ id: 'a', spikeUp: 4, spikeRight: 6, spikeDown: 9, spikeLeft: 9 })
+
+    const { board: next, events } = resolveCaptures(board, 1, 1, placed, 'A', NO_ELEMENTS, SAME_ONLY)
+
+    expect(next[1][2]!.owner).toBe('A')
+    expect(next[0][1]!.owner).toBe('A') // ally unchanged
+    expect(events.filter((e) => e.type === 'same')).toHaveLength(1)
+  })
+
+  it('does nothing with only one matching side', () => {
+    const board = emptyBoard(3)
+    board[1][2] = { owner: 'B', stone: stone({ id: 'enemy', spikeLeft: 6 }) }
+    const placed = stone({ id: 'a', spikeRight: 6, spikeUp: 9, spikeDown: 9, spikeLeft: 9 })
+
+    const { events } = resolveCaptures(board, 1, 1, placed, 'A', NO_ELEMENTS, SAME_ONLY)
+
+    expect(events.filter((e) => e.type === 'same')).toHaveLength(0)
+  })
+})

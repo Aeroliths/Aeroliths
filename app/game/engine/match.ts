@@ -75,19 +75,47 @@ export function resolveCaptures(
   const size = board.length
   const next = cloneBoard(board)
   const events: CaptureEvent[] = []
+  const capturedKeys = new Set<string>()
 
-  for (const { dx, dy, attackerSide, defenderSide, edge } of ADJACENCY) {
+  // Snapshot the four sides against the board *before* any flip.
+  const sides = ADJACENCY.map(({ dx, dy, attackerSide, defenderSide, edge }) => {
     const nx = x + dx
     const ny = y + dy
-    if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue
+    const inBounds = nx >= 0 && ny >= 0 && nx < size && ny < size
+    const neighbour = inBounds ? next[ny]![nx] : null
+    return {
+      nx,
+      ny,
+      edge,
+      neighbour,
+      attack: stone[attackerSide],
+      defend: neighbour ? neighbour.stone[defenderSide] : null,
+    }
+  })
 
-    const neighbour = next[ny]![nx]
-    if (!neighbour || neighbour.owner === player) continue
+  const capture = (nx: number, ny: number, edge: Edge, type: CaptureEvent['type'], delta: -1 | 0 | 1) => {
+    const key = `${nx}-${ny}`
+    if (capturedKeys.has(key)) return
+    const cell = next[ny]![nx]!
+    next[ny]![nx] = { ...cell, owner: player }
+    capturedKeys.add(key)
+    events.push({ x: nx, y: ny, type, edge, elementDelta: delta })
+  }
 
-    const delta = elementBonus(elements, stone, neighbour.stone)
-    if (stone[attackerSide] + delta > neighbour.stone[defenderSide]) {
-      next[ny]![nx] = { ...neighbour, owner: player }
-      events.push({ x: nx, y: ny, type: 'basic', edge, elementDelta: delta as -1 | 0 | 1 })
+  // Basic (element bonus applies).
+  for (const s of sides) {
+    if (!s.neighbour || s.neighbour.owner === player || s.defend === null) continue
+    const delta = elementBonus(elements, stone, s.neighbour.stone) as -1 | 0 | 1
+    if (s.attack + delta > s.defend) capture(s.nx, s.ny, s.edge, 'basic', delta)
+  }
+
+  // Same (raw values; allied sides count toward the threshold).
+  if (rules.same) {
+    const matching = sides.filter((s) => s.neighbour && s.defend === s.attack)
+    if (matching.length >= 2) {
+      for (const s of matching) {
+        if (s.neighbour!.owner !== player) capture(s.nx, s.ny, s.edge, 'same', 0)
+      }
     }
   }
 
