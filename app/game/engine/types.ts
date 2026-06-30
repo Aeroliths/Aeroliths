@@ -62,6 +62,10 @@ export interface MatchConfig {
   elements?: ElementGraph
   startingPlayer?: Player
   rules?: CaptureRules
+  /** Per-cell element id (boardElements[y][x]); null = neutral. */
+  boardElements?: (string | null)[][]
+  /** Seconds per turn; 0 = no timer. */
+  turnSeconds?: number
 }
 
 export interface MatchState {
@@ -72,7 +76,17 @@ export interface MatchState {
   current: Player
   elements: ElementGraph
   rules: CaptureRules
+  /** Per-cell element id (boardElements[y][x]); null = neutral. */
+  boardElements: (string | null)[][]
+  /** Seconds per turn; 0 = no timer. */
+  turnSeconds: number
   lastMove: { x: number; y: number } | null
   status: 'playing' | 'finished'
   winner: Player | 'draw' | null
+}
+
+/** One move's resulting state plus the captures it produced (UI history). */
+export interface TimelineEntry {
+  state: MatchState
+  events: CaptureEvent[]
 }

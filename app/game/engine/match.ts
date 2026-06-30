@@ -23,6 +23,20 @@ function elementBonus(elements: ElementGraph, attacker: Stone, defender: Stone):
   return bonus
 }
 
+/** +1 when the stone matches the cell's element, -1 when the cell has an element
+ *  the stone doesn't match (or the stone is elementless), 0 on a neutral cell. */
+function cellBonus(boardElements: (string | null)[][], x: number, y: number, stone: Stone): -1 | 0 | 1 {
+  const cell = boardElements[y]?.[x] ?? null
+  if (cell === null) return 0
+  return stone.elementId === cell ? 1 : -1
+}
+
+const clampDelta = (n: number): -1 | 0 | 1 => (n > 0 ? 1 : n < 0 ? -1 : 0)
+
+function emptyElements(size: number): (string | null)[][] {
+  return Array.from({ length: size }, () => Array.from({ length: size }, () => null))
+}
+
 /** The four neighbours and which spike of each stone faces the other across the edge. */
 const ADJACENCY = [
   { dx: 1, dy: 0, attackerSide: 'spikeRight', defenderSide: 'spikeLeft', edge: 'right' },
@@ -44,7 +58,7 @@ function cloneBoard(board: Cell[][]): Cell[][] {
 }
 
 export function createMatch(config: MatchConfig): MatchState {
-  const { size, hands, elements, startingPlayer, rules } = config
+  const { size, hands, elements, startingPlayer, rules, boardElements, turnSeconds } = config
 
   return {
     size,
@@ -53,6 +67,8 @@ export function createMatch(config: MatchConfig): MatchState {
     current: startingPlayer ?? 'A',
     elements: elements ?? { strongAgainst: {} },
     rules: rules ?? { same: false, plus: false, combo: false },
+    boardElements: boardElements ?? emptyElements(size),
+    turnSeconds: turnSeconds ?? 0,
     lastMove: null,
     status: 'playing',
     winner: null,
@@ -71,6 +87,7 @@ export function resolveCaptures(
   player: Player,
   elements: ElementGraph,
   rules: CaptureRules,
+  boardElements: (string | null)[][] = [],
 ): { board: Cell[][]; events: CaptureEvent[] } {
   const size = board.length
   const next = cloneBoard(board)
@@ -103,11 +120,15 @@ export function resolveCaptures(
     events.push({ x: nx, y: ny, type, edge, elementDelta: delta })
   }
 
-  // Basic (element bonus applies).
+  // Basic (element matchup + cell bonuses apply). The placed stone's cell bonus is constant.
+  const attackerCell = cellBonus(boardElements, x, y, stone)
   for (const s of sides) {
     if (!s.neighbour || s.neighbour.owner === player || s.defend === null) continue
-    const delta = elementBonus(elements, stone, s.neighbour.stone) as -1 | 0 | 1
-    if (s.attack + delta > s.defend) capture(s.nx, s.ny, s.edge, 'basic', delta)
+    const matchup = elementBonus(elements, stone, s.neighbour.stone)
+    const defenderCell = cellBonus(boardElements, s.nx, s.ny, s.neighbour.stone)
+    const effAttack = s.attack + matchup + attackerCell
+    const effDefend = s.defend + defenderCell
+    if (effAttack > effDefend) capture(s.nx, s.ny, s.edge, 'basic', clampDelta(matchup + attackerCell))
   }
 
   // Same (raw values; allied sides count toward the threshold).
@@ -149,6 +170,7 @@ export function resolveCaptures(
     while (comboQueue.length > 0) {
       const { x: cx, y: cy } = comboQueue.shift()!
       const cell = next[cy]![cx]!
+      const cAttackerCell = cellBonus(boardElements, cx, cy, cell.stone)
       for (const { dx, dy, attackerSide, defenderSide, edge } of ADJACENCY) {
         const nx = cx + dx
         const ny = cy + dy
@@ -156,9 +178,10 @@ export function resolveCaptures(
         const neighbour = next[ny]![nx]
         if (!neighbour || neighbour.owner === player) continue
         if (capturedKeys.has(`${nx}-${ny}`)) continue
-        const delta = elementBonus(elements, cell.stone, neighbour.stone) as -1 | 0 | 1
-        if (cell.stone[attackerSide] + delta > neighbour.stone[defenderSide]) {
-          capture(nx, ny, edge, 'combo', delta)
+        const matchup = elementBonus(elements, cell.stone, neighbour.stone)
+        const defenderCell = cellBonus(boardElements, nx, ny, neighbour.stone)
+        if (cell.stone[attackerSide] + matchup + cAttackerCell > neighbour.stone[defenderSide] + defenderCell) {
+          capture(nx, ny, edge, 'combo', clampDelta(matchup + cAttackerCell))
           comboQueue.push({ x: nx, y: ny })
         }
       }
@@ -193,6 +216,7 @@ export function previewCaptures(
     state.current,
     state.elements,
     state.rules,
+    state.boardElements,
   )
   return events
 }
@@ -227,7 +251,7 @@ export function placeStoneWithEvents(
   const placedBoard = cloneBoard(state.board)
   placedBoard[y]![x] = { owner: player, stone }
 
-  const { board, events } = resolveCaptures(placedBoard, x, y, stone, player, state.elements, state.rules)
+  const { board, events } = resolveCaptures(placedBoard, x, y, stone, player, state.elements, state.rules, state.boardElements)
 
   const hands: Record<Player, typeof hand> = {
     A: [...state.hands.A],
