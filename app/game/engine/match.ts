@@ -296,6 +296,23 @@ export function isBoardFull(state: MatchState): boolean {
   return state.board.every((row) => row.every((cell) => cell !== null))
 }
 
+/** A random legal move for the current player, or null if none exists. */
+export function randomMove(
+  state: MatchState,
+  rng: () => number = Math.random,
+): { handIndex: number; x: number; y: number } | null {
+  const hand = state.hands[state.current]
+  if (hand.length === 0) return null
+
+  const empties: { x: number; y: number }[] = []
+  state.board.forEach((row, y) => row.forEach((cell, x) => { if (!cell) empties.push({ x, y }) }))
+  if (empties.length === 0) return null
+
+  const handIndex = Math.floor(rng() * hand.length)
+  const spot = empties[Math.floor(rng() * empties.length)]!
+  return { handIndex, x: spot.x, y: spot.y }
+}
+
 /** The starter plays first and so receives one fewer stone on odd boards. */
 export function handSizeFor(size: number, player: Player, startingPlayer: Player): number {
   const cells = size * size

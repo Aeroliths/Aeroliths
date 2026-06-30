@@ -6,6 +6,7 @@ import {
   previewCaptures,
   handSizeFor,
   decideWinner,
+  randomMove,
 } from '~/app/game/engine/match'
 import type { CaptureRules, MatchState, Stone } from '~/app/game/engine/types'
 
@@ -200,5 +201,25 @@ describe('placeStoneWithEvents', () => {
     const { state, events } = placeStoneWithEvents(afterB, 0, 0, 0)
     expect(state.board[0][1]!.owner).toBe('A')
     expect(events).toEqual([{ x: 1, y: 0, type: 'basic', edge: 'right', elementDelta: 0 }])
+  })
+})
+
+describe('randomMove', () => {
+  it('returns a legal move on a non-full board with a non-empty hand', () => {
+    const state = createMatch({
+      size: 2,
+      hands: { A: [stone('a1'), stone('a2')], B: [stone('b1'), stone('b2')] },
+      rules: RULES,
+    })
+    const mv = randomMove(state, () => 0)
+    expect(mv).not.toBeNull()
+    expect(state.board[mv!.y][mv!.x]).toBeNull()
+    expect(mv!.handIndex).toBeGreaterThanOrEqual(0)
+    expect(mv!.handIndex).toBeLessThan(state.hands.A.length)
+  })
+
+  it('returns null when the current hand is empty', () => {
+    const state = createMatch({ size: 2, hands: { A: [], B: [stone('b1')] }, rules: RULES })
+    expect(randomMove(state, () => 0)).toBeNull()
   })
 })
