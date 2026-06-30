@@ -313,10 +313,14 @@ export function randomMove(
   return { handIndex, x: spot.x, y: spot.y }
 }
 
-/** The starter plays first and so receives one fewer stone on odd boards. */
+/**
+ * The starter plays first and therefore makes the last move on an odd board
+ * (cells 1,3,…,N), so it must hold the extra stone (ceil); the second player
+ * holds floor. This is required for the board to be fillable.
+ */
 export function handSizeFor(size: number, player: Player, startingPlayer: Player): number {
   const cells = size * size
-  return player === startingPlayer ? Math.floor(cells / 2) : Math.ceil(cells / 2)
+  return player === startingPlayer ? Math.ceil(cells / 2) : Math.floor(cells / 2)
 }
 
 function spikeTotal(state: MatchState, player: Player): number {

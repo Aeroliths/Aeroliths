@@ -8,7 +8,7 @@ import {
   decideWinner,
   randomMove,
 } from '~/app/game/engine/match'
-import type { CaptureRules, MatchState, Stone } from '~/app/game/engine/types'
+import type { CaptureRules, MatchState, Player, Stone } from '~/app/game/engine/types'
 
 const RULES: CaptureRules = { same: false, plus: false, combo: false }
 
@@ -147,16 +147,34 @@ describe('previewCaptures', () => {
 })
 
 describe('handSizeFor', () => {
-  it('gives the non-starter the extra stone on odd boards', () => {
-    expect(handSizeFor(3, 'A', 'A')).toBe(4) // starter A: floor(9/2)=4
-    expect(handSizeFor(3, 'B', 'A')).toBe(5) // non-starter B: ceil(9/2)=5
-    expect(handSizeFor(3, 'B', 'B')).toBe(4) // starter B
-    expect(handSizeFor(3, 'A', 'B')).toBe(5) // non-starter A
+  it('gives the starter the extra stone on odd boards (it makes the last move)', () => {
+    expect(handSizeFor(3, 'A', 'A')).toBe(5) // starter A: ceil(9/2)=5
+    expect(handSizeFor(3, 'B', 'A')).toBe(4) // non-starter B: floor(9/2)=4
+    expect(handSizeFor(3, 'B', 'B')).toBe(5) // starter B
+    expect(handSizeFor(3, 'A', 'B')).toBe(4) // non-starter A
   })
 
   it('splits evenly on even boards', () => {
     expect(handSizeFor(4, 'A', 'A')).toBe(8)
     expect(handSizeFor(4, 'B', 'A')).toBe(8)
+  })
+
+  it('hand sizes from handSizeFor exactly fill an odd board (no deadlock)', () => {
+    const starter: Player = 'B'
+    const handA = Array.from({ length: handSizeFor(3, 'A', starter) }, (_, i) => stone(`a${i}`))
+    const handB = Array.from({ length: handSizeFor(3, 'B', starter) }, (_, i) => stone(`b${i}`))
+    let state = createMatch({ size: 3, hands: { A: handA, B: handB }, rules: RULES, startingPlayer: starter })
+
+    // Play every empty cell in turn; each player always has a stone to place.
+    for (let n = 0; n < 9; n++) {
+      const empties: { x: number; y: number }[] = []
+      state.board.forEach((row, y) => row.forEach((cell, x) => { if (!cell) empties.push({ x, y }) }))
+      expect(state.hands[state.current].length).toBeGreaterThan(0)
+      state = placeStone(state, 0, empties[0]!.x, empties[0]!.y)
+    }
+
+    expect(state.status).toBe('finished')
+    expect(state.board.flat().every((c) => c !== null)).toBe(true)
   })
 })
 

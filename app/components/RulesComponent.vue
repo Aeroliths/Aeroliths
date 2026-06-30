@@ -19,7 +19,7 @@
             <li>The board size is chosen before the game starts (3x3, 4x4 or 5x5).</li>
             <li>Each player fills a hand of Lithos for the match.</li>
             <li>The first player is <strong>chosen or randomized</strong> in the setup screen.</li>
-            <li>On odd boards the player who goes <strong>second</strong> receives one extra Lithos to offset the first-move advantage.</li>
+            <li>On odd boards the <strong>first</strong> player holds one extra Lithos, since they also make the last move.</li>
             <li>Hands can be filled manually, at <strong>random</strong>, <strong>mirrored</strong> (identical hands), or via an alternating <strong>draft</strong>.</li>
             <li>An optional <strong>turn timer</strong> can be enabled; running out plays a random move.</li>
             <li>Players then take turns placing one Lithos per turn on any empty cell.</li>
