@@ -27,6 +27,30 @@
         </label>
       </div>
 
+      <div class="hand-modes">
+        <button class="ghost-btn sm" @click="fillRandom">Random</button>
+        <button class="ghost-btn sm" @click="fillMirror">Mirror</button>
+        <button class="ghost-btn sm" @click="startDraft">Draft</button>
+      </div>
+
+      <div v-if="draftActive" class="draft">
+        <div class="draft-head">
+          <span>Draft — <strong>{{ draftTurn === 'A' ? 'Player 1' : 'Player 2' }}</strong> to pick</span>
+          <button class="ghost-btn sm" @click="cancelDraft">Cancel draft</button>
+        </div>
+        <div class="draft-pool">
+          <button
+            v-for="(stone, i) in draftPool"
+            :key="stone.id + '-' + i"
+            class="catalog-card"
+            @click="pickDraft(i)"
+          >
+            <GameStone :stone="stone" />
+            <span class="catalog-name">{{ stone.name }}</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Both players side by side: drop Lithos from the shared catalog. -->
       <div class="players">
         <div
@@ -139,7 +163,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
 import { createMatch, placeStoneWithEvents, getScore, handSizeFor } from '~/game/engine/match'
-import { generateBoardElements } from '~/game/engine/setup'
+import { generateBoardElements, randomHand, buildDraftPool } from '~/game/engine/setup'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
 import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
@@ -216,6 +240,54 @@ function autoFill(player: Player) {
     const pick = catalog.value[hands.value[player].length % catalog.value.length]!
     hands.value[player].push(pick)
   }
+}
+
+/* ---------- Hand modes: Random / Mirror / Draft ---------- */
+
+function fillRandom() {
+  if (catalog.value.length === 0) return
+  hands.value.A = randomHand(catalog.value, handSize('A'))
+  hands.value.B = randomHand(catalog.value, handSize('B'))
+}
+
+function fillMirror() {
+  if (catalog.value.length === 0) return
+  const a = randomHand(catalog.value, handSize('A'))
+  hands.value.A = a
+  hands.value.B = a.slice(0, handSize('B'))
+}
+
+const draftActive = ref(false)
+const draftPool = ref<Stone[]>([])
+const draftTurn = ref<Player>('A')
+
+function startDraft() {
+  if (catalog.value.length === 0) return
+  hands.value.A = []
+  hands.value.B = []
+  draftPool.value = buildDraftPool(catalog.value, handSize('A') + handSize('B'))
+  draftTurn.value = 'A'
+  draftActive.value = true
+}
+
+function nextDraftTurn() {
+  if (handFull('A') && handFull('B')) { draftActive.value = false; return }
+  const other: Player = draftTurn.value === 'A' ? 'B' : 'A'
+  draftTurn.value = handFull(other) ? draftTurn.value : other
+}
+
+function pickDraft(i: number) {
+  if (!draftActive.value || handFull(draftTurn.value)) return
+  const [stone] = draftPool.value.splice(i, 1)
+  if (stone) hands.value[draftTurn.value].push(stone)
+  nextDraftTurn()
+}
+
+function cancelDraft() {
+  draftActive.value = false
+  draftPool.value = []
+  hands.value.A = []
+  hands.value.B = []
 }
 
 /* ---------- Drag a Lithos from the catalog onto a player column ----------
@@ -430,6 +502,23 @@ onMounted(loadData)
   align-items: center;
   gap: 0.3rem;
   cursor: pointer;
+}
+
+.hand-modes { display: flex; gap: 0.5rem; }
+.draft { display: flex; flex-direction: column; gap: 0.5rem; }
+.draft-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+.draft-pool {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.6rem;
+  max-height: 40vh;
+  overflow-y: auto;
 }
 
 /* ---- Two player columns ---- */
