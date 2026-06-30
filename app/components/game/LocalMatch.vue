@@ -134,14 +134,33 @@
     <!-- ========== PLAY ========== -->
     <div v-else-if="match" class="play">
       <GameBoard
+        v-if="replaying"
+        :state="replayState"
+        :selected-hand-index="null"
+        :last-events="replayEvents"
+        :element-sprites="elementSprites"
+        readonly
+      />
+      <GameBoard
+        v-else
         :state="match"
         :selected-hand-index="selectedHandIndex"
         :last-events="lastEvents"
         :element-sprites="elementSprites"
         :seconds-left="match.turnSeconds > 0 && match.status === 'playing' ? remaining : undefined"
+        :capture-info="match.status === 'finished' ? captureInfo : undefined"
         @select-hand="selectHand"
         @place-at="play"
       />
+
+      <div v-if="replaying" class="replay-bar">
+        <button class="ghost-btn sm" :disabled="replayIndex === 0" @click="replayStep(-1)">◀</button>
+        <span>{{ replayIndex }} / {{ timeline.length - 1 }}</span>
+        <button class="ghost-btn sm" :disabled="replayIndex >= timeline.length - 1" @click="replayStep(1)">▶</button>
+        <button class="ghost-btn sm" @click="replayAuto">Auto</button>
+        <button class="ghost-btn sm" @click="stopReplay">Close</button>
+      </div>
+
       <div v-if="match.status !== 'finished'" class="play-actions">
         <button class="ghost-btn" :disabled="!canUndo" @click="undo">Undo</button>
         <button class="ghost-btn" @click="reset">Edit config</button>
@@ -150,15 +169,20 @@
       <!-- End-of-game overlay: position:absolute inside .play (which is
            position:relative). No Teleport, scoped styles, so it renders
            reliably and is not trapped by .play-container's backdrop-filter. -->
-      <div v-if="match.status === 'finished'" class="end-overlay" @click.self="reset">
+      <div v-if="match.status === 'finished' && !replaying" class="end-overlay" @click.self="reset">
         <div class="end-modal" role="dialog" aria-modal="true">
           <div class="end-result" :class="resultClass">{{ resultTitle }}</div>
           <div class="end-score">
-            <span class="es-a">Player 1 : {{ finalScore.A }}</span>
+            <span class="es-a">Player 1 : {{ animScore.A }}</span>
             <span class="es-sep">/</span>
-            <span class="es-b">Player 2 : {{ finalScore.B }}</span>
+            <span class="es-b">Player 2 : {{ animScore.B }}</span>
+          </div>
+          <div class="end-recap">
+            <span>Biggest capture: {{ highlights.biggestCapture }}{{ highlights.biggestBy ? ` (${highlights.biggestBy === 'A' ? 'P1' : 'P2'})` : '' }}</span>
+            <span>Same {{ highlights.same }} · Plus {{ highlights.plus }} · Combo {{ highlights.combo }}</span>
           </div>
           <div class="end-actions">
+            <button class="end-btn" @click="startReplay">Revoir la partie</button>
             <button class="end-btn end-btn-primary" @click="playAgain">Play again</button>
             <button class="end-btn" @click="reset">Edit config</button>
           </div>
@@ -174,6 +198,7 @@ import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
 import { createMatch, placeStoneWithEvents, getScore, handSizeFor, randomMove } from '~/game/engine/match'
 import { generateBoardElements, randomHand, buildDraftPool } from '~/game/engine/setup'
+import { matchHighlights, buildCaptureInfo } from '~/game/engine/analysis'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
 import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
@@ -193,7 +218,9 @@ const elementalCells = ref(false)
 const turnSeconds = ref(0)
 const remaining = ref(0)
 const replaying = ref(false)
+const replayIndex = ref(0)
 let timerId: ReturnType<typeof setInterval> | null = null
+let replayTimer: ReturnType<typeof setInterval> | null = null
 const elementSprites = computed<Record<string, string>>(() => {
   const map: Record<string, string> = {}
   for (const s of catalog.value) {
@@ -377,6 +404,7 @@ function onPointerUp(e: PointerEvent) {
 
 onBeforeUnmount(removeDragListeners)
 onBeforeUnmount(stopTimer)
+onBeforeUnmount(() => { if (replayTimer) clearInterval(replayTimer) })
 
 function start() {
   if (!canStart.value) return
@@ -398,6 +426,7 @@ function start() {
   timeline.value = [{ state: match.value, events: [] }]
   selectedHandIndex.value = null
   lastEvents.value = []
+  stopReplay()
   phase.value = 'play'
   emit('activeChange', true)
   armTimer()
@@ -407,6 +436,8 @@ function reset() {
   match.value = null
   selectedHandIndex.value = null
   phase.value = 'setup'
+  stopTimer()
+  stopReplay()
   emit('activeChange', false)
 }
 
@@ -467,6 +498,49 @@ watch(
   () => {
     if (match.value?.status === 'playing') armTimer()
     else stopTimer()
+  },
+)
+
+/* ---------- End-of-game: replay, highlights, animated score ---------- */
+
+const replayState = computed(() => timeline.value[replayIndex.value]?.state ?? match.value)
+const replayEvents = computed(() => timeline.value[replayIndex.value]?.events ?? [])
+const highlights = computed(() => matchHighlights(timeline.value))
+const captureInfo = computed(() => buildCaptureInfo(timeline.value))
+
+function startReplay() { replaying.value = true; replayIndex.value = 0; stopTimer() }
+function stopReplay() {
+  replaying.value = false
+  if (replayTimer) { clearInterval(replayTimer); replayTimer = null }
+}
+function replayStep(d: number) {
+  replayIndex.value = Math.min(timeline.value.length - 1, Math.max(0, replayIndex.value + d))
+}
+function replayAuto() {
+  if (replayTimer) { clearInterval(replayTimer); replayTimer = null; return }
+  replayTimer = setInterval(() => {
+    if (replayIndex.value >= timeline.value.length - 1) {
+      clearInterval(replayTimer!); replayTimer = null; return
+    }
+    replayIndex.value += 1
+  }, 1000)
+}
+
+const animScore = ref({ A: 0, B: 0 })
+watch(
+  () => match.value?.status,
+  (s) => {
+    if (s !== 'finished') return
+    const target = finalScore.value
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (reduce) { animScore.value = { ...target }; return }
+    const startT = performance.now()
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startT) / 600)
+      animScore.value = { A: Math.round(target.A * t), B: Math.round(target.B * t) }
+      if (t < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
   },
 )
 
@@ -763,6 +837,17 @@ onMounted(loadData)
   display: flex;
   gap: 0.75rem;
   justify-content: center;
+}
+
+.replay-bar { display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
+
+.end-recap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
 }
 
 .owner-A {}

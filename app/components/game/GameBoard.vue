@@ -48,6 +48,9 @@
           ]"
           :data-cx="x"
           :data-cy="y"
+          :title="captureInfo && captureInfo[`${x}-${y}`]
+            ? `Captured by ${captureInfo[`${x}-${y}`].by === 'A' ? 'Player 1' : 'Player 2'} (${captureInfo[`${x}-${y}`].type})`
+            : undefined"
           :disabled="!!cell || !canPlace || state.status === 'finished'"
           @mouseenter="showPreview(x, y)"
           @mouseleave="clearPreview"
@@ -81,7 +84,7 @@
     </Transition>
 
     <!-- Current player's hand -->
-    <div v-if="state.status === 'playing'" class="hand">
+    <div v-if="state.status === 'playing' && !readonly" class="hand">
       <div class="hand-label">{{ state.current === 'A' ? 'Player 1' : 'Player 2' }} hand</div>
       <div class="hand-cards">
         <button
@@ -128,6 +131,8 @@ const props = defineProps<{
   lastEvents?: CaptureEvent[]
   elementSprites?: Record<string, string>
   secondsLeft?: number
+  readonly?: boolean
+  captureInfo?: Record<string, { type: string; by: string }>
 }>()
 
 const emit = defineEmits<{
@@ -137,7 +142,7 @@ const emit = defineEmits<{
 
 const score = computed(() => getScore(props.state))
 const canPlace = computed(
-  () => props.selectedHandIndex !== null && props.state.status === 'playing'
+  () => !props.readonly && props.selectedHandIndex !== null && props.state.status === 'playing'
 )
 
 /* ---------- Hover preview of would-be captures ---------- */
@@ -173,7 +178,7 @@ let startY = 0
 let pendingIndex: number | null = null
 
 function onPointerDown(e: PointerEvent, index: number) {
-  if (props.state.status !== 'playing') return
+  if (props.readonly || props.state.status !== 'playing') return
   e.preventDefault()
   startX = e.clientX
   startY = e.clientY
