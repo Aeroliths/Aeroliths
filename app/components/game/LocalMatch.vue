@@ -2,6 +2,11 @@
   <div class="local-match">
     <!-- ========== SETUP ========== -->
     <div v-if="phase === 'setup'" class="setup">
+      <div v-if="resumable" class="resume-banner">
+        <span>An unfinished game was found.</span>
+        <button class="ghost-btn sm" @click="resumeMatch">Resume</button>
+        <button class="ghost-btn sm" @click="discardResume">Discard</button>
+      </div>
       <div class="setup-controls">
         <label class="size-picker">
           Board size
@@ -440,6 +445,7 @@ function start() {
   phase.value = 'play'
   emit('activeChange', true)
   armTimer()
+  saveMatch()
 }
 
 function reset() {
@@ -448,6 +454,7 @@ function reset() {
   phase.value = 'setup'
   stopTimer()
   stopReplay()
+  clearSave()
   emit('activeChange', false)
 }
 
@@ -478,8 +485,45 @@ function playAt(handIndex: number, x: number, y: number) {
   selectedHandIndex.value = null
   sound.play('place')
   if (events.length > 0) sound.play('capture')
-  if (state.status === 'finished') sound.play('win')
+  if (state.status === 'finished') { sound.play('win'); clearSave() }
+  else saveMatch()
 }
+
+/* ---------- Auto-save & resume ---------- */
+
+const SAVE_KEY = 'aeroliths.localMatch'
+const resumable = ref<MatchState | null>(null)
+
+function saveMatch() {
+  if (!match.value || replaying.value) return
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(match.value)) } catch { /* quota */ }
+}
+function clearSave() {
+  try { localStorage.removeItem(SAVE_KEY) } catch { /* ignore */ }
+}
+
+function checkResume() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY)
+    if (!raw) return
+    const saved = JSON.parse(raw) as MatchState
+    if (saved && saved.status === 'playing') resumable.value = saved
+  } catch { clearSave() }
+}
+
+function resumeMatch() {
+  if (!resumable.value) return
+  match.value = resumable.value
+  timeline.value = [{ state: resumable.value, events: [] }]
+  selectedHandIndex.value = null
+  lastEvents.value = []
+  phase.value = 'play'
+  resumable.value = null
+  emit('activeChange', true)
+  armTimer()
+}
+
+function discardResume() { resumable.value = null; clearSave() }
 
 function play(x: number, y: number) {
   if (selectedHandIndex.value === null) return
@@ -585,7 +629,10 @@ async function loadData() {
   }
 }
 
-onMounted(loadData)
+onMounted(() => {
+  loadData()
+  checkResume()
+})
 </script>
 
 <style scoped>
@@ -855,6 +902,17 @@ onMounted(loadData)
 .replay-bar { display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
 
 .vol { width: 90px; }
+
+.resume-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+  background: var(--bg-glass-light);
+  font-size: var(--font-sm);
+}
 
 .end-recap {
   display: flex;
