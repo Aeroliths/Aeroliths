@@ -57,6 +57,9 @@ function cloneBoard(board: Cell[][]): Cell[][] {
   return board.map((row) => row.map((cell) => (cell ? { ...cell } : null)))
 }
 
+/** Value an off-board edge contributes to Same/Plus under the Wall rule. */
+const WALL_VALUE = 10
+
 export function createMatch(config: MatchConfig): MatchState {
   const { size, hands, elements, startingPlayer, rules, boardElements, turnSeconds } = config
 
@@ -66,9 +69,12 @@ export function createMatch(config: MatchConfig): MatchState {
     hands: { A: [...hands.A], B: [...hands.B] },
     current: startingPlayer ?? 'A',
     elements: elements ?? { strongAgainst: {} },
-    rules: rules ?? { same: false, plus: false, combo: false },
+    rules: rules ?? { same: false, plus: false, combo: false, wall: false },
     boardElements: boardElements ?? emptyElements(size),
     turnSeconds: turnSeconds ?? 0,
+    handRule: config.handRule ?? 'none',
+    openHands: config.openHands ?? false,
+    suddenDeath: config.suddenDeath ?? false,
     lastMove: null,
     status: 'playing',
     winner: null,
@@ -95,19 +101,23 @@ export function resolveCaptures(
   const capturedKeys = new Set<string>()
   const comboQueue: { x: number; y: number }[] = []
 
-  // Snapshot the four sides against the board *before* any flip.
+  // Snapshot the four sides against the board *before* any flip. With the Wall
+  // rule an off-board edge behaves like a value-10 neighbour for Same/Plus, but
+  // is never itself captured (it has no `neighbour`).
   const sides = ADJACENCY.map(({ dx, dy, attackerSide, defenderSide, edge }) => {
     const nx = x + dx
     const ny = y + dy
     const inBounds = nx >= 0 && ny >= 0 && nx < size && ny < size
     const neighbour = inBounds ? next[ny]![nx] : null
+    const isWall = !inBounds && rules.wall
     return {
       nx,
       ny,
       edge,
       neighbour,
+      isWall,
       attack: stone[attackerSide],
-      defend: neighbour ? neighbour.stone[defenderSide] : null,
+      defend: neighbour ? neighbour.stone[defenderSide] : isWall ? WALL_VALUE : null,
     }
   })
 
@@ -131,12 +141,12 @@ export function resolveCaptures(
     if (effAttack > effDefend) capture(s.nx, s.ny, s.edge, 'basic', clampDelta(matchup + attackerCell))
   }
 
-  // Same (raw values; allied sides count toward the threshold).
+  // Same (raw values; allied and wall sides count toward the threshold).
   if (rules.same) {
-    const matching = sides.filter((s) => s.neighbour && s.defend === s.attack)
+    const matching = sides.filter((s) => (s.neighbour || s.isWall) && s.defend === s.attack)
     if (matching.length >= 2) {
       for (const s of matching) {
-        if (s.neighbour!.owner !== player) {
+        if (s.neighbour && s.neighbour.owner !== player) {
           capture(s.nx, s.ny, s.edge, 'same', 0)
           comboQueue.push({ x: s.nx, y: s.ny })
         }
@@ -146,7 +156,7 @@ export function resolveCaptures(
 
   // Plus (raw values; group sides by edge-sum, capture enemies in any group of size >= 2).
   if (rules.plus) {
-    const present = sides.filter((s) => s.neighbour && s.defend !== null)
+    const present = sides.filter((s) => (s.neighbour || s.isWall) && s.defend !== null)
     const sums = new Map<number, typeof present>()
     for (const s of present) {
       const sum = s.attack + (s.defend as number)
@@ -157,7 +167,7 @@ export function resolveCaptures(
     for (const group of sums.values()) {
       if (group.length < 2) continue
       for (const s of group) {
-        if (s.neighbour!.owner !== player) {
+        if (s.neighbour && s.neighbour.owner !== player) {
           capture(s.nx, s.ny, s.edge, 'plus', 0)
           comboQueue.push({ x: s.nx, y: s.ny })
         }
@@ -279,6 +289,20 @@ export function placeStoneWithEvents(
 /** Convenience wrapper returning only the next state. */
 export function placeStone(state: MatchState, handIndex: number, x: number, y: number): MatchState {
   return placeStoneWithEvents(state, handIndex, x, y).state
+}
+
+/**
+ * Hands for a Sudden Death replay: each player keeps the stones they currently
+ * control on the board. Used to restart a fresh round after a draw.
+ */
+export function suddenDeathHands(state: MatchState): Record<Player, Stone[]> {
+  const hands: Record<Player, Stone[]> = { A: [], B: [] }
+  for (const row of state.board) {
+    for (const cell of row) {
+      if (cell) hands[cell.owner].push({ ...cell.stone })
+    }
+  }
+  return hands
 }
 
 /** Cells controlled by each player. */

@@ -41,7 +41,12 @@ export interface CaptureRules {
   same: boolean
   plus: boolean
   combo: boolean
+  /** Wall: board edges count as a value-10 neighbour for Same/Plus. */
+  wall: boolean
 }
+
+/** How the active player draws/selects a stone each turn. */
+export type HandRule = 'none' | 'order' | 'chaos'
 
 export type Edge = 'up' | 'down' | 'left' | 'right'
 
@@ -66,6 +71,12 @@ export interface MatchConfig {
   boardElements?: (string | null)[][]
   /** Seconds per turn; 0 = no timer. */
   turnSeconds?: number
+  /** Order/Chaos hand constraint; 'none' = free choice. */
+  handRule?: HandRule
+  /** Both hands visible to both players. */
+  openHands?: boolean
+  /** Replay a fresh round from controlled stones when a game ends in a draw. */
+  suddenDeath?: boolean
 }
 
 export interface MatchState {
@@ -80,6 +91,12 @@ export interface MatchState {
   boardElements: (string | null)[][]
   /** Seconds per turn; 0 = no timer. */
   turnSeconds: number
+  /** Order/Chaos hand constraint; 'none' = free choice. */
+  handRule: HandRule
+  /** Both hands visible to both players. */
+  openHands: boolean
+  /** Replay a fresh round from controlled stones when a game ends in a draw. */
+  suddenDeath: boolean
   lastMove: { x: number; y: number } | null
   status: 'playing' | 'finished'
   winner: Player | 'draw' | null
