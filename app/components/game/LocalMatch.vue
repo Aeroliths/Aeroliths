@@ -164,6 +164,13 @@
       <div v-if="match.status !== 'finished'" class="play-actions">
         <button class="ghost-btn" :disabled="!canUndo" @click="undo">Undo</button>
         <button class="ghost-btn" @click="reset">Edit config</button>
+        <button class="ghost-btn" @click="sound.toggleMute()">{{ sound.muted.value ? '🔇' : '🔊' }}</button>
+        <input
+          class="vol"
+          type="range" min="0" max="1" step="0.1"
+          :value="sound.volume.value"
+          @input="sound.setVolume(Number(($event.target as HTMLInputElement).value))"
+        />
       </div>
 
       <!-- End-of-game overlay: position:absolute inside .play (which is
@@ -199,6 +206,7 @@ import GameStone from './GameStone.vue'
 import { createMatch, placeStoneWithEvents, getScore, handSizeFor, randomMove } from '~/game/engine/match'
 import { generateBoardElements, randomHand, buildDraftPool } from '~/game/engine/setup'
 import { matchHighlights, buildCaptureInfo } from '~/game/engine/analysis'
+import { useSound } from '~/composables/useSound'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
 import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
@@ -207,6 +215,8 @@ type Phase = 'setup' | 'play'
 const emit = defineEmits<{
   (e: 'activeChange', active: boolean): void
 }>()
+
+const sound = useSound()
 
 const phase = ref<Phase>('setup')
 const loading = ref(true)
@@ -466,6 +476,9 @@ function playAt(handIndex: number, x: number, y: number) {
   lastEvents.value = events
   timeline.value.push({ state, events })
   selectedHandIndex.value = null
+  sound.play('place')
+  if (events.length > 0) sound.play('capture')
+  if (state.status === 'finished') sound.play('win')
 }
 
 function play(x: number, y: number) {
@@ -840,6 +853,8 @@ onMounted(loadData)
 }
 
 .replay-bar { display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
+
+.vol { width: 90px; }
 
 .end-recap {
   display: flex;
