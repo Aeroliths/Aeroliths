@@ -194,7 +194,7 @@
             <span>Same {{ highlights.same }} · Plus {{ highlights.plus }} · Combo {{ highlights.combo }}</span>
           </div>
           <div class="end-actions">
-            <button class="end-btn" @click="startReplay">Revoir la partie</button>
+            <button class="end-btn" @click="startReplay">Watch replay</button>
             <button class="end-btn end-btn-primary" @click="playAgain">Play again</button>
             <button class="end-btn" @click="reset">Edit config</button>
           </div>
