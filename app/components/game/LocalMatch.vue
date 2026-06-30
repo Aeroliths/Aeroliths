@@ -138,7 +138,7 @@ import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
 import { createMatch, placeStoneWithEvents, getScore, handSizeFor } from '~/game/engine/match'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
-import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone } from '~/game/engine/types'
+import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
 type Phase = 'setup' | 'play'
 
@@ -164,8 +164,8 @@ const hands = ref<Record<Player, Stone[]>>({ A: [], B: [] })
 
 const match = ref<MatchState | null>(null)
 const selectedHandIndex = ref<number | null>(null)
-const history = ref<MatchState[]>([])
-const canUndo = computed(() => history.value.length > 0 && match.value?.status === 'playing')
+const timeline = ref<TimelineEntry[]>([])
+const canUndo = computed(() => timeline.value.length > 1 && match.value?.status === 'playing')
 const lastEvents = ref<CaptureEvent[]>([])
 
 const finalScore = computed(() => (match.value ? getScore(match.value) : { A: 0, B: 0 }))
@@ -282,7 +282,6 @@ onBeforeUnmount(removeDragListeners)
 
 function start() {
   if (!canStart.value) return
-  history.value = []
   const startingPlayer = resolveStartingPlayer()
   const handA = [...hands.value.A].slice(0, handSizeFor(size.value, 'A', startingPlayer))
   const handB = [...hands.value.B].slice(0, handSizeFor(size.value, 'B', startingPlayer))
@@ -293,7 +292,9 @@ function start() {
     rules: { ...rules.value },
     startingPlayer,
   })
+  timeline.value = [{ state: match.value, events: [] }]
   selectedHandIndex.value = null
+  lastEvents.value = []
   phase.value = 'play'
   emit('activeChange', true)
 }
@@ -310,26 +311,30 @@ function selectHand(index: number) {
 }
 
 function undo() {
-  const prev = history.value.pop()
-  if (prev) {
-    match.value = prev
-    selectedHandIndex.value = null
-  }
+  if (timeline.value.length <= 1) return
+  timeline.value.pop()
+  match.value = timeline.value[timeline.value.length - 1]!.state
+  selectedHandIndex.value = null
+  lastEvents.value = []
 }
 
 function playAgain() {
   // Re-run start() with the same hands/rules/starter already in the setup state.
-  history.value = []
   start()
 }
 
-function play(x: number, y: number) {
-  if (!match.value || selectedHandIndex.value === null) return
-  history.value.push(match.value)
-  const { state, events } = placeStoneWithEvents(match.value, selectedHandIndex.value, x, y)
+function playAt(handIndex: number, x: number, y: number) {
+  if (!match.value || match.value.status !== 'playing') return
+  const { state, events } = placeStoneWithEvents(match.value, handIndex, x, y)
   match.value = state
   lastEvents.value = events
+  timeline.value.push({ state, events })
   selectedHandIndex.value = null
+}
+
+function play(x: number, y: number) {
+  if (selectedHandIndex.value === null) return
+  playAt(selectedHandIndex.value, x, y)
 }
 
 async function loadData() {
