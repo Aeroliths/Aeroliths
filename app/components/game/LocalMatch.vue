@@ -25,6 +25,15 @@
             <option value="B">Player 2</option>
           </select>
         </label>
+        <label class="size-picker">
+          Turn timer
+          <select v-model.number="turnSeconds">
+            <option :value="0">Off</option>
+            <option :value="10">10s</option>
+            <option :value="20">20s</option>
+            <option :value="30">30s</option>
+          </select>
+        </label>
       </div>
 
       <div class="hand-modes">
@@ -129,6 +138,7 @@
         :selected-hand-index="selectedHandIndex"
         :last-events="lastEvents"
         :element-sprites="elementSprites"
+        :seconds-left="match.turnSeconds > 0 && match.status === 'playing' ? remaining : undefined"
         @select-hand="selectHand"
         @place-at="play"
       />
@@ -159,10 +169,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
-import { createMatch, placeStoneWithEvents, getScore, handSizeFor } from '~/game/engine/match'
+import { createMatch, placeStoneWithEvents, getScore, handSizeFor, randomMove } from '~/game/engine/match'
 import { generateBoardElements, randomHand, buildDraftPool } from '~/game/engine/setup'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
 import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
@@ -180,6 +190,10 @@ const size = ref(3)
 const rules = ref<CaptureRules>({ same: false, plus: false, combo: false })
 const startingChoice = ref<'A' | 'B' | 'random'>('random')
 const elementalCells = ref(false)
+const turnSeconds = ref(0)
+const remaining = ref(0)
+const replaying = ref(false)
+let timerId: ReturnType<typeof setInterval> | null = null
 const elementSprites = computed<Record<string, string>>(() => {
   const map: Record<string, string> = {}
   for (const s of catalog.value) {
@@ -362,6 +376,7 @@ function onPointerUp(e: PointerEvent) {
 }
 
 onBeforeUnmount(removeDragListeners)
+onBeforeUnmount(stopTimer)
 
 function start() {
   if (!canStart.value) return
@@ -378,12 +393,14 @@ function start() {
     rules: { ...rules.value },
     startingPlayer,
     boardElements,
+    turnSeconds: turnSeconds.value,
   })
   timeline.value = [{ state: match.value, events: [] }]
   selectedHandIndex.value = null
   lastEvents.value = []
   phase.value = 'play'
   emit('activeChange', true)
+  armTimer()
 }
 
 function reset() {
@@ -403,6 +420,7 @@ function undo() {
   match.value = timeline.value[timeline.value.length - 1]!.state
   selectedHandIndex.value = null
   lastEvents.value = []
+  armTimer()
 }
 
 function playAgain() {
@@ -423,6 +441,34 @@ function play(x: number, y: number) {
   if (selectedHandIndex.value === null) return
   playAt(selectedHandIndex.value, x, y)
 }
+
+/* ---------- Turn timer ---------- */
+
+function stopTimer() {
+  if (timerId !== null) { clearInterval(timerId); timerId = null }
+}
+
+function armTimer() {
+  stopTimer()
+  if (!match.value || match.value.turnSeconds <= 0 || match.value.status !== 'playing' || replaying.value) return
+  remaining.value = match.value.turnSeconds
+  timerId = setInterval(() => {
+    remaining.value -= 1
+    if (remaining.value <= 0) {
+      stopTimer()
+      const mv = match.value ? randomMove(match.value) : null
+      if (mv) playAt(mv.handIndex, mv.x, mv.y)
+    }
+  }, 1000)
+}
+
+watch(
+  () => [match.value?.current, match.value?.status] as const,
+  () => {
+    if (match.value?.status === 'playing') armTimer()
+    else stopTimer()
+  },
+)
 
 async function loadData() {
   loading.value = true

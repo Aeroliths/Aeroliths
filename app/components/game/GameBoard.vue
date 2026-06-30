@@ -13,6 +13,11 @@
           {{ state.current === 'A' ? 'Player 1' : 'Player 2' }} to play
         </span>
         <span v-if="state.status === 'playing' && emptyCells === 1" class="final-move">Final move!</span>
+        <span
+          v-if="state.status === 'playing' && secondsLeft !== undefined"
+          class="turn-timer"
+          :class="{ low: secondsLeft <= 3 }"
+        >{{ secondsLeft }}s</span>
       </div>
 
       <div class="score" :class="{ active: state.current === 'B' && state.status === 'playing' }">
@@ -122,6 +127,7 @@ const props = defineProps<{
   selectedHandIndex: number | null
   lastEvents?: CaptureEvent[]
   elementSprites?: Record<string, string>
+  secondsLeft?: number
 }>()
 
 const emit = defineEmits<{
@@ -493,6 +499,9 @@ watch(
   font-weight: var(--font-semibold);
   margin-left: 0.5rem;
 }
+
+.turn-timer { margin-left: 0.5rem; font-variant-numeric: tabular-nums; color: var(--color-text-muted); }
+.turn-timer.low { color: var(--owner-b, #ef4444); font-weight: var(--font-bold); }
 
 .owner-A { border-color: var(--owner-a, #3b82f6); }
 .owner-B { border-color: var(--owner-b, #ef4444); }
