@@ -48,6 +48,19 @@
           @mouseleave="clearPreview"
           @click="$emit('placeAt', x, y)"
         >
+          <span
+            v-if="state.boardElements[y] && state.boardElements[y][x]"
+            class="cell-element"
+            :title="`Element: ${state.boardElements[y][x]}`"
+          >
+            <img
+              v-if="elementSprites && elementSprites[state.boardElements[y][x] as string]"
+              :src="elementSprites[state.boardElements[y][x] as string]"
+              alt=""
+              draggable="false"
+            />
+            <span v-else class="cell-element-dot" />
+          </span>
           <GameStone v-if="cell" :stone="cell.stone" :owner="cell.owner" />
           <span
             v-if="edgeBadges[`${x}-${y}`] && edgeBadges[`${x}-${y}`].delta !== 0"
@@ -108,6 +121,7 @@ const props = defineProps<{
   state: MatchState
   selectedHandIndex: number | null
   lastEvents?: CaptureEvent[]
+  elementSprites?: Record<string, string>
 }>()
 
 const emit = defineEmits<{
@@ -412,6 +426,26 @@ watch(
 
 .cell.last-move {
   box-shadow: inset 0 0 0 2px var(--color-primary, #6366f1);
+}
+
+.cell-element {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 1;
+}
+.cell-element img { width: 100%; height: 100%; object-fit: contain; }
+.cell-element-dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-primary, #6366f1);
+  box-shadow: 0 0 6px rgba(99, 102, 241, 0.8);
 }
 
 /* Ephemeral element bonus badge on the contested edge of a captured cell. */

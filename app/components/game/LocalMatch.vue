@@ -15,6 +15,7 @@
           <label><input type="checkbox" v-model="rules.same" /> Same</label>
           <label><input type="checkbox" v-model="rules.plus" /> Plus</label>
           <label><input type="checkbox" v-model="rules.combo" /> Combo</label>
+          <label><input type="checkbox" v-model="elementalCells" /> Elemental cells</label>
         </div>
         <label class="size-picker">
           First player
@@ -103,6 +104,7 @@
         :state="match"
         :selected-hand-index="selectedHandIndex"
         :last-events="lastEvents"
+        :element-sprites="elementSprites"
         @select-hand="selectHand"
         @place-at="play"
       />
@@ -137,6 +139,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
 import { createMatch, placeStoneWithEvents, getScore, handSizeFor } from '~/game/engine/match'
+import { generateBoardElements } from '~/game/engine/setup'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
 import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
@@ -152,6 +155,14 @@ const size = ref(3)
 
 const rules = ref<CaptureRules>({ same: false, plus: false, combo: false })
 const startingChoice = ref<'A' | 'B' | 'random'>('random')
+const elementalCells = ref(false)
+const elementSprites = computed<Record<string, string>>(() => {
+  const map: Record<string, string> = {}
+  for (const s of catalog.value) {
+    if (s.elementId && s.elementSprite) map[s.elementId] = s.elementSprite
+  }
+  return map
+})
 
 function resolveStartingPlayer(): Player {
   if (startingChoice.value === 'random') return Math.random() < 0.5 ? 'A' : 'B'
@@ -285,12 +296,16 @@ function start() {
   const startingPlayer = resolveStartingPlayer()
   const handA = [...hands.value.A].slice(0, handSizeFor(size.value, 'A', startingPlayer))
   const handB = [...hands.value.B].slice(0, handSizeFor(size.value, 'B', startingPlayer))
+  const boardElements = elementalCells.value
+    ? generateBoardElements(size.value, Object.keys(elements.value.strongAgainst))
+    : undefined
   match.value = createMatch({
     size: size.value,
     hands: { A: handA, B: handB },
     elements: elements.value,
     rules: { ...rules.value },
     startingPlayer,
+    boardElements,
   })
   timeline.value = [{ state: match.value, events: [] }]
   selectedHandIndex.value = null
