@@ -20,6 +20,8 @@
             <li>Each player fills a hand of Lithos for the match.</li>
             <li>The first player is <strong>chosen or randomized</strong> in the setup screen.</li>
             <li>On odd boards the player who goes <strong>second</strong> receives one extra Lithos to offset the first-move advantage.</li>
+            <li>Hands can be filled manually, at <strong>random</strong>, <strong>mirrored</strong> (identical hands), or via an alternating <strong>draft</strong>.</li>
+            <li>An optional <strong>turn timer</strong> can be enabled; running out plays a random move.</li>
             <li>Players then take turns placing one Lithos per turn on any empty cell.</li>
           </ul>
         </section>
@@ -151,6 +153,12 @@
               <strong>Combo</strong> &mdash; any Lithos captured by Same or Plus immediately
               attacks its own neighbours with the normal comparison, which can chain into
               further captures.
+            </li>
+            <li>
+              <strong>Elemental cells</strong> &mdash; some board cells carry an element.
+              A Lithos placed on one gets <strong>+1</strong> to its values when its element
+              matches the cell, <strong>&minus;1</strong> otherwise. This applies to Basic
+              comparisons only (Same and Plus use raw values).
             </li>
           </ul>
         </section>
