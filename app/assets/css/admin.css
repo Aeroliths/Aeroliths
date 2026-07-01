@@ -193,31 +193,46 @@
   box-shadow: 0 4px 20px rgba(122, 184, 212, 0.3);
 }
 
+.lithos-actions button {
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
 .btn-edit {
   background: var(--gradient-brand);
+  border: 1px solid transparent;
   color: var(--color-text-primary);
 }
 
 .btn-edit:hover:not(:disabled) {
-  opacity: 0.85;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-role {
-  background: var(--color-warning);
-  color: #1a1a2e;
+  background: var(--bg-glass-medium);
+  border: 1px solid var(--color-border-brand-light);
+  color: var(--color-brand-primary);
 }
 
 .btn-role:hover:not(:disabled) {
-  opacity: 0.85;
+  background: var(--color-info-bg);
+  border-color: var(--color-border-brand-medium);
 }
 
 .btn-delete {
-  background: var(--color-error);
-  color: #fff;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error-light);
 }
 
 .btn-delete:hover:not(:disabled) {
-  opacity: 0.85;
+  background: var(--color-error-bg-hover);
+  border-color: var(--color-error-border-hover);
 }
 
 .btn-danger {
@@ -351,7 +366,6 @@ tr:hover td {
 
 .actions button {
   padding: 6px 12px;
-  border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: var(--font-sm);
@@ -803,6 +817,11 @@ tr:hover td {
   box-shadow: var(--shadow-focus);
 }
 
+.relation-select option {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
 .btn-add {
   padding: var(--spacing-sm) var(--spacing-lg);
   background: var(--gradient-primary);
@@ -839,6 +858,11 @@ tr:hover td {
   cursor: pointer;
   box-sizing: border-box;
   transition: var(--transition-all);
+}
+
+.form-group select option {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 .form-group select:focus {

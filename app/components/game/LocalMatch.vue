@@ -738,6 +738,11 @@ onMounted(() => {
   padding: 0.35rem 0.5rem;
 }
 
+.size-picker select option {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
 .rule-toggles {
   display: flex;
   gap: 0.75rem;
