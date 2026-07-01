@@ -165,6 +165,8 @@
         :element-sprites="elementSprites"
         :seconds-left="match.turnSeconds > 0 && match.status === 'playing' ? remaining : undefined"
         :capture-info="match.status === 'finished' ? captureInfo : undefined"
+        :forced-hand-index="forcedHandIndex"
+        :sudden-death-round="suddenDeathRound"
         @select-hand="selectHand"
         @place-at="play"
       />
@@ -205,6 +207,11 @@
             <span>Same {{ highlights.same }} · Plus {{ highlights.plus }} · Combo {{ highlights.combo }}</span>
           </div>
           <div class="end-actions">
+            <button
+              v-if="match.winner === 'draw' && match.suddenDeath"
+              class="end-btn end-btn-primary"
+              @click="startSuddenDeath"
+            >Sudden Death</button>
             <button class="end-btn" @click="startReplay">Watch replay</button>
             <button class="end-btn end-btn-primary" @click="playAgain">Play again</button>
             <button class="end-btn" @click="reset">Edit config</button>
@@ -496,6 +503,7 @@ function reset() {
   match.value = null
   selectedHandIndex.value = null
   phase.value = 'setup'
+  suddenDeathRound.value = 0
   stopTimer()
   stopReplay()
   clearSave()
@@ -512,12 +520,22 @@ function undo() {
   match.value = timeline.value[timeline.value.length - 1]!.state
   selectedHandIndex.value = null
   lastEvents.value = []
+  rollChaos()
   armTimer()
 }
 
 function playAgain() {
   // Re-run start() with the same hands/rules/starter already in the setup state.
   start()
+}
+
+function startSuddenDeath() {
+  if (!match.value) return
+  const next = suddenDeathHands(match.value)
+  const boardElements = match.value.boardElements
+  const startingPlayer: Player = lastStarter.value === 'A' ? 'B' : 'A'
+  suddenDeathRound.value += 1
+  beginMatch(next.A, next.B, startingPlayer, boardElements)
 }
 
 function playAt(handIndex: number, x: number, y: number) {
@@ -564,6 +582,7 @@ function resumeMatch() {
   phase.value = 'play'
   resumable.value = null
   emit('activeChange', true)
+  rollChaos()
   armTimer()
 }
 
@@ -589,7 +608,12 @@ function armTimer() {
     if (remaining.value <= 0) {
       stopTimer()
       const mv = match.value ? randomMove(match.value) : null
-      if (mv) playAt(mv.handIndex, mv.x, mv.y)
+      if (mv) {
+        let hi = mv.handIndex
+        if (match.value!.handRule === 'order') hi = 0
+        else if (match.value!.handRule === 'chaos' && forcedHandIndex.value !== null) hi = forcedHandIndex.value
+        playAt(hi, mv.x, mv.y)
+      }
     }
   }, 1000)
 }
@@ -597,7 +621,7 @@ function armTimer() {
 watch(
   () => [match.value?.current, match.value?.status] as const,
   () => {
-    if (match.value?.status === 'playing') armTimer()
+    if (match.value?.status === 'playing') { rollChaos(); armTimer() }
     else stopTimer()
   },
 )

@@ -160,6 +160,35 @@
               matches the cell, <strong>&minus;1</strong> otherwise. This applies to Basic
               comparisons only (Same and Plus use raw values).
             </li>
+            <li>
+              <strong>Wall</strong> &mdash; the board edges count as a value-<strong>10</strong>
+              neighbour for the Same and Plus rules (they are never captured). A side facing a
+              wall counts for Same when your value there is 10, and adds 10 to that side's sum
+              for Plus.
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Hand &amp; Match Rules</h2>
+          <ul>
+            <li>
+              <strong>Open hands</strong> &mdash; both hands are visible to both players
+              throughout the match.
+            </li>
+            <li>
+              <strong>Order</strong> &mdash; you must play your Lithos in order: only the
+              leftmost Lithos in your hand can be placed each turn.
+            </li>
+            <li>
+              <strong>Chaos</strong> &mdash; a random Lithos from your hand is chosen for you
+              each turn; you only choose where to place it.
+            </li>
+            <li>
+              <strong>Sudden Death</strong> &mdash; if the game ends in a draw, a new round
+              starts with each player holding the Lithos they controlled at the end. The
+              starting player alternates each round until someone wins.
+            </li>
           </ul>
         </section>
 

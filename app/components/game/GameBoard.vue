@@ -1,5 +1,21 @@
 <template>
   <div class="game-board">
+    <!-- Open hands: the opponent's hand, face-up and read-only -->
+    <div v-if="state.openHands && !readonly && state.status === 'playing'" class="open-hand">
+      <span class="open-hand-label">{{ opponentLabel }} hand</span>
+      <div class="open-hand-cards">
+        <div
+          v-for="(stone, i) in state.hands[opponent]"
+          :key="stone.id + '-' + i"
+          class="open-card"
+          :class="`owner-${opponent}`"
+        >
+          <GameStone :stone="stone" :owner="opponent" />
+        </div>
+        <span v-if="state.hands[opponent].length === 0" class="empty-hand">No Lithos left</span>
+      </div>
+    </div>
+
     <!-- Status bar -->
     <div class="status-bar">
       <div class="score" :class="{ active: state.current === 'A' && state.status === 'playing' }">
@@ -12,6 +28,7 @@
         <span v-if="state.status === 'playing'" class="turn">
           {{ state.current === 'A' ? 'Player 1' : 'Player 2' }} to play
         </span>
+        <span v-if="suddenDeathRound && suddenDeathRound > 0" class="sd-round">Sudden Death · Round {{ suddenDeathRound }}</span>
         <span v-if="state.status === 'playing' && emptyCells === 1" class="final-move">Final move!</span>
         <span
           v-if="state.status === 'playing' && secondsLeft !== undefined"
@@ -93,8 +110,9 @@
           class="hand-card"
           :class="[
             `owner-${state.current}`,
-            { selected: i === selectedHandIndex, dragging: drag?.index === i },
+            { selected: i === selectedHandIndex, dragging: drag?.index === i, locked: !isPlayable(i) },
           ]"
+          :disabled="!isPlayable(i)"
           @pointerdown="onPointerDown($event, i)"
           @dragstart.prevent
         >
@@ -133,6 +151,8 @@ const props = defineProps<{
   secondsLeft?: number
   readonly?: boolean
   captureInfo?: Record<string, { type: string; by: string }>
+  forcedHandIndex?: number | null
+  suddenDeathRound?: number
 }>()
 
 const emit = defineEmits<{
@@ -144,6 +164,20 @@ const score = computed(() => getScore(props.state))
 const canPlace = computed(
   () => !props.readonly && props.selectedHandIndex !== null && props.state.status === 'playing'
 )
+
+/* ---------- Order / Chaos: which hand card may be played this turn ---------- */
+
+function isPlayable(i: number): boolean {
+  if (props.readonly || props.state.status !== 'playing') return false
+  if (props.state.handRule === 'order') return i === 0
+  if (props.state.handRule === 'chaos') return props.forcedHandIndex == null || i === props.forcedHandIndex
+  return true
+}
+
+/* ---------- Open hands: show the opponent's hand face-up ---------- */
+
+const opponent = computed<'A' | 'B'>(() => (props.state.current === 'A' ? 'B' : 'A'))
+const opponentLabel = computed(() => (opponent.value === 'A' ? 'Player 1' : 'Player 2'))
 
 /* ---------- Hover preview of would-be captures ---------- */
 
@@ -179,6 +213,7 @@ let pendingIndex: number | null = null
 
 function onPointerDown(e: PointerEvent, index: number) {
   if (props.readonly || props.state.status !== 'playing') return
+  if (!isPlayable(index)) return
   e.preventDefault()
   startX = e.clientX
   startY = e.clientY
@@ -508,8 +543,25 @@ watch(
 .turn-timer { margin-left: 0.5rem; font-variant-numeric: tabular-nums; color: var(--color-text-muted); }
 .turn-timer.low { color: var(--owner-b, #ef4444); font-weight: var(--font-bold); }
 
+.sd-round { display: block; font-size: var(--font-sm); color: var(--owner-b, #ef4444); font-weight: var(--font-semibold); }
+
 .owner-A { border-color: var(--owner-a, #3b82f6); }
 .owner-B { border-color: var(--owner-b, #ef4444); }
+
+/* ---- Open hands: opponent's hand, face-up and read-only ---- */
+.open-hand { width: 100%; max-width: 520px; }
+.open-hand-label { font-size: var(--font-sm); color: var(--color-text-muted); margin-bottom: 0.4rem; display: block; }
+.open-hand-cards { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.open-card {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border-light);
+  background: var(--bg-glass-medium);
+  pointer-events: none;
+}
+.open-card.owner-A { border-color: var(--owner-a, #3b82f6); }
+.open-card.owner-B { border-color: var(--owner-b, #ef4444); }
 
 /* Capture: the Lithos flips over to its new owner with a glow. */
 .cell.capturing {
@@ -562,6 +614,10 @@ watch(
 
 /* The picked-up card is dimmed in place while its clone follows the cursor. */
 .hand-card.dragging { opacity: 0.35; transform: none; }
+
+/* Order/Chaos: a hand card that cannot be played this turn. */
+.hand-card.locked { opacity: 0.4; cursor: not-allowed; }
+.hand-card.locked:hover { transform: none; }
 
 .empty-hand {
   color: var(--color-text-muted);
