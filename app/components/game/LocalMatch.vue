@@ -20,8 +20,19 @@
           <label><input type="checkbox" v-model="rules.same" /> Same</label>
           <label><input type="checkbox" v-model="rules.plus" /> Plus</label>
           <label><input type="checkbox" v-model="rules.combo" /> Combo</label>
+          <label><input type="checkbox" v-model="rules.wall" /> Wall</label>
           <label><input type="checkbox" v-model="elementalCells" /> Elemental cells</label>
         </div>
+        <label><input type="checkbox" v-model="openHands" /> Open hands</label>
+        <label><input type="checkbox" v-model="suddenDeath" /> Sudden Death</label>
+        <label class="size-picker">
+          Hand rule
+          <select v-model="handRule">
+            <option value="none">None</option>
+            <option value="order">Order</option>
+            <option value="chaos">Chaos</option>
+          </select>
+        </label>
         <label class="size-picker">
           First player
           <select v-model="startingChoice">
@@ -208,12 +219,12 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
-import { createMatch, placeStoneWithEvents, getScore, handSizeFor, randomMove } from '~/game/engine/match'
+import { createMatch, placeStoneWithEvents, getScore, handSizeFor, randomMove, suddenDeathHands } from '~/game/engine/match'
 import { generateBoardElements, randomHand, buildDraftPool } from '~/game/engine/setup'
 import { matchHighlights, buildCaptureInfo } from '~/game/engine/analysis'
 import { useSound } from '~/composables/useSound'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
-import type { CaptureEvent, CaptureRules, ElementGraph, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
+import type { CaptureEvent, CaptureRules, ElementGraph, HandRule, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
 type Phase = 'setup' | 'play'
 
@@ -227,10 +238,16 @@ const phase = ref<Phase>('setup')
 const loading = ref(true)
 const size = ref(3)
 
-const rules = ref<CaptureRules>({ same: false, plus: false, combo: false })
+const rules = ref<CaptureRules>({ same: false, plus: false, combo: false, wall: false })
 const startingChoice = ref<'A' | 'B' | 'random'>('random')
 const elementalCells = ref(false)
 const turnSeconds = ref(0)
+const openHands = ref(false)
+const suddenDeath = ref(false)
+const handRule = ref<HandRule>('none')
+const lastStarter = ref<Player>('A')
+const suddenDeathRound = ref(0)
+const forcedHandIndex = ref<number | null>(null)
 const remaining = ref(0)
 const replaying = ref(false)
 const replayIndex = ref(0)
@@ -421,14 +438,12 @@ onBeforeUnmount(removeDragListeners)
 onBeforeUnmount(stopTimer)
 onBeforeUnmount(() => { if (replayTimer) clearInterval(replayTimer) })
 
-function start() {
-  if (!canStart.value) return
-  const startingPlayer = resolveStartingPlayer()
-  const handA = [...hands.value.A].slice(0, handSizeFor(size.value, 'A', startingPlayer))
-  const handB = [...hands.value.B].slice(0, handSizeFor(size.value, 'B', startingPlayer))
-  const boardElements = elementalCells.value
-    ? generateBoardElements(size.value, Object.keys(elements.value.strongAgainst))
-    : undefined
+function beginMatch(
+  handA: Stone[],
+  handB: Stone[],
+  startingPlayer: Player,
+  boardElements: (string | null)[][] | undefined,
+) {
   match.value = createMatch({
     size: size.value,
     hands: { A: handA, B: handB },
@@ -437,15 +452,44 @@ function start() {
     startingPlayer,
     boardElements,
     turnSeconds: turnSeconds.value,
+    handRule: handRule.value,
+    openHands: openHands.value,
+    suddenDeath: suddenDeath.value,
   })
+  lastStarter.value = startingPlayer
   timeline.value = [{ state: match.value, events: [] }]
   selectedHandIndex.value = null
   lastEvents.value = []
   stopReplay()
   phase.value = 'play'
   emit('activeChange', true)
+  rollChaos()
   armTimer()
   saveMatch()
+}
+
+function start() {
+  if (!canStart.value) return
+  const startingPlayer = resolveStartingPlayer()
+  const handA = [...hands.value.A].slice(0, handSizeFor(size.value, 'A', startingPlayer))
+  const handB = [...hands.value.B].slice(0, handSizeFor(size.value, 'B', startingPlayer))
+  const boardElements = elementalCells.value
+    ? generateBoardElements(size.value, Object.keys(elements.value.strongAgainst))
+    : undefined
+  suddenDeathRound.value = 0
+  beginMatch(handA, handB, startingPlayer, boardElements)
+}
+
+function rollChaos() {
+  if (!match.value || match.value.status !== 'playing' || match.value.handRule !== 'chaos') {
+    forcedHandIndex.value = null
+    return
+  }
+  const hand = match.value.hands[match.value.current]
+  if (hand.length === 0) { forcedHandIndex.value = null; return }
+  const idx = Math.floor(Math.random() * hand.length)
+  forcedHandIndex.value = idx
+  selectedHandIndex.value = idx
 }
 
 function reset() {

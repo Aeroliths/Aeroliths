@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { resolveCaptures } from '../../../app/game/engine/match'
 import type { Cell, CaptureRules, ElementGraph, Stone } from '../../../app/game/engine/types'
 
-const NO_RULES: CaptureRules = { same: false, plus: false, combo: false }
+const NO_RULES: CaptureRules = { same: false, plus: false, combo: false, wall: false }
 const NO_ELEMENTS: ElementGraph = { strongAgainst: {} }
 
 function stone(p: Partial<Stone> & { id: string }): Stone {

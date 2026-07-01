@@ -10,7 +10,7 @@ import {
 } from '~/app/game/engine/match'
 import type { CaptureRules, MatchState, Player, Stone } from '~/app/game/engine/types'
 
-const RULES: CaptureRules = { same: false, plus: false, combo: false }
+const RULES: CaptureRules = { same: false, plus: false, combo: false, wall: false }
 
 function stone(id: string, spikes: Partial<Stone> = {}): Stone {
   return {
@@ -190,6 +190,11 @@ describe('decideWinner tie-break', () => {
       current: 'A',
       elements: { strongAgainst: {} },
       rules: RULES,
+      boardElements: [[null, null], [null, null]],
+      turnSeconds: 0,
+      handRule: 'none',
+      openHands: false,
+      suddenDeath: false,
       lastMove: null,
       status: 'playing',
       winner: null,
@@ -219,6 +224,29 @@ describe('placeStoneWithEvents', () => {
     const { state, events } = placeStoneWithEvents(afterB, 0, 0, 0)
     expect(state.board[0][1]!.owner).toBe('A')
     expect(events).toEqual([{ x: 1, y: 0, type: 'basic', edge: 'right', elementDelta: 0 }])
+  })
+})
+
+describe('createMatch — rule options', () => {
+  it('threads handRule, openHands and suddenDeath into state', () => {
+    const m = createMatch({
+      size: 3,
+      hands: { A: [], B: [] },
+      handRule: 'chaos',
+      openHands: true,
+      suddenDeath: true,
+    })
+    expect(m.handRule).toBe('chaos')
+    expect(m.openHands).toBe(true)
+    expect(m.suddenDeath).toBe(true)
+  })
+
+  it('defaults the new fields when omitted', () => {
+    const m = createMatch({ size: 3, hands: { A: [], B: [] } })
+    expect(m.handRule).toBe('none')
+    expect(m.openHands).toBe(false)
+    expect(m.suddenDeath).toBe(false)
+    expect(m.rules.wall).toBe(false)
   })
 })
 

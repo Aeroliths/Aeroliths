@@ -3,7 +3,7 @@ import { createMatch, placeStone, placeStoneWithEvents } from '../../../app/game
 import { matchHighlights, buildCaptureInfo } from '../../../app/game/engine/analysis'
 import type { CaptureRules, Stone, TimelineEntry } from '../../../app/game/engine/types'
 
-const RULES: CaptureRules = { same: false, plus: false, combo: false }
+const RULES: CaptureRules = { same: false, plus: false, combo: false, wall: false }
 
 function stone(id: string, s: Partial<Stone> = {}): Stone {
   return {
