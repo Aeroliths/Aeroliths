@@ -1391,76 +1391,42 @@ tr:hover td {
   font-weight: var(--font-semibold);
 }
 
-/* Login chart */
-.login-chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 180px;
-  padding: var(--spacing-sm) var(--spacing-xs) 0;
+/* Activity chart (logins/visits): a smoothed SVG line + gradient area,
+   with per-point counts labelled directly above non-zero dots. */
+.activity-chart {
+  padding: var(--spacing-sm) var(--spacing-xs);
   background: var(--bg-glass-light);
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
 }
 
-.login-chart-col {
+.activity-chart-svg {
+  width: 100%;
+  height: 180px;
+  display: block;
+  overflow: visible;
+}
+
+.activity-chart-point-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--color-text-primary);
+}
+
+.activity-chart-labels {
+  display: flex;
+  margin-top: 4px;
+}
+
+.activity-chart-label {
   flex: 1 1 0;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 4px;
-  height: 100%;
-}
-
-.login-chart-bar-track {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
-  min-height: 0;
-}
-
-.login-chart-bar {
-  position: relative;
-  width: 100%;
-  min-height: 2px;
-  background: var(--gradient-brand);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  transition: height 0.4s ease;
-}
-
-.login-chart-bar:hover {
-  filter: brightness(1.15);
-}
-
-.login-chart-bar--visits {
-  background: linear-gradient(135deg, #c8a050 0%, #8a6a30 100%);
-}
-
-.login-chart-value {
-  position: absolute;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 10px;
-  color: var(--color-text-subtle);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.login-chart-col:hover .login-chart-value {
-  opacity: 1;
-}
-
-.login-chart-label {
   font-size: 10px;
   color: var(--color-text-subtle);
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 14px;
 }
 
 .stats-sort-toggle {
