@@ -445,6 +445,7 @@ const periods = [
   { label: 'Today', value: 'today' },
   { label: 'This Week', value: 'week' },
   { label: 'This Month', value: 'month' },
+  { label: 'This Year', value: 'year' },
 ]
 const userPeriod = ref('today')
 
@@ -453,6 +454,7 @@ const userPeriodLabel = computed(() => {
     case 'today': return 'Today'
     case 'week': return 'This Week'
     case 'month': return 'This Month'
+    case 'year': return 'This Year'
     default: return ''
   }
 })
@@ -466,6 +468,8 @@ const userPeriodData = computed(() => {
       return { new: stats.value.users.newThisWeek, active: stats.value.users.activeThisWeek }
     case 'month':
       return { new: stats.value.users.newThisMonth, active: stats.value.users.newThisMonth }
+    case 'year':
+      return { new: stats.value.users.newThisYear, active: stats.value.users.newThisYear }
     default:
       return { new: 0, active: 0 }
   }
@@ -625,6 +629,8 @@ const visitsPeriodData = computed(() => {
       return { unique: stats.value.visits.uniqueThisWeek, total: stats.value.visits.totalThisWeek }
     case 'month':
       return { unique: stats.value.visits.uniqueThisMonth, total: stats.value.visits.totalThisMonth }
+    case 'year':
+      return { unique: stats.value.visits.uniqueThisYear, total: stats.value.visits.totalThisYear }
     default:
       return { unique: 0, total: 0 }
   }
@@ -639,6 +645,11 @@ const formatChartLabel = (label: string, index: number) => {
     // Day short name (Mon, Tue...)
     const d = new Date(label + 'T00:00:00')
     return d.toLocaleDateString(undefined, { weekday: 'short' })
+  }
+  if (userPeriod.value === 'year') {
+    // Month short name (Jan, Feb...); labels are 'YYYY-MM'
+    const d = new Date(label + '-01T00:00:00')
+    return d.toLocaleDateString(undefined, { month: 'short' })
   }
   // month: show day number, every 3rd for readability
   if (index % 3 !== 0 && index !== activityChartData.value.labels.length - 1) return ''

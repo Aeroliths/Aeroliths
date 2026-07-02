@@ -10,6 +10,9 @@ export default defineEventHandler(async (event) => {
     weekStart.setDate(weekStart.getDate() - 7)
     const monthStart = new Date(todayStart)
     monthStart.setDate(monthStart.getDate() - 30)
+    // First day of the month 11 months ago, so the year window covers the
+    // current calendar month plus the 11 before it (12 buckets total).
+    const yearStart = new Date(now.getFullYear(), now.getMonth() - 11, 1)
 
     // Login chart windows: inclusive of today
     const loginWeekStart = new Date(todayStart)
@@ -23,6 +26,7 @@ export default defineEventHandler(async (event) => {
       usersToday,
       usersThisWeek,
       usersThisMonth,
+      usersThisYear,
       activeToday,
       activeThisWeek,
       totalLithos,
@@ -50,6 +54,11 @@ export default defineEventHandler(async (event) => {
       // New users this month (30 days)
       db.postgres.user.count({
         where: { createdAt: { gte: monthStart } },
+      }),
+
+      // New users this year (last 12 calendar months)
+      db.postgres.user.count({
+        where: { createdAt: { gte: yearStart } },
       }),
 
       // Active users today
@@ -113,10 +122,11 @@ export default defineEventHandler(async (event) => {
       }),
     ])
 
-    // Login & visit history for charts: fetch last 30 days once, bucket by period
+    // Login & visit history for charts: fetch the last 12 months once (the
+    // widest window needed), bucket by period.
     const [loginRows, visitRows] = await Promise.all([
       db.postgres.loginHistory.findMany({
-        where: { loggedAt: { gte: loginMonthStart } },
+        where: { loggedAt: { gte: yearStart } },
         select: { loggedAt: true },
       }),
       // siteVisit was added later; degrade gracefully if it's not yet available
@@ -124,7 +134,7 @@ export default defineEventHandler(async (event) => {
       (async () => {
         try {
           return await db.postgres.siteVisit.findMany({
-            where: { visitedAt: { gte: loginMonthStart } },
+            where: { visitedAt: { gte: yearStart } },
             select: { visitedAt: true, visitorId: true },
           })
         } catch (err) {
@@ -140,14 +150,24 @@ export default defineEventHandler(async (event) => {
     const loginsByDayWeek = new Array(7).fill(0) as number[]
     // Bucket: month by day (index 0 = 29 days ago ... index 29 = today)
     const loginsByDayMonth = new Array(30).fill(0) as number[]
+    // Bucket: year by calendar month (index 0 = 11 months ago ... index 11 = this month)
+    const loginsByMonthYear = new Array(12).fill(0) as number[]
 
     const visitsByHour = new Array(24).fill(0) as number[]
     const visitsByDayWeek = new Array(7).fill(0) as number[]
     const visitsByDayMonth = new Array(30).fill(0) as number[]
+    const visitsByMonthYear = new Array(12).fill(0) as number[]
 
     const dayMs = 24 * 60 * 60 * 1000
+    const monthsFromYearStart = (d: Date) =>
+      (d.getFullYear() - yearStart.getFullYear()) * 12 + (d.getMonth() - yearStart.getMonth())
+
     for (const row of loginRows) {
       const d = row.loggedAt
+      const monthIndex = monthsFromYearStart(d)
+      if (monthIndex >= 0 && monthIndex < 12) {
+        loginsByMonthYear[monthIndex]++
+      }
       const daysFromMonthStart = Math.floor(
         (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginMonthStart.getTime()) / dayMs
       )
@@ -170,8 +190,14 @@ export default defineEventHandler(async (event) => {
     const uniqueVisitorsToday = new Set<string>()
     const uniqueVisitorsWeek = new Set<string>()
     const uniqueVisitorsMonth = new Set<string>()
+    const uniqueVisitorsYear = new Set<string>()
     for (const row of visitRows) {
       const d = row.visitedAt
+      const monthIndex = monthsFromYearStart(d)
+      if (monthIndex >= 0 && monthIndex < 12) {
+        visitsByMonthYear[monthIndex]++
+        uniqueVisitorsYear.add(row.visitorId)
+      }
       const daysFromMonthStart = Math.floor(
         (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginMonthStart.getTime()) / dayMs
       )
@@ -207,6 +233,9 @@ export default defineEventHandler(async (event) => {
     }
     const weekDayLabels = buildDayLabels(loginWeekStart, 7)
     const monthDayLabels = buildDayLabels(loginMonthStart, 30)
+    const yearMonthLabels = Array.from({ length: 12 }, (_, i) =>
+      new Date(yearStart.getFullYear(), yearStart.getMonth() + i, 1).toISOString().slice(0, 7)
+    )
 
     // Process element distribution
     const elementCounts: Record<string, number> = {}
@@ -248,6 +277,7 @@ export default defineEventHandler(async (event) => {
           newToday: usersToday,
           newThisWeek: usersThisWeek,
           newThisMonth: usersThisMonth,
+          newThisYear: usersThisYear,
           activeToday,
           activeThisWeek,
         },
@@ -255,12 +285,15 @@ export default defineEventHandler(async (event) => {
           uniqueToday: uniqueVisitorsToday.size,
           uniqueThisWeek: uniqueVisitorsWeek.size,
           uniqueThisMonth: uniqueVisitorsMonth.size,
+          uniqueThisYear: uniqueVisitorsYear.size,
           totalToday: visitsByHour.reduce((s, n) => s + n, 0),
           totalThisWeek: visitsByDayWeek.reduce((s, n) => s + n, 0),
           totalThisMonth: visitsByDayMonth.reduce((s, n) => s + n, 0),
+          totalThisYear: visitsByMonthYear.reduce((s, n) => s + n, 0),
           today: { labels: hourLabels, counts: visitsByHour },
           week: { labels: weekDayLabels, counts: visitsByDayWeek },
           month: { labels: monthDayLabels, counts: visitsByDayMonth },
+          year: { labels: yearMonthLabels, counts: visitsByMonthYear },
         },
         lithos: {
           total: totalLithos,
@@ -287,6 +320,7 @@ export default defineEventHandler(async (event) => {
           today: { labels: hourLabels, counts: loginsByHour },
           week: { labels: weekDayLabels, counts: loginsByDayWeek },
           month: { labels: monthDayLabels, counts: loginsByDayMonth },
+          year: { labels: yearMonthLabels, counts: loginsByMonthYear },
         },
         recentUsers,
       },
