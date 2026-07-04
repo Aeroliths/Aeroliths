@@ -20,16 +20,12 @@
           class="litho-card"
           :class="`rarity-${item.lithos.rarity}`"
         >
-          <img :src="item.lithos.sprite" :alt="item.lithos.name" class="litho-sprite" />
+          <div class="litho-visual">
+            <GameStone :stone="lithoToStone(item.lithos)" />
+          </div>
           <div class="litho-info">
             <span class="litho-name">{{ item.lithos.name }}</span>
             <span class="litho-rarity">{{ item.lithos.rarity }}</span>
-          </div>
-          <div class="litho-spikes">
-            <span title="Up">↑{{ item.lithos.spikeUp }}</span>
-            <span title="Right">→{{ item.lithos.spikeRight }}</span>
-            <span title="Down">↓{{ item.lithos.spikeDown }}</span>
-            <span title="Left">←{{ item.lithos.spikeLeft }}</span>
           </div>
           <div class="deck-controls">
             <span class="owned-qty">Owned: {{ item.quantity }}</span>
@@ -69,7 +65,9 @@
           class="deck-entry"
           :class="`rarity-${entry.lithos.rarity}`"
         >
-          <img :src="entry.lithos.sprite" :alt="entry.lithos.name" class="deck-sprite" />
+          <div class="deck-visual">
+            <GameStone :stone="lithoToStone(entry.lithos)" />
+          </div>
           <div class="deck-entry-info">
             <span class="litho-name">{{ entry.lithos.name }}</span>
             <span class="litho-rarity">{{ entry.lithos.rarity }}</span>
@@ -89,6 +87,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import GameStone from '~/components/game/GameStone.vue'
+import type { Stone } from '~/game/engine/types'
 
 interface Lithos {
   id: string
@@ -99,6 +99,23 @@ interface Lithos {
   spikeRight: number
   spikeDown: number
   spikeLeft: number
+  elementId?: string | null
+  element?: { id: string; name: string; sprite?: string | null } | null
+}
+
+function lithoToStone(l: Lithos): Stone {
+  return {
+    id: l.id,
+    name: l.name,
+    sprite: l.sprite,
+    elementId: l.elementId ?? null,
+    elementName: l.element?.name ?? null,
+    elementSprite: l.element?.sprite ?? null,
+    spikeUp: l.spikeUp,
+    spikeDown: l.spikeDown,
+    spikeLeft: l.spikeLeft,
+    spikeRight: l.spikeRight,
+  }
 }
 
 interface CollectionItem {
@@ -245,11 +262,12 @@ onMounted(fetchAll)
   transform: translateY(-2px);
 }
 
-.litho-sprite {
+.litho-visual {
   width: 100%;
   aspect-ratio: 1;
-  object-fit: contain;
   border-radius: var(--radius-lg);
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-light);
 }
 
 .litho-info {
@@ -267,13 +285,6 @@ onMounted(fetchAll)
 .litho-rarity {
   font-size: 0.7rem;
   text-transform: capitalize;
-  color: var(--color-text-muted);
-}
-
-.litho-spikes {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.7rem;
   color: var(--color-text-muted);
 }
 
@@ -349,11 +360,13 @@ onMounted(fetchAll)
   padding: 0.5rem 0.75rem;
 }
 
-.deck-sprite {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
+.deck-visual {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   border-radius: var(--radius-md);
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-light);
 }
 
 .deck-entry-info {

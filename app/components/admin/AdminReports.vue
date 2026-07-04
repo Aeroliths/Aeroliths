@@ -474,7 +474,6 @@ onMounted(() => fetchReports())
 
 .report-actions button {
   padding: 6px 14px;
-  border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: var(--font-sm);

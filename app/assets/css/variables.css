@@ -4,6 +4,12 @@
    ========================================= */
 
 :root {
+  /* Tell the browser this page is dark-themed, so native form controls
+     (select dropdown popups, checkboxes, scrollbars) render with the dark
+     UI instead of defaulting to a light system popup with light inherited
+     text — which is what caused dropdown options to render unreadable. */
+  color-scheme: dark;
+
   /* =========================================
      BRAND COLORS
      Bleu céruléen - ciel clair, azur atmosphérique

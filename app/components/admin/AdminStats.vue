@@ -118,25 +118,42 @@
             </div>
             <div
               v-else
-              class="login-chart"
+              class="activity-chart"
               :aria-label="`${activityMetric} chart for ${userPeriodLabel}`"
             >
-              <div
-                v-for="(count, i) in activityChartData.counts"
-                :key="activityChartData.labels[i]"
-                class="login-chart-col"
-                :title="`${activityChartData.labels[i]}: ${count} ${activityMetric === 'logins' ? 'login' : 'visit'}${count === 1 ? '' : 's'}`"
+              <svg
+                ref="chartSvgRef"
+                class="activity-chart-svg"
+                :viewBox="`0 0 ${CHART_VB_W} ${CHART_VB_H}`"
+                preserveAspectRatio="none"
               >
-                <div class="login-chart-bar-track">
-                  <div
-                    class="login-chart-bar"
-                    :class="{ 'login-chart-bar--visits': activityMetric === 'visits' }"
-                    :style="{ height: getActivityBarHeight(count) + '%' }"
-                  >
-                    <span v-if="count > 0" class="login-chart-value">{{ count }}</span>
-                  </div>
-                </div>
-                <span class="login-chart-label">{{ formatChartLabel(activityChartData.labels[i], i) }}</span>
+                <defs>
+                  <linearGradient id="activityAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" :stop-color="chartColor" stop-opacity="0.35" />
+                    <stop offset="100%" :stop-color="chartColor" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path :d="chartAreaPath" fill="url(#activityAreaGradient)" />
+                <path
+                  :d="chartLinePath"
+                  fill="none"
+                  :stroke="chartColor"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <g v-for="(pt, i) in chartPoints" :key="i">
+                  <circle :cx="pt.x" :cy="pt.y" r="4" :fill="chartColor" stroke="var(--color-bg-primary)" stroke-width="2" />
+                  <text v-if="pt.count > 0" :x="pt.x" :y="pt.y - 12" text-anchor="middle" class="activity-chart-point-label">{{ pt.count }}</text>
+                </g>
+              </svg>
+              <div class="activity-chart-labels">
+                <span
+                  v-for="(count, i) in activityChartData.counts"
+                  :key="activityChartData.labels[i]"
+                  class="activity-chart-label"
+                  :title="`${activityChartData.labels[i]}: ${count} ${activityMetric === 'logins' ? 'login' : 'visit'}${count === 1 ? '' : 's'}`"
+                >{{ formatChartLabel(activityChartData.labels[i], i) }}</span>
               </div>
             </div>
           </div>
@@ -428,6 +445,7 @@ const periods = [
   { label: 'Today', value: 'today' },
   { label: 'This Week', value: 'week' },
   { label: 'This Month', value: 'month' },
+  { label: 'This Year', value: 'year' },
 ]
 const userPeriod = ref('today')
 
@@ -436,6 +454,7 @@ const userPeriodLabel = computed(() => {
     case 'today': return 'Today'
     case 'week': return 'This Week'
     case 'month': return 'This Month'
+    case 'year': return 'This Year'
     default: return ''
   }
 })
@@ -449,6 +468,8 @@ const userPeriodData = computed(() => {
       return { new: stats.value.users.newThisWeek, active: stats.value.users.activeThisWeek }
     case 'month':
       return { new: stats.value.users.newThisMonth, active: stats.value.users.newThisMonth }
+    case 'year':
+      return { new: stats.value.users.newThisYear, active: stats.value.users.newThisYear }
     default:
       return { new: 0, active: 0 }
   }
@@ -547,10 +568,57 @@ const activityChartMax = computed(() =>
   Math.max(1, ...activityChartData.value.counts)
 )
 
-const getActivityBarHeight = (count: number) => {
-  if (activityChartMax.value === 0) return 0
-  return Math.round((count / activityChartMax.value) * 100)
-}
+// Activity chart geometry: a smoothed line + gradient area. The viewBox
+// width is measured from the live SVG element so its coordinate space has
+// the same aspect ratio as the rendered box — otherwise `preserveAspectRatio
+//="none"` stretches text and circles non-uniformly (they render squashed).
+const chartSvgRef = ref<SVGSVGElement | null>(null)
+const { width: chartSvgWidth } = useElementSize(chartSvgRef)
+
+const CHART_VB_H = 180
+const CHART_PAD_TOP = 14
+const CHART_PAD_BOTTOM = 7
+const CHART_VB_W = computed(() => Math.round(chartSvgWidth.value) || 600)
+
+const chartColor = computed(() => (activityMetric.value === 'visits' ? '#c8a050' : '#4a7fa5'))
+
+const chartPoints = computed(() => {
+  const counts = activityChartData.value.counts
+  const n = counts.length
+  if (n === 0) return []
+  const max = activityChartMax.value
+  const vbW = CHART_VB_W.value
+  const usableH = CHART_VB_H - CHART_PAD_TOP - CHART_PAD_BOTTOM
+  return counts.map((count, i) => {
+    const x = ((i + 0.5) / n) * vbW
+    const ratio = max === 0 ? 0 : count / max
+    const y = CHART_PAD_TOP + (1 - ratio) * usableH
+    return { x, y, count }
+  })
+})
+
+// Smooth cubic-bezier interpolation between points (horizontal tangents),
+// giving a curved line without needing a full Catmull-Rom spline.
+const chartLinePath = computed(() => {
+  const pts = chartPoints.value
+  if (pts.length === 0) return ''
+  if (pts.length === 1) return `M ${pts[0]!.x} ${pts[0]!.y} L ${pts[0]!.x} ${pts[0]!.y}`
+  let d = `M ${pts[0]!.x} ${pts[0]!.y}`
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i]!
+    const p1 = pts[i + 1]!
+    const midX = (p0.x + p1.x) / 2
+    d += ` C ${midX} ${p0.y}, ${midX} ${p1.y}, ${p1.x} ${p1.y}`
+  }
+  return d
+})
+
+const chartAreaPath = computed(() => {
+  const pts = chartPoints.value
+  if (pts.length === 0) return ''
+  const baseline = CHART_VB_H - CHART_PAD_BOTTOM
+  return `${chartLinePath.value} L ${pts[pts.length - 1]!.x} ${baseline} L ${pts[0]!.x} ${baseline} Z`
+})
 
 const visitsPeriodData = computed(() => {
   if (!stats.value?.visits) return { unique: 0, total: 0 }
@@ -561,6 +629,8 @@ const visitsPeriodData = computed(() => {
       return { unique: stats.value.visits.uniqueThisWeek, total: stats.value.visits.totalThisWeek }
     case 'month':
       return { unique: stats.value.visits.uniqueThisMonth, total: stats.value.visits.totalThisMonth }
+    case 'year':
+      return { unique: stats.value.visits.uniqueThisYear, total: stats.value.visits.totalThisYear }
     default:
       return { unique: 0, total: 0 }
   }
@@ -575,6 +645,11 @@ const formatChartLabel = (label: string, index: number) => {
     // Day short name (Mon, Tue...)
     const d = new Date(label + 'T00:00:00')
     return d.toLocaleDateString(undefined, { weekday: 'short' })
+  }
+  if (userPeriod.value === 'year') {
+    // Month short name (Jan, Feb...); labels are 'YYYY-MM'
+    const d = new Date(label + '-01T00:00:00')
+    return d.toLocaleDateString(undefined, { month: 'short' })
   }
   // month: show day number, every 3rd for readability
   if (index % 3 !== 0 && index !== activityChartData.value.labels.length - 1) return ''
