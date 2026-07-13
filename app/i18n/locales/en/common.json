@@ -1,1 +1,42 @@
-{}
+{
+  "nav": {
+    "home": "Home",
+    "rules": "Rules",
+    "news": "News",
+    "play": "Play",
+    "friends": "Friends",
+    "leaderboard": "Leaderboard",
+    "admin": "Admin",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register"
+  },
+  "header": {
+    "homeAriaLabel": "Aeroliths home",
+    "toggleMenuAriaLabel": "Toggle menu"
+  },
+  "footer": {
+    "registeredPlayers": "Registered players",
+    "lithos": "Lithos",
+    "collected": "Collected",
+    "games": "Games",
+    "soon": "Soon",
+    "community": "Community",
+    "discord": "Discord",
+    "about": "About",
+    "legal": "Legal",
+    "contact": "Contact",
+    "disclaimer": "Not affiliated with Activision or Toys For Bob.",
+    "hostedBy": "Hosted by "
+  },
+  "cookieBanner": {
+    "title": "Cookies",
+    "textBefore": "This site uses cookies to function. They are required both to keep you signed in and to measure anonymous traffic. By continuing to use the site you accept this. Details on the",
+    "legalPageLink": "legal page",
+    "accept": "Got it"
+  },
+  "languageSwitcher": {
+    "en": "English",
+    "fr": "Français"
+  }
+}

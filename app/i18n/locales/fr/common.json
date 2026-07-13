@@ -1,1 +1,42 @@
-{}
+{
+  "nav": {
+    "home": "Accueil",
+    "rules": "Règles",
+    "news": "Actualités",
+    "play": "Jouer",
+    "friends": "Amis",
+    "leaderboard": "Classement",
+    "admin": "Admin",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'inscrire"
+  },
+  "header": {
+    "homeAriaLabel": "Accueil Aeroliths",
+    "toggleMenuAriaLabel": "Basculer le menu"
+  },
+  "footer": {
+    "registeredPlayers": "Joueurs inscrits",
+    "lithos": "Lithos",
+    "collected": "Collectés",
+    "games": "Parties",
+    "soon": "Bientôt",
+    "community": "Communauté",
+    "discord": "Discord",
+    "about": "À propos",
+    "legal": "Mentions légales",
+    "contact": "Contact",
+    "disclaimer": "Non affilié à Activision ou Toys For Bob.",
+    "hostedBy": "Hébergé par "
+  },
+  "cookieBanner": {
+    "title": "Cookies",
+    "textBefore": "Ce site utilise des cookies pour fonctionner. Ils sont nécessaires pour vous garder connecté et mesurer le trafic de façon anonyme. En continuant à utiliser le site, vous acceptez cela. Plus de détails sur la",
+    "legalPageLink": "page légale",
+    "accept": "Compris"
+  },
+  "languageSwitcher": {
+    "en": "English",
+    "fr": "Français"
+  }
+}

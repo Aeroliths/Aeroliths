@@ -9,42 +9,42 @@
           <div class="footer-counters">
             <div class="footer-counter">
               <span class="footer-counter-value">{{ animatedUsers }}</span>
-              <span class="footer-counter-label">Registered players</span>
+              <span class="footer-counter-label">{{ $t('footer.registeredPlayers') }}</span>
             </div>
             <div class="footer-counter">
               <span class="footer-counter-value">{{ animatedLithos }}</span>
-              <span class="footer-counter-label">Lithos</span>
+              <span class="footer-counter-label">{{ $t('footer.lithos') }}</span>
             </div>
             <div class="footer-counter">
               <span class="footer-counter-value">{{ animatedCollections }}</span>
-              <span class="footer-counter-label">Collected</span>
+              <span class="footer-counter-label">{{ $t('footer.collected') }}</span>
             </div>
             <div class="footer-counter footer-counter--dev">
               <span class="footer-counter-value">{{ animatedGames }}</span>
-              <span class="footer-counter-label">Games</span>
-              <span class="footer-counter-badge">Soon</span>
+              <span class="footer-counter-label">{{ $t('footer.games') }}</span>
+              <span class="footer-counter-badge">{{ $t('footer.soon') }}</span>
             </div>
           </div>
         </div>
         <div class="footer-groups">
           <div class="footer-group">
-            <span class="footer-group-label">Community</span>
-            <NuxtLink href="/friends">Friends</NuxtLink>
-            <NuxtLink href="/leaderboard">Leaderboard</NuxtLink>
-            <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer">Discord</a>
+            <span class="footer-group-label">{{ $t('footer.community') }}</span>
+            <NuxtLink href="/friends">{{ $t('nav.friends') }}</NuxtLink>
+            <NuxtLink href="/leaderboard">{{ $t('nav.leaderboard') }}</NuxtLink>
+            <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer">{{ $t('footer.discord') }}</a>
           </div>
           <div class="footer-group">
-            <span class="footer-group-label">About</span>
-            <NuxtLink href="/legal">Legal</NuxtLink>
-            <NuxtLink href="/rules">Rules</NuxtLink>
-            <a :href="`mailto:${SITE_INFO.support.email}`">Contact</a>
+            <span class="footer-group-label">{{ $t('footer.about') }}</span>
+            <NuxtLink href="/legal">{{ $t('footer.legal') }}</NuxtLink>
+            <NuxtLink href="/rules">{{ $t('nav.rules') }}</NuxtLink>
+            <a :href="`mailto:${SITE_INFO.support.email}`">{{ $t('footer.contact') }}</a>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
         <p>{{ SITE_INFO.copyright }}</p>
-        <p class="footer-disclaimer">Not affiliated with Activision or Toys For Bob.</p>
-        <p>Hosted by <a :href="SITE_INFO.hosting.website" target="_blank" rel="noopener noreferrer">{{ SITE_INFO.hosting.provider }}</a></p>
+        <p class="footer-disclaimer">{{ $t('footer.disclaimer') }}</p>
+        <p>{{ $t('footer.hostedBy') }}<a :href="SITE_INFO.hosting.website" target="_blank" rel="noopener noreferrer">{{ SITE_INFO.hosting.provider }}</a></p>
       </div>
     </div>
   </footer>
