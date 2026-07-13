@@ -1,1 +1,41 @@
-{}
+{
+  "home": {
+    "hero": {
+      "tag": "Strategy Board Game",
+      "tagline": "Play. Conquer. Dominate.",
+      "desc": "A fan-made strategy game inspired by Skylanders Skystones.",
+      "playNow": "Play Now",
+      "rules": "Rules"
+    },
+    "features": {
+      "fastMatches": { "title": "Fast Matches", "desc": "Quick games on a 3x3 board. Every move counts." },
+      "deepStrategy": { "title": "Deep Strategy", "desc": "4 directional values per stone. Master the mechanics." },
+      "rankedPlay": { "title": "Ranked Play", "desc": "Climb the leaderboard and prove your skills." }
+    },
+    "cta": {
+      "title": "Ready to play?",
+      "desc": "Join the community and start your first game today.",
+      "getStarted": "Get Started",
+      "discord": "Discord"
+    },
+    "about": {
+      "title": "What is Aeroliths?",
+      "p1": "Aeroliths is a free fan-made online strategy board game inspired by Skylanders Skystones. Two players face off on a tactical grid, taking turns to place elemental Lithos and capture their opponent's pieces. Each Lithos has its own attack values on four sides, and the player who controls the most stones at the end of the match wins.",
+      "p2": "Build a deck that fits your playstyle, learn the strengths and weaknesses of the four elements (Fire, Water, Earth and Air), and climb the ranked leaderboard against players from around the world. The game runs entirely in your browser - no download required.",
+      "featuresTitle": "Key Features",
+      "features": {
+        "free": { "title": "Free to play", "desc": "no ads, no paywalls, no microtransactions." },
+        "strategy": { "title": "Strategic depth", "desc": "every placement matters and elements counter each other." },
+        "deckBuilding": { "title": "Deck building", "desc": "collect Lithos and assemble your perfect deck." },
+        "online": { "title": "Online matches", "desc": "challenge friends or climb the ranked ladder." },
+        "browser": { "title": "Browser-based", "desc": "play instantly on desktop or mobile, no install needed." }
+      }
+    },
+    "meta": {
+      "title": "Aeroliths - Free Online Strategy Board Game Inspired by Skystones",
+      "description": "Aeroliths is a free fan-made online strategy board game inspired by Skylanders Skystones. Build your deck, master the four elements, and dominate the leaderboard.",
+      "ogTitle": "Aeroliths - Free Online Strategy Board Game",
+      "ogDescription": "Build your deck, master the four elements, and dominate the leaderboard in this free fan-made strategy game inspired by Skylanders Skystones."
+    }
+  }
+}

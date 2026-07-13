@@ -1,20 +1,20 @@
 <template>
   <section class="hero">
     <div class="hero-content">
-      <span class="hero-tag">Strategy Board Game</span>
+      <span class="hero-tag">{{ $t('home.hero.tag') }}</span>
       <h1 class="hero-title">
         <span class="hero-gradient-text">Aeroliths</span>
       </h1>
-      <p class="hero-tagline">Play. Conquer. Dominate.</p>
+      <p class="hero-tagline">{{ $t('home.hero.tagline') }}</p>
       <p class="hero-desc">
-        A fan-made strategy game inspired by Skylanders Skystones.
+        {{ $t('home.hero.desc') }}
       </p>
       <div class="hero-buttons">
         <NuxtLink to="/play" class="btn btn--primary">
-          Play Now
+          {{ $t('home.hero.playNow') }}
         </NuxtLink>
         <NuxtLink to="/rules" class="btn btn--ghost">
-          Rules
+          {{ $t('home.hero.rules') }}
         </NuxtLink>
       </div>
     </div>

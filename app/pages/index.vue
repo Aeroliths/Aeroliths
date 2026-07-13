@@ -14,26 +14,17 @@
         />
 
         <div class="home-about__content">
-          <h2>What is Aeroliths?</h2>
-          <p>
-            Aeroliths is a free fan-made online strategy board game inspired by Skylanders Skystones.
-            Two players face off on a tactical grid, taking turns to place elemental Lithos and capture
-            their opponent's pieces. Each Lithos has its own attack values on four sides, and the player
-            who controls the most stones at the end of the match wins.
-          </p>
-          <p>
-            Build a deck that fits your playstyle, learn the strengths and weaknesses of the four
-            elements (Fire, Water, Earth and Air), and climb the ranked leaderboard against players
-            from around the world. The game runs entirely in your browser - no download required.
-          </p>
+          <h2>{{ $t('home.about.title') }}</h2>
+          <p>{{ $t('home.about.p1') }}</p>
+          <p>{{ $t('home.about.p2') }}</p>
 
-          <h2>Key Features</h2>
+          <h2>{{ $t('home.about.featuresTitle') }}</h2>
           <ul class="home-about__features">
-            <li><strong>Free to play</strong> - no ads, no paywalls, no microtransactions.</li>
-            <li><strong>Strategic depth</strong> - every placement matters and elements counter each other.</li>
-            <li><strong>Deck building</strong> - collect Lithos and assemble your perfect deck.</li>
-            <li><strong>Online matches</strong> - challenge friends or climb the ranked ladder.</li>
-            <li><strong>Browser-based</strong> - play instantly on desktop or mobile, no install needed.</li>
+            <li><strong>{{ $t('home.about.features.free.title') }}</strong> - {{ $t('home.about.features.free.desc') }}</li>
+            <li><strong>{{ $t('home.about.features.strategy.title') }}</strong> - {{ $t('home.about.features.strategy.desc') }}</li>
+            <li><strong>{{ $t('home.about.features.deckBuilding.title') }}</strong> - {{ $t('home.about.features.deckBuilding.desc') }}</li>
+            <li><strong>{{ $t('home.about.features.online.title') }}</strong> - {{ $t('home.about.features.online.desc') }}</li>
+            <li><strong>{{ $t('home.about.features.browser.title') }}</strong> - {{ $t('home.about.features.browser.desc') }}</li>
           </ul>
         </div>
       </div>
@@ -46,13 +37,15 @@ definePageMeta({
   layout: 'default'
 })
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: 'Aeroliths - Free Online Strategy Board Game Inspired by Skystones',
-  description: 'Aeroliths is a free fan-made online strategy board game inspired by Skylanders Skystones. Build your deck, master the four elements, and dominate the leaderboard.',
-  ogTitle: 'Aeroliths - Free Online Strategy Board Game',
-  ogDescription: 'Build your deck, master the four elements, and dominate the leaderboard in this free fan-made strategy game inspired by Skylanders Skystones.',
-  twitterTitle: 'Aeroliths - Free Online Strategy Board Game',
-  twitterDescription: 'Build your deck, master the four elements, and dominate the leaderboard in this free fan-made strategy game inspired by Skylanders Skystones.',
+  title: () => t('home.meta.title'),
+  description: () => t('home.meta.description'),
+  ogTitle: () => t('home.meta.ogTitle'),
+  ogDescription: () => t('home.meta.ogDescription'),
+  twitterTitle: () => t('home.meta.ogTitle'),
+  twitterDescription: () => t('home.meta.ogDescription'),
 })
 
 // Structured data - WebSite + VideoGame

@@ -1,10 +1,10 @@
 <template>
   <section class="cta">
-    <h2 class="cta-title">Ready to play?</h2>
-    <p class="cta-desc">Join the community and start your first game today.</p>
+    <h2 class="cta-title">{{ $t('home.cta.title') }}</h2>
+    <p class="cta-desc">{{ $t('home.cta.desc') }}</p>
     <div class="cta-buttons">
       <NuxtLink to="/register" class="btn btn--primary btn--lg">
-        Get Started
+        {{ $t('home.cta.getStarted') }}
       </NuxtLink>
       <a
         :href="SITE_INFO.discord.url"
@@ -13,7 +13,7 @@
         class="btn btn--discord btn--lg"
       >
         <UIcon name="i-simple-icons-discord" />
-        Discord
+        {{ $t('home.cta.discord') }}
       </a>
     </div>
   </section>
