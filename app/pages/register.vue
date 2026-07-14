@@ -4,25 +4,25 @@
       <!-- Verification pending state -->
       <div class="register-card" v-if="registrationComplete">
         <div class="register-header">
-          <h1>Check your email</h1>
-          <p>We sent a verification link to <strong>{{ registeredEmail }}</strong></p>
+          <h1>{{ $t('auth.register.checkEmailTitle') }}</h1>
+          <p>{{ $t('auth.register.checkEmailDesc') }}<strong>{{ registeredEmail }}</strong></p>
         </div>
         <div class="verification-notice">
-          <p>Click the link in the email to activate your account. The link expires in 24 hours.</p>
+          <p>{{ $t('auth.register.checkEmailInstructions') }}</p>
           <button
             @click="handleResend"
             :disabled="resendCooldown > 0 || isLoading"
             class="register-button resend-button"
           >
-            <span v-if="resendCooldown > 0">Resend in {{ resendCooldown }}s</span>
-            <span v-else>Resend verification email</span>
+            <span v-if="resendCooldown > 0">{{ $t('auth.register.resendCooldown', { seconds: resendCooldown }) }}</span>
+            <span v-else>{{ $t('auth.register.resendVerification') }}</span>
           </button>
           <p v-if="resendMessage" class="resend-message">{{ resendMessage }}</p>
         </div>
         <div class="register-footer">
           <p>
-            Already verified?
-            <NuxtLink to="/login">Login here</NuxtLink>
+            {{ $t('auth.register.alreadyVerified') }}
+            <NuxtLink to="/login">{{ $t('auth.register.loginHere') }}</NuxtLink>
           </p>
         </div>
       </div>
@@ -30,57 +30,57 @@
       <!-- Registration form -->
       <div class="register-card" v-else>
         <div class="register-header">
-          <h1>Join Aeroliths</h1>
-          <p>Create your account to start playing</p>
+          <h1>{{ $t('auth.register.title') }}</h1>
+          <p>{{ $t('auth.register.subtitle') }}</p>
         </div>
 
         <form @submit.prevent="handleRegister" class="register-form">
           <div class="form-group">
-            <label for="username">Username *</label>
+            <label for="username">{{ $t('auth.register.usernameLabel') }}</label>
             <input
               id="username"
               v-model="formData.username"
               type="text"
               required
-              placeholder="Choose a username"
+              :placeholder="$t('auth.register.usernamePlaceholder')"
               :disabled="isLoading"
             />
           </div>
 
           <div class="form-group">
-            <label for="email">Email *</label>
+            <label for="email">{{ $t('auth.register.emailLabel') }}</label>
             <input
               id="email"
               v-model="formData.email"
               type="email"
               required
-              placeholder="your.email@example.com"
+              :placeholder="$t('auth.register.emailPlaceholder')"
               :disabled="isLoading"
             />
           </div>
 
           <div class="form-group">
-            <label for="password">Password *</label>
+            <label for="password">{{ $t('auth.register.passwordLabel') }}</label>
             <input
               id="password"
               v-model="formData.password"
               type="password"
               required
               minlength="8"
-              placeholder="At least 8 characters"
+              :placeholder="$t('auth.register.passwordPlaceholder')"
               :disabled="isLoading"
             />
-            <small class="form-hint">Minimum 8 characters</small>
+            <small class="form-hint">{{ $t('auth.register.passwordHint') }}</small>
           </div>
 
           <div class="form-group">
-            <label for="confirmPassword">Confirm Password *</label>
+            <label for="confirmPassword">{{ $t('auth.register.confirmPasswordLabel') }}</label>
             <input
               id="confirmPassword"
               v-model="confirmPassword"
               type="password"
               required
-              placeholder="Re-enter your password"
+              :placeholder="$t('auth.register.confirmPasswordPlaceholder')"
               :disabled="isLoading"
             />
           </div>
@@ -92,8 +92,8 @@
           <HCaptchaWidget ref="captchaRef" v-model="captchaToken" />
 
           <button type="submit" class="register-button" :disabled="isLoading || !captchaToken">
-            <span v-if="!isLoading">Create Account</span>
-            <span v-else>Creating account...</span>
+            <span v-if="!isLoading">{{ $t('auth.register.submit') }}</span>
+            <span v-else>{{ $t('auth.register.submitting') }}</span>
           </button>
         </form>
 
@@ -101,8 +101,8 @@
 
         <div class="register-footer">
           <p>
-            Already have an account?
-            <NuxtLink to="/login">Login here</NuxtLink>
+            {{ $t('auth.register.alreadyHaveAccount') }}
+            <NuxtLink to="/login">{{ $t('auth.register.loginHere2') }}</NuxtLink>
           </p>
         </div>
       </div>
@@ -120,6 +120,7 @@ definePageMeta({
 })
 
 const { register, resendVerification, isLoading } = useAuth()
+const { t } = useI18n()
 
 const formData = ref({
   email: '',
@@ -152,12 +153,12 @@ const handleRegister = async () => {
   errorMessage.value = ''
 
   if (formData.value.password !== confirmPassword.value) {
-    errorMessage.value = 'Passwords do not match'
+    errorMessage.value = t('auth.register.passwordMismatch')
     return
   }
 
   if (formData.value.password.length < 8) {
-    errorMessage.value = 'Password must be at least 8 characters long'
+    errorMessage.value = t('auth.register.passwordTooShort')
     return
   }
 
@@ -175,7 +176,7 @@ const handleRegister = async () => {
     registeredEmail.value = result.email || formData.value.email
     startCooldown()
   } else if (!result.success) {
-    errorMessage.value = result.error || 'Registration failed. Please try again.'
+    errorMessage.value = result.error || t('auth.register.registrationFailed')
     captchaRef.value?.reset()
   }
 }
@@ -184,10 +185,10 @@ const handleResend = async () => {
   resendMessage.value = ''
   const result = await resendVerification(registeredEmail.value)
   if (result.success) {
-    resendMessage.value = 'Verification email sent!'
+    resendMessage.value = t('auth.register.verificationSent')
     startCooldown()
   } else {
-    resendMessage.value = result.error || 'Failed to resend. Please try again.'
+    resendMessage.value = result.error || t('auth.register.resendFailed')
   }
 }
 
@@ -196,8 +197,8 @@ onUnmounted(() => {
 })
 
 useSeoMeta({
-  title: 'Create an Account - Join the Aeroliths Community for Free',
-  description: 'Sign up for a free Aeroliths account in seconds. Build your deck, collect Lithos, climb the ranked leaderboard and join the community.',
+  title: () => t('auth.register.meta.title'),
+  description: () => t('auth.register.meta.description'),
   ogTitle: 'Join Aeroliths - Create Your Free Account',
   ogDescription: 'Sign up for free, build your deck, collect Lithos and join the Aeroliths community.',
   robots: 'noindex, follow',

@@ -3,31 +3,31 @@
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <h1>Reset Password</h1>
-          <p>Choose a new password for your account</p>
+          <h1>{{ $t('auth.resetPassword.title') }}</h1>
+          <p>{{ $t('auth.resetPassword.subtitle') }}</p>
         </div>
 
         <form v-if="!success" @submit.prevent="handleReset" class="login-form">
           <div class="form-group">
-            <label for="password">New Password</label>
+            <label for="password">{{ $t('auth.resetPassword.passwordLabel') }}</label>
             <input
               id="password"
               v-model="password"
               type="password"
               required
-              placeholder="Enter your new password"
+              :placeholder="$t('auth.resetPassword.passwordPlaceholder')"
               :disabled="isLoading"
             />
           </div>
 
           <div class="form-group">
-            <label for="confirmPassword">Confirm Password</label>
+            <label for="confirmPassword">{{ $t('auth.resetPassword.confirmPasswordLabel') }}</label>
             <input
               id="confirmPassword"
               v-model="confirmPassword"
               type="password"
               required
-              placeholder="Confirm your new password"
+              :placeholder="$t('auth.resetPassword.confirmPasswordPlaceholder')"
               :disabled="isLoading"
             />
           </div>
@@ -37,15 +37,15 @@
           </div>
 
           <button type="submit" class="login-button" :disabled="isLoading">
-            <span v-if="!isLoading">Reset Password</span>
-            <span v-else>Resetting...</span>
+            <span v-if="!isLoading">{{ $t('auth.resetPassword.submit') }}</span>
+            <span v-else>{{ $t('auth.resetPassword.submitting') }}</span>
           </button>
         </form>
 
         <div v-else class="reset-success">
-          <p>Your password has been reset successfully!</p>
-          <p>You can now log in with your new password.</p>
-          <NuxtLink to="/login" class="reset-login-link">Go to Login</NuxtLink>
+          <p>{{ $t('auth.resetPassword.successTitle') }}</p>
+          <p>{{ $t('auth.resetPassword.successDesc') }}</p>
+          <NuxtLink to="/login" class="reset-login-link">{{ $t('auth.resetPassword.goToLogin') }}</NuxtLink>
         </div>
       </div>
     </div>
@@ -59,6 +59,7 @@ definePageMeta({
 })
 
 const route = useRoute()
+const { t } = useI18n()
 
 const password = ref('')
 const confirmPassword = ref('')
@@ -77,7 +78,7 @@ const handleReset = async () => {
   errorMessage.value = ''
 
   if (password.value !== confirmPassword.value) {
-    errorMessage.value = 'Passwords do not match.'
+    errorMessage.value = t('auth.resetPassword.passwordMismatch')
     return
   }
 
@@ -94,15 +95,15 @@ const handleReset = async () => {
     })
     success.value = true
   } catch (error: any) {
-    errorMessage.value = error.data?.message || 'An error occurred. Please try again.'
+    errorMessage.value = error.data?.message || t('auth.resetPassword.genericError')
   } finally {
     isLoading.value = false
   }
 }
 
 useSeoMeta({
-  title: 'Reset Password - Aeroliths',
-  description: 'Set a new password for your Aeroliths account.',
+  title: () => t('auth.resetPassword.meta.title'),
+  description: () => t('auth.resetPassword.meta.description'),
   robots: 'noindex, follow',
 })
 </script>

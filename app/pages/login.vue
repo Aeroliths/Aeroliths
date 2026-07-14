@@ -3,31 +3,31 @@
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <h1>Welcome Back</h1>
-          <p>Login to access Aeroliths</p>
+          <h1>{{ $t('auth.login.title') }}</h1>
+          <p>{{ $t('auth.login.subtitle') }}</p>
         </div>
 
         <form @submit.prevent="handleLogin" class="login-form">
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email">{{ $t('auth.login.emailLabel') }}</label>
             <input
               id="email"
               v-model="credentials.email"
               type="email"
               required
-              placeholder="your.email@example.com"
+              :placeholder="$t('auth.login.emailPlaceholder')"
               :disabled="isLoading"
             />
           </div>
 
           <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password">{{ $t('auth.login.passwordLabel') }}</label>
             <input
               id="password"
               v-model="credentials.password"
               type="password"
               required
-              placeholder="Enter your password"
+              :placeholder="$t('auth.login.passwordPlaceholder')"
               :disabled="isLoading"
             />
           </div>
@@ -44,8 +44,8 @@
               :disabled="resendCooldown > 0"
               class="resend-button"
             >
-              <span v-if="resendCooldown > 0">Resend in {{ resendCooldown }}s</span>
-              <span v-else>Resend verification email</span>
+              <span v-if="resendCooldown > 0">{{ $t('auth.login.resendCooldown', { seconds: resendCooldown }) }}</span>
+              <span v-else>{{ $t('auth.login.resendVerification') }}</span>
             </button>
             <p v-if="resendMessage" class="resend-message">{{ resendMessage }}</p>
           </div>
@@ -53,8 +53,8 @@
           <HCaptchaWidget ref="captchaRef" v-model="captchaToken" />
 
           <button type="submit" class="login-button" :disabled="isLoading || !captchaToken">
-            <span v-if="!isLoading">Login</span>
-            <span v-else>Logging in...</span>
+            <span v-if="!isLoading">{{ $t('auth.login.submit') }}</span>
+            <span v-else>{{ $t('auth.login.submitting') }}</span>
           </button>
         </form>
 
@@ -62,11 +62,11 @@
 
         <div class="login-footer">
           <p>
-            <NuxtLink to="/forgot-password">Forgot your password?</NuxtLink>
+            <NuxtLink to="/forgot-password">{{ $t('auth.login.forgotPassword') }}</NuxtLink>
           </p>
           <p>
-            Don't have an account?
-            <NuxtLink to="/register">Register here</NuxtLink>
+            {{ $t('auth.login.noAccount') }}
+            <NuxtLink to="/register">{{ $t('auth.login.registerHere') }}</NuxtLink>
           </p>
         </div>
       </div>
@@ -85,11 +85,11 @@ definePageMeta({
 
 const { login, resendVerification, isLoading } = useAuth()
 const route = useRoute()
+const { t } = useI18n()
 
 const oauthErrorMessages: Record<string, string> = {
-  oauth_email_unverified:
-    'Your Discord email is not verified. Verify it with your provider, or sign in with email and password.',
-  oauth_failed: 'Social sign-in failed. Please try again.',
+  oauth_email_unverified: t('auth.login.discordEmailNotVerified'),
+  oauth_failed: t('auth.login.socialSignInFailed'),
 }
 
 const credentials = ref({
@@ -129,11 +129,11 @@ const handleLogin = async () => {
   if (result.success) {
     navigateTo('/play')
   } else if (result.code === 'EMAIL_NOT_VERIFIED') {
-    errorMessage.value = result.error || 'Please verify your email before logging in.'
+    errorMessage.value = result.error || t('auth.login.verifyBeforeLogin')
     showResendOption.value = true
     captchaRef.value?.reset()
   } else {
-    errorMessage.value = result.error || 'Login failed. Please check your credentials.'
+    errorMessage.value = result.error || t('auth.login.loginFailed')
     captchaRef.value?.reset()
   }
 }
@@ -142,10 +142,10 @@ const handleResend = async () => {
   resendMessage.value = ''
   const result = await resendVerification(credentials.value.email)
   if (result.success) {
-    resendMessage.value = 'Verification email sent!'
+    resendMessage.value = t('auth.login.verificationSent')
     startCooldown()
   } else {
-    resendMessage.value = result.error || 'Failed to resend. Please try again.'
+    resendMessage.value = result.error || t('auth.login.resendFailed')
   }
 }
 
@@ -154,8 +154,8 @@ onUnmounted(() => {
 })
 
 useSeoMeta({
-  title: 'Login - Access Your Aeroliths Account',
-  description: 'Sign in to your Aeroliths account to play, build your deck, manage your collection and challenge other players online.',
+  title: () => t('auth.login.meta.title'),
+  description: () => t('auth.login.meta.description'),
   ogTitle: 'Login to Aeroliths',
   ogDescription: 'Sign in to play Aeroliths, build your deck and challenge other players online.',
   robots: 'noindex, follow',

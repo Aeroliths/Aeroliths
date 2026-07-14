@@ -3,16 +3,16 @@
     <div class="username-container">
       <div class="username-card">
         <div class="username-header">
-          <h1>Choose your username</h1>
+          <h1>{{ $t('auth.chooseUsername.title') }}</h1>
           <p v-if="pendingEmail">
-            Signing up with <strong>{{ pendingEmail }}</strong>
-            <span v-if="pendingProvider"> via {{ providerLabel }}</span>
+            {{ $t('auth.chooseUsername.signingUpAs') }}<strong>{{ pendingEmail }}</strong>
+            <span v-if="pendingProvider">{{ $t('auth.chooseUsername.via') }}{{ providerLabel }}</span>
           </p>
         </div>
 
         <form @submit.prevent="handleSubmit" class="username-form">
           <div class="form-group">
-            <label for="username">Username</label>
+            <label for="username">{{ $t('auth.chooseUsername.usernameLabel') }}</label>
             <input
               id="username"
               v-model="username"
@@ -20,11 +20,11 @@
               required
               minlength="3"
               maxlength="30"
-              placeholder="3-30 characters: letters, numbers, _ or -"
+              :placeholder="$t('auth.chooseUsername.usernamePlaceholder')"
               :disabled="isSubmitting"
               autofocus
             />
-            <small class="form-hint">Letters, numbers, underscores or hyphens only.</small>
+            <small class="form-hint">{{ $t('auth.chooseUsername.usernameHint') }}</small>
           </div>
 
           <div v-if="errorMessage" class="error-message">
@@ -32,8 +32,8 @@
           </div>
 
           <button type="submit" class="username-button" :disabled="isSubmitting || !isValid">
-            <span v-if="!isSubmitting">Create my account</span>
-            <span v-else>Creating account...</span>
+            <span v-if="!isSubmitting">{{ $t('auth.chooseUsername.submit') }}</span>
+            <span v-else>{{ $t('auth.chooseUsername.submitting') }}</span>
           </button>
         </form>
       </div>
@@ -48,6 +48,7 @@ definePageMeta({
   layout: 'default',
 })
 
+const { t } = useI18n()
 const { data } = await useFetch('/api/auth/oauth/pending')
 
 // No onboarding session in progress -> send the user back to login
@@ -70,8 +71,7 @@ const handleSubmit = async () => {
   errorMessage.value = ''
 
   if (!isValid.value) {
-    errorMessage.value =
-      'Username must be 3-30 characters and contain only letters, numbers, underscores, or hyphens'
+    errorMessage.value = t('auth.chooseUsername.usernameFormatError')
     return
   }
 
@@ -84,14 +84,14 @@ const handleSubmit = async () => {
     })
     await navigateTo('/play')
   } catch (error: any) {
-    errorMessage.value = error.data?.message || error.message || 'Failed to create your account.'
+    errorMessage.value = error.data?.message || error.message || t('auth.chooseUsername.genericError')
   } finally {
     isSubmitting.value = false
   }
 }
 
 useSeoMeta({
-  title: 'Choose your username',
+  title: () => t('auth.chooseUsername.meta.title'),
   robots: 'noindex, nofollow',
 })
 </script>
