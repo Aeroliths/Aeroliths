@@ -3,14 +3,14 @@
     <!-- Collection panel -->
     <div class="panel collection-panel">
       <div class="panel-header">
-        <h2>My Collection</h2>
-        <span class="count">{{ collection.length }} lithos</span>
+        <h2>{{ $t('play.deckBuilder.myCollection') }}</h2>
+        <span class="count">{{ collection.length }} {{ $t('play.deckBuilder.lithosSuffix') }}</span>
       </div>
 
-      <div v-if="loading" class="loading">Loading...</div>
+      <div v-if="loading" class="loading">{{ $t('play.deckBuilder.loading') }}</div>
 
       <div v-else-if="collection.length === 0" class="empty">
-        Your collection is empty.
+        {{ $t('play.deckBuilder.collectionEmpty') }}
       </div>
 
       <div v-else class="lithos-grid">
@@ -28,7 +28,7 @@
             <span class="litho-rarity">{{ item.lithos.rarity }}</span>
           </div>
           <div class="deck-controls">
-            <span class="owned-qty">Owned: {{ item.quantity }}</span>
+            <span class="owned-qty">{{ $t('play.deckBuilder.ownedPrefix') }}{{ item.quantity }}</span>
             <div class="qty-buttons">
               <button
                 class="qty-btn"
@@ -50,12 +50,12 @@
     <!-- Deck panel -->
     <div class="panel deck-panel">
       <div class="panel-header">
-        <h2>My Deck</h2>
-        <span class="count">{{ totalDeckCards }} card{{ totalDeckCards !== 1 ? 's' : '' }}</span>
+        <h2>{{ $t('play.deckBuilder.myDeck') }}</h2>
+        <span class="count">{{ totalDeckCards }} {{ totalDeckCards !== 1 ? $t('play.deckBuilder.cardPlural') : $t('play.deckBuilder.cardSingular') }}</span>
       </div>
 
       <div v-if="deckEntries.length === 0" class="empty">
-        Add lithos from your collection.
+        {{ $t('play.deckBuilder.addFromCollection') }}
       </div>
 
       <div v-else class="deck-list">
@@ -77,7 +77,7 @@
             class="remove-btn"
             :disabled="saving === entry.lithos.id"
             @click="updateDeck(entry.lithos.id, 0)"
-            title="Remove"
+            :title="$t('play.deckBuilder.removeTitle')"
           >✕</button>
         </div>
       </div>

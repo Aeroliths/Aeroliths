@@ -3,13 +3,13 @@
     <!-- ========== SETUP ========== -->
     <div v-if="phase === 'setup'" class="setup">
       <div v-if="resumable" class="resume-banner">
-        <span>An unfinished game was found.</span>
-        <button class="ghost-btn sm" @click="resumeMatch">Resume</button>
-        <button class="ghost-btn sm" @click="discardResume">Discard</button>
+        <span>{{ $t('play.localMatch.resumeBannerText') }}</span>
+        <button class="ghost-btn sm" @click="resumeMatch">{{ $t('play.localMatch.resume') }}</button>
+        <button class="ghost-btn sm" @click="discardResume">{{ $t('play.localMatch.discard') }}</button>
       </div>
       <div class="setup-controls">
         <label class="size-picker">
-          Board size
+          {{ $t('play.localMatch.boardSize') }}
           <select v-model.number="size">
             <option :value="3">3 x 3</option>
             <option :value="4">4 x 4</option>
@@ -17,34 +17,34 @@
           </select>
         </label>
         <div class="rule-toggles">
-          <label><input type="checkbox" v-model="rules.same" /> Same</label>
-          <label><input type="checkbox" v-model="rules.plus" /> Plus</label>
-          <label><input type="checkbox" v-model="rules.combo" /> Combo</label>
-          <label><input type="checkbox" v-model="rules.wall" /> Wall</label>
-          <label><input type="checkbox" v-model="elementalCells" /> Elemental cells</label>
+          <label><input type="checkbox" v-model="rules.same" /> {{ $t('play.localMatch.same') }}</label>
+          <label><input type="checkbox" v-model="rules.plus" /> {{ $t('play.localMatch.plus') }}</label>
+          <label><input type="checkbox" v-model="rules.combo" /> {{ $t('play.localMatch.combo') }}</label>
+          <label><input type="checkbox" v-model="rules.wall" /> {{ $t('play.localMatch.wall') }}</label>
+          <label><input type="checkbox" v-model="elementalCells" /> {{ $t('play.localMatch.elementalCells') }}</label>
         </div>
-        <label><input type="checkbox" v-model="openHands" /> Open hands</label>
-        <label><input type="checkbox" v-model="suddenDeath" /> Sudden Death</label>
+        <label><input type="checkbox" v-model="openHands" /> {{ $t('play.localMatch.openHands') }}</label>
+        <label><input type="checkbox" v-model="suddenDeath" /> {{ $t('play.localMatch.suddenDeath') }}</label>
         <label class="size-picker">
-          Hand rule
+          {{ $t('play.localMatch.handRule') }}
           <select v-model="handRule">
-            <option value="none">None</option>
-            <option value="order">Order</option>
-            <option value="chaos">Chaos</option>
+            <option value="none">{{ $t('play.localMatch.handRuleNone') }}</option>
+            <option value="order">{{ $t('play.localMatch.handRuleOrder') }}</option>
+            <option value="chaos">{{ $t('play.localMatch.handRuleChaos') }}</option>
           </select>
         </label>
         <label class="size-picker">
-          First player
+          {{ $t('play.localMatch.firstPlayer') }}
           <select v-model="startingChoice">
-            <option value="random">Random</option>
-            <option value="A">Player 1</option>
-            <option value="B">Player 2</option>
+            <option value="random">{{ $t('play.localMatch.firstPlayerRandom') }}</option>
+            <option value="A">{{ $t('play.board.player1') }}</option>
+            <option value="B">{{ $t('play.board.player2') }}</option>
           </select>
         </label>
         <label class="size-picker">
-          Turn timer
+          {{ $t('play.localMatch.turnTimer') }}
           <select v-model.number="turnSeconds">
-            <option :value="0">Off</option>
+            <option :value="0">{{ $t('play.localMatch.turnTimerOff') }}</option>
             <option :value="10">10s</option>
             <option :value="20">20s</option>
             <option :value="30">30s</option>
@@ -53,15 +53,15 @@
       </div>
 
       <div class="hand-modes">
-        <button class="ghost-btn sm" @click="fillRandom">Random</button>
-        <button class="ghost-btn sm" @click="fillMirror">Mirror</button>
-        <button class="ghost-btn sm" @click="startDraft">Draft</button>
+        <button class="ghost-btn sm" @click="fillRandom">{{ $t('play.localMatch.handModeRandom') }}</button>
+        <button class="ghost-btn sm" @click="fillMirror">{{ $t('play.localMatch.handModeMirror') }}</button>
+        <button class="ghost-btn sm" @click="startDraft">{{ $t('play.localMatch.handModeDraft') }}</button>
       </div>
 
       <div v-if="draftActive" class="draft">
         <div class="draft-head">
-          <span>Draft — <strong>{{ draftTurn === 'A' ? 'Player 1' : 'Player 2' }}</strong> to pick</span>
-          <button class="ghost-btn sm" @click="cancelDraft">Cancel draft</button>
+          <span>{{ $t('play.localMatch.draftPrefix') }}<strong>{{ draftTurn === 'A' ? $t('play.board.player1') : $t('play.board.player2') }}</strong> {{ $t('play.localMatch.draftSuffix') }}</span>
+          <button class="ghost-btn sm" @click="cancelDraft">{{ $t('play.localMatch.cancelDraft') }}</button>
         </div>
         <div class="draft-pool">
           <button
@@ -86,10 +86,10 @@
           :data-hand-owner="p"
         >
           <div class="player-col-header">
-            <span class="player-name">{{ p === 'A' ? 'Player 1' : 'Player 2' }}</span>
+            <span class="player-name">{{ p === 'A' ? $t('play.board.player1') : $t('play.board.player2') }}</span>
             <span class="player-count">{{ hands[p].length }}/{{ handSize(p) }}</span>
-            <button class="ghost-btn sm" @click="autoFill(p)">Auto-fill</button>
-            <button class="ghost-btn sm" @click="hands[p] = []">Clear</button>
+            <button class="ghost-btn sm" @click="autoFill(p)">{{ $t('play.localMatch.autoFill') }}</button>
+            <button class="ghost-btn sm" @click="hands[p] = []">{{ $t('play.localMatch.clear') }}</button>
           </div>
 
           <div class="player-hand">
@@ -98,23 +98,22 @@
               :key="stone.id + '-' + i"
               class="mini-card"
               :class="`owner-${p}`"
-              title="Remove"
+              :title="$t('play.localMatch.removeTitle')"
               @click="removeFromHand(p, i)"
             >
               <GameStone :stone="stone" />
             </button>
-            <div v-if="hands[p].length === 0" class="drop-hint">Drag Lithos here</div>
+            <div v-if="hands[p].length === 0" class="drop-hint">{{ $t('play.localMatch.dragLithosHere') }}</div>
           </div>
         </div>
       </div>
 
       <p class="hint">
-        Drag Lithos from the catalog into each player's column.
-        Click a Lithos in a hand to remove it.
+        {{ $t('play.localMatch.hint') }}
       </p>
 
       <!-- Shared catalog -->
-      <div v-if="loading" class="empty">Loading Lithos...</div>
+      <div v-if="loading" class="empty">{{ $t('play.localMatch.loadingLithos') }}</div>
       <div v-else class="catalog">
         <button
           v-for="stone in catalog"
@@ -130,7 +129,7 @@
       </div>
 
       <button class="start-btn" :disabled="!canStart" @click="start">
-        Start game
+        {{ $t('play.localMatch.startGame') }}
       </button>
 
       <!-- Floating Lithos that follows the cursor while dragging from the catalog -->
@@ -175,13 +174,13 @@
         <button class="ghost-btn sm" :disabled="replayIndex === 0" @click="replayStep(-1)">◀</button>
         <span>{{ replayIndex }} / {{ timeline.length - 1 }}</span>
         <button class="ghost-btn sm" :disabled="replayIndex >= timeline.length - 1" @click="replayStep(1)">▶</button>
-        <button class="ghost-btn sm" @click="replayAuto">Auto</button>
-        <button class="ghost-btn sm" @click="stopReplay">Close</button>
+        <button class="ghost-btn sm" @click="replayAuto">{{ $t('play.localMatch.auto') }}</button>
+        <button class="ghost-btn sm" @click="stopReplay">{{ $t('play.localMatch.close') }}</button>
       </div>
 
       <div v-if="match.status !== 'finished'" class="play-actions">
-        <button class="ghost-btn" :disabled="!canUndo" @click="undo">Undo</button>
-        <button class="ghost-btn" @click="reset">Edit config</button>
+        <button class="ghost-btn" :disabled="!canUndo" @click="undo">{{ $t('play.localMatch.undo') }}</button>
+        <button class="ghost-btn" @click="reset">{{ $t('play.localMatch.editConfig') }}</button>
         <button class="ghost-btn" @click="sound.toggleMute()">{{ sound.muted.value ? '🔇' : '🔊' }}</button>
         <input
           class="vol"
@@ -198,23 +197,23 @@
         <div class="end-modal" role="dialog" aria-modal="true">
           <div class="end-result" :class="resultClass">{{ resultTitle }}</div>
           <div class="end-score">
-            <span class="es-a">Player 1 : {{ animScore.A }}</span>
+            <span class="es-a">{{ $t('play.board.player1') }} : {{ animScore.A }}</span>
             <span class="es-sep">/</span>
-            <span class="es-b">Player 2 : {{ animScore.B }}</span>
+            <span class="es-b">{{ $t('play.board.player2') }} : {{ animScore.B }}</span>
           </div>
           <div class="end-recap">
-            <span>Biggest capture: {{ highlights.biggestCapture }}{{ highlights.biggestBy ? ` (${highlights.biggestBy === 'A' ? 'P1' : 'P2'})` : '' }}</span>
-            <span>Same {{ highlights.same }} · Plus {{ highlights.plus }} · Combo {{ highlights.combo }}</span>
+            <span>{{ $t('play.localMatch.biggestCapturePrefix') }}{{ highlights.biggestCapture }}{{ highlights.biggestBy ? ` (${highlights.biggestBy === 'A' ? $t('play.localMatch.p1') : $t('play.localMatch.p2')})` : '' }}</span>
+            <span>{{ $t('play.localMatch.same') }} {{ highlights.same }} · {{ $t('play.localMatch.plus') }} {{ highlights.plus }} · {{ $t('play.localMatch.combo') }} {{ highlights.combo }}</span>
           </div>
           <div class="end-actions">
             <button
               v-if="match.winner === 'draw' && match.suddenDeath"
               class="end-btn end-btn-primary"
               @click="startSuddenDeath"
-            >Sudden Death</button>
-            <button class="end-btn" @click="startReplay">Watch replay</button>
-            <button class="end-btn end-btn-primary" @click="playAgain">Play again</button>
-            <button class="end-btn" @click="reset">Edit config</button>
+            >{{ $t('play.localMatch.suddenDeathButton') }}</button>
+            <button class="end-btn" @click="startReplay">{{ $t('play.localMatch.watchReplay') }}</button>
+            <button class="end-btn end-btn-primary" @click="playAgain">{{ $t('play.localMatch.playAgain') }}</button>
+            <button class="end-btn" @click="reset">{{ $t('play.localMatch.editConfig') }}</button>
           </div>
         </div>
       </div>
@@ -240,6 +239,7 @@ const emit = defineEmits<{
 }>()
 
 const sound = useSound()
+const { t } = useI18n()
 
 const phase = ref<Phase>('setup')
 const loading = ref(true)
@@ -286,9 +286,9 @@ const lastEvents = ref<CaptureEvent[]>([])
 const finalScore = computed(() => (match.value ? getScore(match.value) : { A: 0, B: 0 }))
 const resultTitle = computed(() => {
   const w = match.value?.winner
-  if (w === 'draw') return "It's a draw!"
-  if (w === 'A') return 'Player 1 wins!'
-  if (w === 'B') return 'Player 2 wins!'
+  if (w === 'draw') return t('play.localMatch.draw')
+  if (w === 'A') return t('play.localMatch.player1Wins')
+  if (w === 'B') return t('play.localMatch.player2Wins')
   return ''
 })
 const resultClass = computed(() => {

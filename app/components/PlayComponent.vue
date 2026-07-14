@@ -2,8 +2,8 @@
   <div class="play-page">
     <div class="play-container">
       <div class="play-header">
-        <h1>Play Aeroliths</h1>
-        <p>Welcome, <strong>{{ user?.username }}</strong>!</p>
+        <h1>{{ $t('play.playComponent.title') }}</h1>
+        <p>{{ $t('play.playComponent.welcome') }}<strong>{{ user?.username }}</strong>{{ $t('play.playComponent.welcomeSuffix') }}</p>
       </div>
 
       <div v-if="!matchActive" class="mode-cards">
@@ -13,8 +13,8 @@
           @click="mode = 'deck'"
         >
           <span class="mode-icon" aria-hidden="true">🗂️</span>
-          <span class="mode-title">Deck Builder</span>
-          <span class="mode-desc">Manage your collection and deck</span>
+          <span class="mode-title">{{ $t('play.playComponent.deckBuilderTitle') }}</span>
+          <span class="mode-desc">{{ $t('play.playComponent.deckBuilderDesc') }}</span>
         </button>
         <button
           class="mode-card"
@@ -22,8 +22,8 @@
           @click="mode = 'local'"
         >
           <span class="mode-icon" aria-hidden="true">⚔️</span>
-          <span class="mode-title">Local Match</span>
-          <span class="mode-desc">Take on a friend in a local 1v1</span>
+          <span class="mode-title">{{ $t('play.playComponent.localMatchTitle') }}</span>
+          <span class="mode-desc">{{ $t('play.playComponent.localMatchDesc') }}</span>
         </button>
       </div>
 
