@@ -7,13 +7,15 @@ definePageMeta({
   layout: 'default'
 })
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: 'Rules of Aeroliths - How to Play, Captures, Elements & Strategy Guide',
-  description: 'Learn how to play Aeroliths: lithos placement, capture mechanics, elemental matchups, and winning strategies. Master the game in just a few minutes.',
-  ogTitle: 'How to Play Aeroliths - Complete Rules & Strategy Guide',
-  ogDescription: 'Lithos placement, captures, elemental matchups and strategy. Everything you need to start winning at Aeroliths.',
-  twitterTitle: 'How to Play Aeroliths - Complete Rules Guide',
-  twitterDescription: 'Lithos placement, captures, elemental matchups and strategy. Everything you need to start winning at Aeroliths.',
+  title: () => t('rules.meta.title'),
+  description: () => t('rules.meta.description'),
+  ogTitle: () => t('rules.meta.title'),
+  ogDescription: () => t('rules.meta.description'),
+  twitterTitle: () => t('rules.meta.title'),
+  twitterDescription: () => t('rules.meta.description'),
 })
 
 // FAQPage structured data - eligible for Google rich results

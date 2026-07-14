@@ -1,1 +1,78 @@
-{}
+{
+  "rules": {
+    "title": "Rules",
+    "overview": {
+      "title": "Overview",
+      "p1": "Aeroliths is a 1v1 strategy board game. Two players face off on a board by placing stones called Lithos. The goal is to own more Lithos on the board than your opponent when the board is full."
+    },
+    "setup": {
+      "title": "Setup",
+      "boardSize": "The board size is chosen before the game starts (3x3, 4x4 or 5x5).",
+      "fillHand": "Each player fills a hand of Lithos for the match.",
+      "firstPlayer": "The first player is chosen or randomized in the setup screen.",
+      "extraLitho": "On odd boards the first player holds one extra Lithos, since they also make the last move.",
+      "handModes": "Hands can be filled manually, at random, mirrored (identical hands), or via an alternating draft.",
+      "turnTimer": "An optional turn timer can be enabled; running out plays a random move.",
+      "turnOrder": "Players then take turns placing one Lithos per turn on any empty cell."
+    },
+    "lithos": {
+      "title": "The Lithos",
+      "p1": "Lithos are stones that each player places on the board. Every Lithos has 4 values, one on each side: top, right, bottom and left. These values represent the power of the Lithos on that side.",
+      "diagramLabel": "Lithos",
+      "p2": "Each Lithos also belongs to an element (fire, water, earth, air...) which can give it an advantage or disadvantage during combat."
+    },
+    "placing": {
+      "title": "Placing a Lithos",
+      "p1": "On their turn, a player places one Lithos from their deck on any empty cell on the board. Once placed, the Lithos attacks all adjacent opponent Lithos (top, right, bottom, left)."
+    },
+    "capture": {
+      "title": "Capture",
+      "p1": "When a Lithos is placed next to an opponent's Lithos, the touching sides are compared:",
+      "greaterWins": "Your side value > opponent's opposite side value - the opponent's Lithos is captured and becomes yours.",
+      "lessOrEqualNothing": "Your side value ≤ opponent's opposite side value - nothing happens on that side.",
+      "multiCapture": "A single Lithos can capture multiple opponent Lithos at once if it is stronger on several sides.",
+      "youLabel": "You",
+      "capturedLabel": "Captured!"
+    },
+    "elements": {
+      "title": "Elements",
+      "p1": "Each Lithos has an element. Elements interact with each other following a strengths and weaknesses cycle:",
+      "fire": "Fire",
+      "wind": "Wind",
+      "earth": "Earth",
+      "water": "Water",
+      "fireStrongVsWind": "Fire is strong against Wind",
+      "windStrongVsEarth": "Wind is strong against Earth",
+      "earthStrongVsWater": "Earth is strong against Water",
+      "waterStrongVsFire": "Water is strong against Fire",
+      "howItWorksTitle": "How it works",
+      "howItWorksP1": "When the element of the attacking Lithos is stronger than the element of the defending Lithos, the defending Lithos loses 1 point on the side being attacked. This bonus applies before the comparison.",
+      "example": "Your fire Lithos (right side = 5) attacks a wind Lithos (left side = 5). Fire is strong against wind, so the wind Lithos loses 1 point: 5 → 4. The comparison becomes 5 vs 4 — your Lithos wins and captures it.",
+      "reverseP1": "Conversely, when the defending Lithos has the stronger element, the attacker loses 1 point on that side before the comparison. When the elements are equal (or neither is strong against the other), the raw values are compared directly."
+    },
+    "optionalRules": {
+      "title": "Optional Rules",
+      "intro": "These rules can be toggled on in the match setup. They add depth to combat:",
+      "same": "Same — if your placed Lithos touches two or more Lithos whose facing value equals yours on that side (your own Lithos count toward the two), every opponent Lithos among those sides is captured, even without winning the comparison.",
+      "plus": "Plus — if two or more sides share the same sum of your value plus the touching opponent value, those opponent Lithos are captured.",
+      "combo": "Combo — any Lithos captured by Same or Plus immediately attacks its own neighbours with the normal comparison, which can chain into further captures.",
+      "elementalCells": "Elemental cells — some board cells carry an element. A Lithos placed on one gets +1 to its values when its element matches the cell, −1 otherwise. This applies to Basic comparisons only (Same and Plus use raw values).",
+      "wall": "Wall — the board edges count as a value-10 neighbour for the Same and Plus rules (they are never captured). A side facing a wall counts for Same when your value there is 10, and adds 10 to that side's sum for Plus."
+    },
+    "handMatchRules": {
+      "title": "Hand & Match Rules",
+      "openHands": "Open hands — both hands are visible to both players throughout the match.",
+      "order": "Order — you must play your Lithos in order: only the leftmost Lithos in your hand can be placed each turn.",
+      "chaos": "Chaos — a random Lithos from your hand is chosen for you each turn; you only choose where to place it.",
+      "suddenDeath": "Sudden Death — if the game ends in a draw, a new round starts with each player holding the Lithos they controlled at the end. The starting player alternates each round until someone wins."
+    },
+    "end": {
+      "title": "End of the Game",
+      "p1": "The game ends when every cell on the board is filled. The player who owns the most Lithos wins. If both own the same number, the winner is the one whose controlled Lithos have the highest total side values; if those are equal too, the game is a draw."
+    },
+    "meta": {
+      "title": "Rules - Aeroliths",
+      "description": "Learn how to play Aeroliths: setup, capturing, elements, and optional rules."
+    }
+  }
+}

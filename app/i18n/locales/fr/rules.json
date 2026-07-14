@@ -1,1 +1,78 @@
-{}
+{
+  "rules": {
+    "title": "Règles",
+    "overview": {
+      "title": "Aperçu",
+      "p1": "Aeroliths est un jeu de stratégie en 1 contre 1. Deux joueurs s'affrontent sur un plateau en plaçant des pierres appelées Lithos. Le but est de posséder plus de Lithos que votre adversaire sur le plateau une fois celui-ci rempli."
+    },
+    "setup": {
+      "title": "Mise en place",
+      "boardSize": "La taille du plateau est choisie avant le début de la partie (3x3, 4x4 ou 5x5).",
+      "fillHand": "Chaque joueur remplit une main de Lithos pour la partie.",
+      "firstPlayer": "Le premier joueur est choisi ou tiré au sort sur l'écran de configuration.",
+      "extraLitho": "Sur les plateaux impairs, le premier joueur possède un Litho supplémentaire, puisqu'il joue aussi le dernier coup.",
+      "handModes": "Les mains peuvent être remplies manuellement, au hasard, en miroir (mains identiques), ou via un draft alterné.",
+      "turnTimer": "Un minuteur de tour optionnel peut être activé ; s'il expire, un coup aléatoire est joué.",
+      "turnOrder": "Les joueurs jouent ensuite à tour de rôle, en plaçant un Litho par tour sur n'importe quelle case vide."
+    },
+    "lithos": {
+      "title": "Les Lithos",
+      "p1": "Les Lithos sont des pierres que chaque joueur place sur le plateau. Chaque Litho possède 4 valeurs, une par côté : haut, droite, bas et gauche. Ces valeurs représentent la puissance du Litho sur ce côté.",
+      "diagramLabel": "Lithos",
+      "p2": "Chaque Litho appartient aussi à un élément (feu, eau, terre, air...) qui peut lui donner un avantage ou un désavantage au combat."
+    },
+    "placing": {
+      "title": "Placer un Litho",
+      "p1": "À son tour, un joueur place un Litho de son deck sur n'importe quelle case vide du plateau. Une fois placé, le Litho attaque tous les Lithos adverses adjacents (haut, droite, bas, gauche)."
+    },
+    "capture": {
+      "title": "Capture",
+      "p1": "Lorsqu'un Litho est placé à côté d'un Litho adverse, les côtés en contact sont comparés :",
+      "greaterWins": "Votre valeur de côté > la valeur du côté opposé de l'adversaire - le Litho adverse est capturé et devient le vôtre.",
+      "lessOrEqualNothing": "Votre valeur de côté ≤ la valeur du côté opposé de l'adversaire - rien ne se passe de ce côté.",
+      "multiCapture": "Un seul Litho peut capturer plusieurs Lithos adverses à la fois s'il est plus fort sur plusieurs côtés.",
+      "youLabel": "Vous",
+      "capturedLabel": "Capturé !"
+    },
+    "elements": {
+      "title": "Éléments",
+      "p1": "Chaque Litho possède un élément. Les éléments interagissent entre eux selon un cycle de forces et de faiblesses :",
+      "fire": "Feu",
+      "wind": "Vent",
+      "earth": "Terre",
+      "water": "Eau",
+      "fireStrongVsWind": "Le Feu est fort contre le Vent",
+      "windStrongVsEarth": "Le Vent est fort contre la Terre",
+      "earthStrongVsWater": "La Terre est forte contre l'Eau",
+      "waterStrongVsFire": "L'Eau est forte contre le Feu",
+      "howItWorksTitle": "Comment ça marche",
+      "howItWorksP1": "Lorsque l'élément du Litho attaquant est plus fort que celui du Litho défenseur, le Litho défenseur perd 1 point sur le côté attaqué. Ce bonus s'applique avant la comparaison.",
+      "example": "Votre Litho de feu (côté droit = 5) attaque un Litho de vent (côté gauche = 5). Le Feu est fort contre le Vent, donc le Litho de vent perd 1 point : 5 → 4. La comparaison devient 5 contre 4 — votre Litho gagne et le capture.",
+      "reverseP1": "Inversement, lorsque le Litho défenseur a l'élément le plus fort, l'attaquant perd 1 point sur ce côté avant la comparaison. Lorsque les éléments sont égaux (ou qu'aucun n'est fort contre l'autre), les valeurs brutes sont comparées directement."
+    },
+    "optionalRules": {
+      "title": "Règles optionnelles",
+      "intro": "Ces règles peuvent être activées lors de la configuration de la partie. Elles ajoutent de la profondeur au combat :",
+      "same": "Identique — si votre Litho placé touche deux Lithos ou plus dont la valeur face à vous est égale à la vôtre sur ce côté (votre propre Litho compte parmi les deux), tous les Lithos adverses parmi ces côtés sont capturés, même sans gagner la comparaison.",
+      "plus": "Plus — si deux côtés ou plus partagent la même somme de votre valeur plus la valeur adverse au contact, ces Lithos adverses sont capturés.",
+      "combo": "Combo — tout Litho capturé par Identique ou Plus attaque immédiatement ses propres voisins avec la comparaison normale, ce qui peut enchaîner d'autres captures.",
+      "elementalCells": "Cases élémentaires — certaines cases du plateau portent un élément. Un Litho placé dessus obtient +1 à ses valeurs si son élément correspond à la case, −1 sinon. Cela s'applique uniquement aux comparaisons de base (Identique et Plus utilisent les valeurs brutes).",
+      "wall": "Mur — les bords du plateau comptent comme un voisin de valeur 10 pour les règles Identique et Plus (ils ne sont jamais capturés). Un côté face à un mur compte pour Identique lorsque votre valeur y est de 10, et ajoute 10 à la somme de ce côté pour Plus."
+    },
+    "handMatchRules": {
+      "title": "Règles de main et de partie",
+      "openHands": "Mains ouvertes — les deux mains sont visibles par les deux joueurs pendant toute la partie.",
+      "order": "Ordre — vous devez jouer vos Lithos dans l'ordre : seul le Litho le plus à gauche de votre main peut être placé à chaque tour.",
+      "chaos": "Chaos — un Litho aléatoire de votre main est choisi pour vous à chaque tour ; vous choisissez uniquement où le placer.",
+      "suddenDeath": "Mort subite — si la partie se termine sur une égalité, une nouvelle manche commence avec chaque joueur possédant les Lithos qu'il contrôlait à la fin. Le joueur qui commence alterne à chaque manche jusqu'à ce qu'un gagnant soit désigné."
+    },
+    "end": {
+      "title": "Fin de la partie",
+      "p1": "La partie se termine lorsque toutes les cases du plateau sont remplies. Le joueur qui possède le plus de Lithos gagne. En cas d'égalité de nombre, le gagnant est celui dont les Lithos contrôlés ont la plus haute somme totale de valeurs ; si celle-ci est également égale, la partie est nulle."
+    },
+    "meta": {
+      "title": "Règles - Aeroliths",
+      "description": "Apprenez à jouer à Aeroliths : mise en place, capture, éléments et règles optionnelles."
+    }
+  }
+}
