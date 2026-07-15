@@ -47,24 +47,24 @@
       "waterStrongVsFire": "L'Eau est forte contre le Feu",
       "howItWorksTitle": "Comment ça marche",
       "howItWorksP1": "Lorsque l'élément du Litho attaquant est plus fort que celui du Litho défenseur, le Litho défenseur perd 1 point sur le côté attaqué. Ce bonus s'applique avant la comparaison.",
-      "example": "Votre Litho de feu (côté droit = 5) attaque un Litho de vent (côté gauche = 5). Le Feu est fort contre le Vent, donc le Litho de vent perd 1 point : 5 → 4. La comparaison devient 5 contre 4 — votre Litho gagne et le capture.",
+      "example": "Votre Litho de feu (côté droit = 5) attaque un Litho de vent (côté gauche = 5). Le Feu est fort contre le Vent, donc le Litho de vent perd 1 point : 5 → 4. La comparaison devient 5 contre 4, votre Litho gagne donc et le capture.",
       "reverseP1": "Inversement, lorsque le Litho défenseur a l'élément le plus fort, l'attaquant perd 1 point sur ce côté avant la comparaison. Lorsque les éléments sont égaux (ou qu'aucun n'est fort contre l'autre), les valeurs brutes sont comparées directement."
     },
     "optionalRules": {
       "title": "Règles optionnelles",
       "intro": "Ces règles peuvent être activées lors de la configuration de la partie. Elles ajoutent de la profondeur au combat :",
-      "same": "Identique — si votre Litho placé touche deux Lithos ou plus dont la valeur face à vous est égale à la vôtre sur ce côté (votre propre Litho compte parmi les deux), tous les Lithos adverses parmi ces côtés sont capturés, même sans gagner la comparaison.",
-      "plus": "Plus — si deux côtés ou plus partagent la même somme de votre valeur plus la valeur adverse au contact, ces Lithos adverses sont capturés.",
-      "combo": "Combo — tout Litho capturé par Identique ou Plus attaque immédiatement ses propres voisins avec la comparaison normale, ce qui peut enchaîner d'autres captures.",
-      "elementalCells": "Cases élémentaires — certaines cases du plateau portent un élément. Un Litho placé dessus obtient +1 à ses valeurs si son élément correspond à la case, −1 sinon. Cela s'applique uniquement aux comparaisons de base (Identique et Plus utilisent les valeurs brutes).",
-      "wall": "Mur — les bords du plateau comptent comme un voisin de valeur 10 pour les règles Identique et Plus (ils ne sont jamais capturés). Un côté face à un mur compte pour Identique lorsque votre valeur y est de 10, et ajoute 10 à la somme de ce côté pour Plus."
+      "same": "Identique : si votre Litho placé touche deux Lithos ou plus dont la valeur face à vous est égale à la vôtre sur ce côté (votre propre Litho compte parmi les deux), tous les Lithos adverses parmi ces côtés sont capturés, même sans gagner la comparaison.",
+      "plus": "Plus : si deux côtés ou plus partagent la même somme de votre valeur plus la valeur adverse au contact, ces Lithos adverses sont capturés.",
+      "combo": "Combo : tout Litho capturé par Identique ou Plus attaque immédiatement ses propres voisins avec la comparaison normale, ce qui peut enchaîner d'autres captures.",
+      "elementalCells": "Cases élémentaires : certaines cases du plateau portent un élément. Un Litho placé dessus obtient +1 à ses valeurs si son élément correspond à la case, −1 sinon. Cela s'applique uniquement aux comparaisons de base (Identique et Plus utilisent les valeurs brutes).",
+      "wall": "Mur : les bords du plateau comptent comme un voisin de valeur 10 pour les règles Identique et Plus (ils ne sont jamais capturés). Un côté face à un mur compte pour Identique lorsque votre valeur y est de 10, et ajoute 10 à la somme de ce côté pour Plus."
     },
     "handMatchRules": {
       "title": "Règles de main et de partie",
-      "openHands": "Mains ouvertes — les deux mains sont visibles par les deux joueurs pendant toute la partie.",
-      "order": "Ordre — vous devez jouer vos Lithos dans l'ordre : seul le Litho le plus à gauche de votre main peut être placé à chaque tour.",
-      "chaos": "Chaos — un Litho aléatoire de votre main est choisi pour vous à chaque tour ; vous choisissez uniquement où le placer.",
-      "suddenDeath": "Mort subite — si la partie se termine sur une égalité, une nouvelle manche commence avec chaque joueur possédant les Lithos qu'il contrôlait à la fin. Le joueur qui commence alterne à chaque manche jusqu'à ce qu'un gagnant soit désigné."
+      "openHands": "Mains ouvertes : les deux mains sont visibles par les deux joueurs pendant toute la partie.",
+      "order": "Ordre : vous devez jouer vos Lithos dans l'ordre ; seul le Litho le plus à gauche de votre main peut être placé à chaque tour.",
+      "chaos": "Chaos : un Litho aléatoire de votre main est choisi pour vous à chaque tour ; vous choisissez uniquement où le placer.",
+      "suddenDeath": "Mort subite : si la partie se termine sur une égalité, une nouvelle manche commence avec chaque joueur possédant les Lithos qu'il contrôlait à la fin. Le joueur qui commence alterne à chaque manche jusqu'à ce qu'un gagnant soit désigné."
     },
     "end": {
       "title": "Fin de la partie",

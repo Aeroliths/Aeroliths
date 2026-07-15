@@ -7,9 +7,11 @@ definePageMeta({
   middleware: 'auth'
 })
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: 'Account Settings - Aeroliths',
-  description: 'Manage your Aeroliths account settings.',
+  title: () => t('settings.meta.title'),
+  description: () => t('settings.meta.description'),
   robots: 'noindex, nofollow',
 })
 </script>

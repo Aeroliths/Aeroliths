@@ -47,24 +47,24 @@
       "waterStrongVsFire": "Water is strong against Fire",
       "howItWorksTitle": "How it works",
       "howItWorksP1": "When the element of the attacking Lithos is stronger than the element of the defending Lithos, the defending Lithos loses 1 point on the side being attacked. This bonus applies before the comparison.",
-      "example": "Your fire Lithos (right side = 5) attacks a wind Lithos (left side = 5). Fire is strong against wind, so the wind Lithos loses 1 point: 5 → 4. The comparison becomes 5 vs 4 — your Lithos wins and captures it.",
+      "example": "Your fire Lithos (right side = 5) attacks a wind Lithos (left side = 5). Fire is strong against wind, so the wind Lithos loses 1 point: 5 → 4. The comparison becomes 5 vs 4, so your Lithos wins and captures it.",
       "reverseP1": "Conversely, when the defending Lithos has the stronger element, the attacker loses 1 point on that side before the comparison. When the elements are equal (or neither is strong against the other), the raw values are compared directly."
     },
     "optionalRules": {
       "title": "Optional Rules",
       "intro": "These rules can be toggled on in the match setup. They add depth to combat:",
-      "same": "Same — if your placed Lithos touches two or more Lithos whose facing value equals yours on that side (your own Lithos count toward the two), every opponent Lithos among those sides is captured, even without winning the comparison.",
-      "plus": "Plus — if two or more sides share the same sum of your value plus the touching opponent value, those opponent Lithos are captured.",
-      "combo": "Combo — any Lithos captured by Same or Plus immediately attacks its own neighbours with the normal comparison, which can chain into further captures.",
-      "elementalCells": "Elemental cells — some board cells carry an element. A Lithos placed on one gets +1 to its values when its element matches the cell, −1 otherwise. This applies to Basic comparisons only (Same and Plus use raw values).",
-      "wall": "Wall — the board edges count as a value-10 neighbour for the Same and Plus rules (they are never captured). A side facing a wall counts for Same when your value there is 10, and adds 10 to that side's sum for Plus."
+      "same": "Same: if your placed Lithos touches two or more Lithos whose facing value equals yours on that side (your own Lithos count toward the two), every opponent Lithos among those sides is captured, even without winning the comparison.",
+      "plus": "Plus: if two or more sides share the same sum of your value plus the touching opponent value, those opponent Lithos are captured.",
+      "combo": "Combo: any Lithos captured by Same or Plus immediately attacks its own neighbours with the normal comparison, which can chain into further captures.",
+      "elementalCells": "Elemental cells: some board cells carry an element. A Lithos placed on one gets +1 to its values when its element matches the cell, −1 otherwise. This applies to Basic comparisons only (Same and Plus use raw values).",
+      "wall": "Wall: the board edges count as a value-10 neighbour for the Same and Plus rules (they are never captured). A side facing a wall counts for Same when your value there is 10, and adds 10 to that side's sum for Plus."
     },
     "handMatchRules": {
       "title": "Hand & Match Rules",
-      "openHands": "Open hands — both hands are visible to both players throughout the match.",
-      "order": "Order — you must play your Lithos in order: only the leftmost Lithos in your hand can be placed each turn.",
-      "chaos": "Chaos — a random Lithos from your hand is chosen for you each turn; you only choose where to place it.",
-      "suddenDeath": "Sudden Death — if the game ends in a draw, a new round starts with each player holding the Lithos they controlled at the end. The starting player alternates each round until someone wins."
+      "openHands": "Open hands: both hands are visible to both players throughout the match.",
+      "order": "Order: you must play your Lithos in sequence; only the leftmost Lithos in your hand can be placed each turn.",
+      "chaos": "Chaos: a random Lithos from your hand is chosen for you each turn; you only choose where to place it.",
+      "suddenDeath": "Sudden Death: if the game ends in a draw, a new round starts with each player holding the Lithos they controlled at the end. The starting player alternates each round until someone wins."
     },
     "end": {
       "title": "End of the Game",

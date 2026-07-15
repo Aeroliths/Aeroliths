@@ -55,7 +55,7 @@
       "handModeRandom": "Random",
       "handModeMirror": "Mirror",
       "handModeDraft": "Draft",
-      "draftPrefix": "Draft — ",
+      "draftPrefix": "Draft: ",
       "draftSuffix": "to pick",
       "cancelDraft": "Cancel draft",
       "autoFill": "Auto-fill",
