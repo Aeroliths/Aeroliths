@@ -1,1 +1,65 @@
-{}
+{
+  "friends": {
+    "title": "Amis",
+    "tabs": { "myFriends": "Mes amis", "requests": "Demandes", "search": "Rechercher" },
+    "list": {
+      "myFriendsCount": "Mes amis ({count})",
+      "friendsSince": "Amis depuis ",
+      "reportTitle": "Signaler l'utilisateur",
+      "report": "Signaler",
+      "remove": "Retirer",
+      "empty": "Vous n'avez pas encore d'amis. Recherchez des joueurs dans l'onglet Rechercher !",
+      "reportSubmitted": "Signalement envoyé. Notre équipe va l'examiner.",
+      "removedSuffix": " retiré de vos amis",
+      "removeFailed": "Échec du retrait de l'ami"
+    },
+    "requests": {
+      "received": "Demandes reçues",
+      "accept": "Accepter",
+      "reject": "Refuser",
+      "noneReceived": "Aucune demande reçue en attente.",
+      "sent": "Demandes envoyées",
+      "cancel": "Annuler",
+      "noneSent": "Aucune demande envoyée.",
+      "acceptedSuffix": " acceptée !",
+      "acceptFailed": "Échec de l'acceptation de la demande",
+      "rejected": "Demande d'ami refusée",
+      "rejectFailed": "Échec du refus de la demande",
+      "cancelled": "Demande annulée",
+      "cancelFailed": "Échec de l'annulation de la demande",
+      "friendRequestFromPrefix": "Demande d'ami de "
+    },
+    "search": {
+      "title": "Rechercher des joueurs",
+      "placeholder": "Rechercher par nom d'utilisateur...",
+      "addFriend": "Ajouter en ami",
+      "alreadyFriends": "Déjà amis",
+      "requestPending": "Demande en attente",
+      "reportTitle": "Signaler l'utilisateur",
+      "report": "Signaler",
+      "noPlayersFound": "Aucun joueur trouvé.",
+      "reportSubmitted": "Signalement envoyé. Notre équipe va l'examiner.",
+      "loadFailed": "Échec du chargement des utilisateurs",
+      "requestSentPrefix": "Demande d'ami envoyée à ",
+      "sendFailed": "Échec de l'envoi de la demande"
+    },
+    "reportModal": {
+      "titlePrefix": "Signaler ",
+      "desc": "Aidez-nous à modérer en signalant les noms d'utilisateur ou photos de profil inappropriés.",
+      "whatAreYouReporting": "Que souhaitez-vous signaler ?",
+      "username": "Nom d'utilisateur",
+      "profilePicture": "Photo de profil",
+      "noProfilePicture": "Cet utilisateur n'a pas de photo de profil.",
+      "reasonLabel": "Raison",
+      "reasonOptional": "(optionnel)",
+      "reasonPlaceholder": "Expliquez éventuellement pourquoi cela devrait être examiné",
+      "charCountSuffix": " / 500",
+      "cancel": "Annuler",
+      "submitting": "Envoi en cours...",
+      "submit": "Envoyer le signalement",
+      "submitted": "Signalement envoyé. Merci.",
+      "submitFailed": "Échec de l'envoi du signalement"
+    },
+    "meta": { "title": "Amis - Aeroliths", "description": "Gérez votre liste d'amis Aeroliths." }
+  }
+}

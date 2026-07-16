@@ -1,1 +1,65 @@
-{}
+{
+  "friends": {
+    "title": "Friends",
+    "tabs": { "myFriends": "My Friends", "requests": "Requests", "search": "Search" },
+    "list": {
+      "myFriendsCount": "My friends ({count})",
+      "friendsSince": "Friends since ",
+      "reportTitle": "Report user",
+      "report": "Report",
+      "remove": "Remove",
+      "empty": "You don't have any friends yet. Search for players in the Search tab!",
+      "reportSubmitted": "Report submitted. Our team will review it.",
+      "removedSuffix": " removed from friends",
+      "removeFailed": "Failed to remove friend"
+    },
+    "requests": {
+      "received": "Requests received",
+      "accept": "Accept",
+      "reject": "Reject",
+      "noneReceived": "No pending requests received.",
+      "sent": "Requests sent",
+      "cancel": "Cancel",
+      "noneSent": "No sent requests.",
+      "acceptedSuffix": " accepted!",
+      "acceptFailed": "Failed to accept request",
+      "rejected": "Friend request rejected",
+      "rejectFailed": "Failed to reject request",
+      "cancelled": "Request cancelled",
+      "cancelFailed": "Failed to cancel request",
+      "friendRequestFromPrefix": "Friend request from "
+    },
+    "search": {
+      "title": "Search players",
+      "placeholder": "Search by username...",
+      "addFriend": "Add friend",
+      "alreadyFriends": "Already friends",
+      "requestPending": "Request pending",
+      "reportTitle": "Report user",
+      "report": "Report",
+      "noPlayersFound": "No players found.",
+      "reportSubmitted": "Report submitted. Our team will review it.",
+      "loadFailed": "Failed to load users",
+      "requestSentPrefix": "Friend request sent to ",
+      "sendFailed": "Failed to send request"
+    },
+    "reportModal": {
+      "titlePrefix": "Report ",
+      "desc": "Help us moderate by reporting inappropriate usernames or profile pictures.",
+      "whatAreYouReporting": "What are you reporting?",
+      "username": "Username",
+      "profilePicture": "Profile picture",
+      "noProfilePicture": "This user has no profile picture set.",
+      "reasonLabel": "Reason",
+      "reasonOptional": "(optional)",
+      "reasonPlaceholder": "Optionally explain why this should be reviewed",
+      "charCountSuffix": " / 500",
+      "cancel": "Cancel",
+      "submitting": "Submitting...",
+      "submit": "Submit report",
+      "submitted": "Report submitted. Thank you.",
+      "submitFailed": "Failed to submit report"
+    },
+    "meta": { "title": "Friends - Aeroliths", "description": "Manage your Aeroliths friends list." }
+  }
+}

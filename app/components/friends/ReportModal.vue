@@ -1,14 +1,14 @@
 <template>
   <div class="modal-overlay" @click="$emit('close')">
     <div class="modal report-modal" @click.stop>
-      <h3>Report {{ targetUsername }}</h3>
+      <h3>{{ $t('friends.reportModal.titlePrefix') }}{{ targetUsername }}</h3>
       <p class="report-hint">
-        Help us moderate by reporting inappropriate usernames or profile pictures.
+        {{ $t('friends.reportModal.desc') }}
       </p>
 
       <form @submit.prevent="submit">
         <div class="form-group">
-          <label>What are you reporting?</label>
+          <label>{{ $t('friends.reportModal.whatAreYouReporting') }}</label>
           <div class="report-type-options">
             <label class="report-type-option" :class="{ active: form.type === 'username' }">
               <input
@@ -17,7 +17,7 @@
                 value="username"
                 :disabled="loading"
               />
-              <span>Username</span>
+              <span>{{ $t('friends.reportModal.username') }}</span>
             </label>
             <label
               class="report-type-option"
@@ -29,25 +29,25 @@
                 value="profile_picture"
                 :disabled="loading || !hasProfilePicture"
               />
-              <span>Profile picture</span>
+              <span>{{ $t('friends.reportModal.profilePicture') }}</span>
             </label>
           </div>
           <small v-if="!hasProfilePicture" class="hint-muted">
-            This user has no profile picture set.
+            {{ $t('friends.reportModal.noProfilePicture') }}
           </small>
         </div>
 
         <div class="form-group">
-          <label for="report-reason">Reason <span class="optional-tag">(optional)</span></label>
+          <label for="report-reason">{{ $t('friends.reportModal.reasonLabel') }} <span class="optional-tag">{{ $t('friends.reportModal.reasonOptional') }}</span></label>
           <textarea
             id="report-reason"
             v-model="form.reason"
             rows="4"
             maxlength="500"
-            placeholder="Optionally explain why this should be reviewed"
+            :placeholder="$t('friends.reportModal.reasonPlaceholder')"
             :disabled="loading"
           />
-          <small class="hint-muted">{{ form.reason.length }} / 500</small>
+          <small class="hint-muted">{{ form.reason.length }}{{ $t('friends.reportModal.charCountSuffix') }}</small>
         </div>
 
         <div v-if="error" class="error-message">{{ error }}</div>
@@ -55,10 +55,10 @@
 
         <div class="modal-actions">
           <button type="button" class="cancel-btn" @click="$emit('close')" :disabled="loading">
-            Cancel
+            {{ $t('friends.reportModal.cancel') }}
           </button>
           <button type="submit" class="btn-danger" :disabled="loading || !canSubmit">
-            {{ loading ? 'Submitting...' : 'Submit report' }}
+            {{ loading ? $t('friends.reportModal.submitting') : $t('friends.reportModal.submit') }}
           </button>
         </div>
       </form>
@@ -68,6 +68,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   targetUserId: string
@@ -104,11 +106,11 @@ const submit = async () => {
         reason: form.value.reason.trim(),
       },
     })
-    success.value = 'Report submitted. Thank you.'
+    success.value = t('friends.reportModal.submitted')
     emit('submitted')
     setTimeout(() => emit('close'), 1200)
   } catch (e: any) {
-    error.value = e.data?.statusMessage || e.data?.message || 'Failed to submit report'
+    error.value = e.data?.statusMessage || e.data?.message || t('friends.reportModal.submitFailed')
   } finally {
     loading.value = false
   }

@@ -1,19 +1,19 @@
 <template>
   <div class="friends-container">
     <div class="friends-panel">
-      <h1>Friends</h1>
+      <h1>{{ $t('friends.title') }}</h1>
 
       <!-- Tab Navigation -->
       <div class="tabs">
         <button :class="{ active: activeTab === 'list' }" @click="activeTab = 'list'">
-          My Friends
+          {{ $t('friends.tabs.myFriends') }}
         </button>
         <button :class="{ active: activeTab === 'requests' }" @click="activeTab = 'requests'" class="tab-with-badge">
-          Requests
+          {{ $t('friends.tabs.requests') }}
           <span v-if="pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
         </button>
         <button :class="{ active: activeTab === 'search' }" @click="activeTab = 'search'">
-          Search
+          {{ $t('friends.tabs.search') }}
         </button>
       </div>
 

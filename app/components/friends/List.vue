@@ -1,6 +1,6 @@
 <template>
   <div class="tab-content">
-    <h2>My friends ({{ friends.length }})</h2>
+    <h2>{{ $t('friends.list.myFriendsCount', { count: friends.length }) }}</h2>
 
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
@@ -14,16 +14,16 @@
           </div>
           <div>
             <div class="username-text">{{ friend.username }}</div>
-            <div class="friend-since">Friends since {{ formatDate(friend.since) }}</div>
+            <div class="friend-since">{{ $t('friends.list.friendsSince') }}{{ formatDate(friend.since) }}</div>
           </div>
         </div>
         <div class="item-actions">
-          <button class="report-btn" @click="openReport(friend)" title="Report user">Report</button>
-          <button class="remove-btn" @click="removeFriend(friend)">Remove</button>
+          <button class="report-btn" @click="openReport(friend)" :title="$t('friends.list.reportTitle')">{{ $t('friends.list.report') }}</button>
+          <button class="remove-btn" @click="removeFriend(friend)">{{ $t('friends.list.remove') }}</button>
         </div>
       </div>
     </div>
-    <div v-else class="empty-state">You don't have any friends yet. Search for players in the Search tab!</div>
+    <div v-else class="empty-state">{{ $t('friends.list.empty') }}</div>
 
     <FriendsReportModal
       v-if="reportTarget"
@@ -39,6 +39,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+const { t } = useI18n()
+
 const friends = ref<any[]>([])
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -49,7 +51,7 @@ const openReport = (friend: any) => {
 }
 
 const onReportSubmitted = () => {
-  showMessage('success', 'Report submitted. Our team will review it.')
+  showMessage('success', t('friends.list.reportSubmitted'))
 }
 
 const showMessage = (type: 'error' | 'success', message: string) => {
@@ -76,10 +78,10 @@ const fetchFriends = async () => {
 const removeFriend = async (friend: any) => {
   try {
     await $fetch(`/api/friends/${friend.edgeId}`, { method: 'DELETE' })
-    showMessage('success', `${friend.username} removed from friends`)
+    showMessage('success', `${friend.username}${t('friends.list.removedSuffix')}`)
     await fetchFriends()
   } catch (e: any) {
-    showMessage('error', e.data?.message || 'Failed to remove friend')
+    showMessage('error', e.data?.message || t('friends.list.removeFailed'))
   }
 }
 

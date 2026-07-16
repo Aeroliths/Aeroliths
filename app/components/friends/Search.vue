@@ -1,6 +1,6 @@
 <template>
   <div class="tab-content">
-    <h2>Search players</h2>
+    <h2>{{ $t('friends.search.title') }}</h2>
 
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
@@ -9,7 +9,7 @@
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Search by username..."
+        :placeholder="$t('friends.search.placeholder')"
       />
     </div>
 
@@ -29,17 +29,17 @@
             :disabled="sendingTo === result.username"
             @click="sendRequest(result.username)"
           >
-            Add friend
+            {{ $t('friends.search.addFriend') }}
           </button>
-          <span v-else-if="isFriend(result.id)" class="pending-label">Already friends</span>
-          <span v-else class="pending-label">Request pending</span>
-          <button class="report-btn" @click="openReport(result)" title="Report user">
-            Report
+          <span v-else-if="isFriend(result.id)" class="pending-label">{{ $t('friends.search.alreadyFriends') }}</span>
+          <span v-else class="pending-label">{{ $t('friends.search.requestPending') }}</span>
+          <button class="report-btn" @click="openReport(result)" :title="$t('friends.search.reportTitle')">
+            {{ $t('friends.search.report') }}
           </button>
         </div>
       </div>
     </div>
-    <div v-else-if="allUsers.length && searchQuery.trim()" class="empty-state">No players found.</div>
+    <div v-else-if="allUsers.length && searchQuery.trim()" class="empty-state">{{ $t('friends.search.noPlayersFound') }}</div>
 
     <FriendsReportModal
       v-if="reportTarget"
@@ -55,6 +55,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 
+const { t } = useI18n()
+
 const searchQuery = ref('')
 const allUsers = ref<any[]>([])
 const sendingTo = ref('')
@@ -69,7 +71,7 @@ const openReport = (target: any) => {
 }
 
 const onReportSubmitted = () => {
-  showMessage('success', 'Report submitted. Our team will review it.')
+  showMessage('success', t('friends.search.reportSubmitted'))
 }
 
 const fuzzyMatch = (username: string, query: string): boolean => {
@@ -127,7 +129,7 @@ const fetchData = async () => {
     pendingRequests.value = requestsRes.data
     allUsers.value = usersRes.data
   } catch (e: any) {
-    showMessage('error', 'Failed to load users')
+    showMessage('error', t('friends.search.loadFailed'))
   }
 }
 
@@ -137,10 +139,10 @@ const sendRequest = async (username: string) => {
     await $fetch('/api/friends/request', {
       method: 'POST', body: { targetUsername: username },
     })
-    showMessage('success', `Friend request sent to ${username}`)
+    showMessage('success', `${t('friends.search.requestSentPrefix')}${username}`)
     await fetchData()
   } catch (e: any) {
-    showMessage('error', e.data?.message || 'Failed to send request')
+    showMessage('error', e.data?.message || t('friends.search.sendFailed'))
   } finally {
     sendingTo.value = ''
   }

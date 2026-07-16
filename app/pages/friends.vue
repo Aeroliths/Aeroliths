@@ -7,9 +7,11 @@ definePageMeta({
   middleware: 'auth'
 })
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: 'Friends - Aeroliths',
-  description: 'Manage your Aeroliths friends list.',
+  title: t('friends.meta.title'),
+  description: t('friends.meta.description'),
   robots: 'noindex, nofollow',
 })
 </script>
