@@ -1,1 +1,53 @@
-{}
+{
+  "leaderboard": {
+    "title": "Classement",
+    "subtitle": "Meilleurs joueurs d'Aeroliths",
+    "tabs": { "collection": "Collection", "battles": "Combats", "inDev": "En développement" },
+    "battleSection": {
+      "title": "Classement des combats",
+      "badge": "En développement",
+      "desc": "Le classement des combats sera disponible une fois le système de combat implémenté. Suivez vos victoires, vos séries et grimpez dans les rangs !",
+      "rank": "#",
+      "player": "Joueur",
+      "wins": "Victoires",
+      "losses": "Défaites",
+      "winRate": "Taux de victoire",
+      "streak": "Série"
+    },
+    "loading": "Chargement du classement...",
+    "ptsSuffix": " pts",
+    "ranking": {
+      "rank": "#",
+      "player": "Joueur",
+      "unique": "Uniques",
+      "total": "Total",
+      "completion": "Complétion",
+      "badges": "Badges",
+      "score": "Score"
+    },
+    "stats": {
+      "players": "Joueurs",
+      "lithosAvailable": "Lithos disponibles",
+      "elements": "Éléments"
+    },
+    "noPlayersYet": "Pas encore de joueurs. Soyez le premier à collectionner !",
+    "profile": {
+      "loading": "Chargement du profil...",
+      "memberSince": "Membre depuis ",
+      "pointsSuffix": " points",
+      "reportTitle": "Signaler ce joueur",
+      "report": "Signaler",
+      "badgesTitle": "Badges",
+      "collectionTitle": "Collection",
+      "totalLithos": "Total de Lithos",
+      "uniqueLithos": "Lithos uniques",
+      "completion": "Complétion",
+      "elementProgress": "Progression par élément",
+      "rarityProgress": "Progression par rareté"
+    },
+    "reportSubmitted": "Signalement envoyé. Notre équipe va l'examiner.",
+    "loadFailed": "Échec du chargement du classement",
+    "profileLoadFailed": "Échec du chargement du profil",
+    "meta": { "title": "Classement - Aeroliths", "description": "Découvrez les meilleurs joueurs et collections d'Aeroliths." }
+  }
+}

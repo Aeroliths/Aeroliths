@@ -3,13 +3,15 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
+
 definePageMeta({
   middleware: 'auth'
 })
 
 useSeoMeta({
-  title: 'Leaderboard - Aeroliths',
-  description: 'View the top players on the Aeroliths ranked leaderboard.',
+  title: t('leaderboard.meta.title'),
+  description: t('leaderboard.meta.description'),
   robots: 'noindex, nofollow',
 })
 </script>

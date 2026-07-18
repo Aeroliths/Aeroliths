@@ -1,34 +1,34 @@
 <template>
   <div class="leaderboard-page">
     <div class="leaderboard-container">
-      <h1>Leaderboard</h1>
-      <p class="subtitle">Top players of Aeroliths</p>
+      <h1>{{ $t('leaderboard.title') }}</h1>
+      <p class="subtitle">{{ $t('leaderboard.subtitle') }}</p>
 
       <!-- Tab Navigation -->
       <div class="leaderboard-tabs">
         <button :class="{ active: activeTab === 'collection' }" @click="activeTab = 'collection'">
-          Collection
+          {{ $t('leaderboard.tabs.collection') }}
         </button>
         <button :class="{ active: activeTab === 'battles' }" @click="activeTab = 'battles'" class="tab-dev">
-          Battles
-          <span class="tab-dev-badge">In Dev</span>
+          {{ $t('leaderboard.tabs.battles') }}
+          <span class="tab-dev-badge">{{ $t('leaderboard.tabs.inDev') }}</span>
         </button>
       </div>
 
       <!-- Battles Tab (In Development) -->
       <div v-if="activeTab === 'battles'" class="leaderboard-dev">
         <div class="dev-icon">&#x2694;&#xFE0F;</div>
-        <h2>Battle Leaderboard</h2>
-        <span class="dev-badge">In Development</span>
-        <p>The battle leaderboard will be available once the combat system is implemented. Track your wins, win streaks, and climb the ranks!</p>
+        <h2>{{ $t('leaderboard.battleSection.title') }}</h2>
+        <span class="dev-badge">{{ $t('leaderboard.battleSection.badge') }}</span>
+        <p>{{ $t('leaderboard.battleSection.desc') }}</p>
         <div class="dev-preview">
           <div class="dev-preview-header">
-            <span class="col-rank">#</span>
-            <span class="col-player">Player</span>
-            <span>Wins</span>
-            <span>Losses</span>
-            <span>Win Rate</span>
-            <span>Streak</span>
+            <span class="col-rank">{{ $t('leaderboard.battleSection.rank') }}</span>
+            <span class="col-player">{{ $t('leaderboard.battleSection.player') }}</span>
+            <span>{{ $t('leaderboard.battleSection.wins') }}</span>
+            <span>{{ $t('leaderboard.battleSection.losses') }}</span>
+            <span>{{ $t('leaderboard.battleSection.winRate') }}</span>
+            <span>{{ $t('leaderboard.battleSection.streak') }}</span>
           </div>
           <div v-for="i in 5" :key="i" class="dev-preview-row">
             <span class="col-rank">{{ i }}</span>
@@ -41,7 +41,7 @@
         </div>
       </div>
 
-      <div v-if="loading && activeTab === 'collection'" class="loading">Loading leaderboard...</div>
+      <div v-if="loading && activeTab === 'collection'" class="loading">{{ $t('leaderboard.loading') }}</div>
       <div v-if="error && activeTab === 'collection'" class="error-message">{{ error }}</div>
 
       <div v-if="!loading && leaderboard.length > 0 && activeTab === 'collection'" class="leaderboard-content">
@@ -54,7 +54,7 @@
             </div>
             <span class="podium-rank">2</span>
             <span class="podium-name">{{ leaderboard[1].username }}</span>
-            <span class="podium-score">{{ leaderboard[1].score }} pts</span>
+            <span class="podium-score">{{ leaderboard[1].score }}{{ $t('leaderboard.ptsSuffix') }}</span>
             <div v-if="leaderboard[1].badges.length > 0" class="podium-badges">
               <span v-for="badge in leaderboard[1].badges.slice(0, 2)" :key="badge.name" class="badge-mini" :title="badge.description">
                 {{ getBadgeIcon(badge.name) }}
@@ -70,7 +70,7 @@
             </div>
             <span class="podium-rank">1</span>
             <span class="podium-name">{{ leaderboard[0].username }}</span>
-            <span class="podium-score">{{ leaderboard[0].score }} pts</span>
+            <span class="podium-score">{{ leaderboard[0].score }}{{ $t('leaderboard.ptsSuffix') }}</span>
             <div v-if="leaderboard[0].badges.length > 0" class="podium-badges">
               <span v-for="badge in leaderboard[0].badges.slice(0, 3)" :key="badge.name" class="badge-mini" :title="badge.description">
                 {{ getBadgeIcon(badge.name) }}
@@ -85,7 +85,7 @@
             </div>
             <span class="podium-rank">3</span>
             <span class="podium-name">{{ leaderboard[2].username }}</span>
-            <span class="podium-score">{{ leaderboard[2].score }} pts</span>
+            <span class="podium-score">{{ leaderboard[2].score }}{{ $t('leaderboard.ptsSuffix') }}</span>
             <div v-if="leaderboard[2].badges.length > 0" class="podium-badges">
               <span v-for="badge in leaderboard[2].badges.slice(0, 2)" :key="badge.name" class="badge-mini" :title="badge.description">
                 {{ getBadgeIcon(badge.name) }}
@@ -98,28 +98,28 @@
         <div class="leaderboard-stats">
           <div class="leaderboard-stat">
             <span class="stat-num">{{ totalPlayers }}</span>
-            <span class="stat-text">Players</span>
+            <span class="stat-text">{{ $t('leaderboard.stats.players') }}</span>
           </div>
           <div class="leaderboard-stat">
             <span class="stat-num">{{ totalLithos }}</span>
-            <span class="stat-text">Lithos Available</span>
+            <span class="stat-text">{{ $t('leaderboard.stats.lithosAvailable') }}</span>
           </div>
           <div class="leaderboard-stat">
             <span class="stat-num">{{ totalElements }}</span>
-            <span class="stat-text">Elements</span>
+            <span class="stat-text">{{ $t('leaderboard.stats.elements') }}</span>
           </div>
         </div>
 
         <!-- Full ranking table -->
         <div class="ranking-table">
           <div class="ranking-header">
-            <span class="col-rank">#</span>
-            <span class="col-player">Player</span>
-            <span class="col-unique">Unique</span>
-            <span class="col-total">Total</span>
-            <span class="col-completion">Completion</span>
-            <span class="col-badges">Badges</span>
-            <span class="col-score">Score</span>
+            <span class="col-rank">{{ $t('leaderboard.ranking.rank') }}</span>
+            <span class="col-player">{{ $t('leaderboard.ranking.player') }}</span>
+            <span class="col-unique">{{ $t('leaderboard.ranking.unique') }}</span>
+            <span class="col-total">{{ $t('leaderboard.ranking.total') }}</span>
+            <span class="col-completion">{{ $t('leaderboard.ranking.completion') }}</span>
+            <span class="col-badges">{{ $t('leaderboard.ranking.badges') }}</span>
+            <span class="col-score">{{ $t('leaderboard.ranking.score') }}</span>
           </div>
 
           <div
@@ -169,7 +169,7 @@
       </div>
 
       <div v-if="!loading && leaderboard.length === 0 && !error && activeTab === 'collection'" class="no-data">
-        <p>No players yet. Be the first to start collecting!</p>
+        <p>{{ $t('leaderboard.noPlayersYet') }}</p>
       </div>
     </div>
 
@@ -178,7 +178,7 @@
       <div class="profile-modal" @click.stop>
         <button class="profile-close" @click="showProfile = false">&#x2715;</button>
 
-        <div v-if="profileLoading" class="loading">Loading profile...</div>
+        <div v-if="profileLoading" class="loading">{{ $t('leaderboard.profile.loading') }}</div>
         <div v-if="profileError" class="error-message">{{ profileError }}</div>
 
         <div v-if="profile && !profileLoading">
@@ -190,22 +190,22 @@
             </div>
             <div class="profile-info">
               <h2>{{ profile.username }}</h2>
-              <span class="profile-since">Member since {{ formatDate(profile.memberSince) }}</span>
-              <span class="profile-score">{{ profile.score }} points</span>
+              <span class="profile-since">{{ $t('leaderboard.profile.memberSince') }}{{ formatDate(profile.memberSince) }}</span>
+              <span class="profile-score">{{ profile.score }}{{ $t('leaderboard.profile.pointsSuffix') }}</span>
             </div>
             <button
               v-if="profile.username !== currentUsername"
               class="profile-report-btn"
               @click="openReport"
-              title="Report this player"
+              :title="$t('leaderboard.profile.reportTitle')"
             >
-              Report
+              {{ $t('leaderboard.profile.report') }}
             </button>
           </div>
 
           <!-- Badges -->
           <div v-if="profile.badges.length > 0" class="profile-section">
-            <h3>Badges</h3>
+            <h3>{{ $t('leaderboard.profile.badgesTitle') }}</h3>
             <div class="badges-grid">
               <div v-for="badge in profile.badges" :key="badge.name" class="badge-card">
                 <span class="badge-icon">{{ getBadgeIcon(badge.name) }}</span>
@@ -217,26 +217,26 @@
 
           <!-- Collection Stats -->
           <div class="profile-section">
-            <h3>Collection</h3>
+            <h3>{{ $t('leaderboard.profile.collectionTitle') }}</h3>
             <div class="profile-stats-row">
               <div class="profile-stat-card">
                 <span class="profile-stat-value">{{ profile.totalOwned }}</span>
-                <span class="profile-stat-label">Total Lithos</span>
+                <span class="profile-stat-label">{{ $t('leaderboard.profile.totalLithos') }}</span>
               </div>
               <div class="profile-stat-card">
                 <span class="profile-stat-value">{{ profile.uniqueOwned }}</span>
-                <span class="profile-stat-label">Unique Lithos</span>
+                <span class="profile-stat-label">{{ $t('leaderboard.profile.uniqueLithos') }}</span>
               </div>
               <div class="profile-stat-card">
                 <span class="profile-stat-value">{{ profile.completionPercent }}%</span>
-                <span class="profile-stat-label">Completion</span>
+                <span class="profile-stat-label">{{ $t('leaderboard.profile.completion') }}</span>
               </div>
             </div>
           </div>
 
           <!-- Element Progress -->
           <div v-if="profile.elementCompletion.length > 0" class="profile-section">
-            <h3>Element Progress</h3>
+            <h3>{{ $t('leaderboard.profile.elementProgress') }}</h3>
             <div class="element-progress-list">
               <div v-for="el in profile.elementCompletion" :key="el.name" class="element-progress-item">
                 <div class="element-progress-header">
@@ -257,7 +257,7 @@
 
           <!-- Rarity Progress -->
           <div v-if="profile.rarityCompletion.length > 0" class="profile-section">
-            <h3>Rarity Progress</h3>
+            <h3>{{ $t('leaderboard.profile.rarityProgress') }}</h3>
             <div class="element-progress-list">
               <div v-for="r in profile.rarityCompletion" :key="r.rarity" class="element-progress-item">
                 <div class="element-progress-header">
@@ -299,6 +299,7 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { user } = useAuth()
+const { t } = useI18n()
 const currentUsername = computed(() => user.value?.username || '')
 
 const activeTab = ref<'collection' | 'battles'>('collection')
@@ -329,7 +330,7 @@ const openReport = () => {
 }
 
 const onReportSubmitted = () => {
-  reportFlash.value = 'Report submitted. Our team will review it.'
+  reportFlash.value = t('leaderboard.reportSubmitted')
   setTimeout(() => (reportFlash.value = ''), 4000)
 }
 
@@ -342,7 +343,7 @@ const fetchLeaderboard = async () => {
     totalLithos.value = response.data.totalLithos
     totalElements.value = response.data.totalElements
   } catch (e: any) {
-    error.value = e.data?.statusMessage || 'Failed to load leaderboard'
+    error.value = e.data?.statusMessage || t('leaderboard.loadFailed')
   } finally {
     loading.value = false
   }
@@ -357,7 +358,7 @@ const openProfile = async (username: string) => {
     const response = await $fetch<any>(`/api/leaderboard/${username}`)
     profile.value = response.data
   } catch (e: any) {
-    profileError.value = e.data?.statusMessage || 'Failed to load profile'
+    profileError.value = e.data?.statusMessage || t('leaderboard.profileLoadFailed')
   } finally {
     profileLoading.value = false
   }

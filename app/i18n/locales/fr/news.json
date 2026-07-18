@@ -1,1 +1,18 @@
-{}
+{
+  "news": {
+    "tag": "Changelog",
+    "heroTitle": "Actualités",
+    "heroDesc": "Mises à jour, changelog et annonces de l'équipe Aeroliths.",
+    "loading": "Chargement des actualités...",
+    "loadFailed": "Échec du chargement des actualités.",
+    "empty": "Pas encore d'actualités - restez à l'écoute !",
+    "readMore": "Lire la suite →",
+    "backToAll": "Retour à toutes les actualités",
+    "chip": "Actualités",
+    "notFound": "Actualité introuvable",
+    "meta": {
+      "listTitle": "Actualités - Aeroliths",
+      "articleFallbackDesc": "Article d'actualité Aeroliths."
+    }
+  }
+}

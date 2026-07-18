@@ -1,1 +1,18 @@
-{}
+{
+  "news": {
+    "tag": "Changelog",
+    "heroTitle": "News",
+    "heroDesc": "Project updates, changelog and announcements from the Aeroliths team.",
+    "loading": "Loading news...",
+    "loadFailed": "Failed to load news.",
+    "empty": "No news yet - stay tuned!",
+    "readMore": "Read more →",
+    "backToAll": "Back to all news",
+    "chip": "News",
+    "notFound": "News not found",
+    "meta": {
+      "listTitle": "News - Aeroliths",
+      "articleFallbackDesc": "Aeroliths news article."
+    }
+  }
+}

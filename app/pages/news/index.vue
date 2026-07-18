@@ -1,17 +1,17 @@
 <template>
   <div class="news-page">
     <section class="news-hero">
-      <span class="news-hero__tag">Changelog</span>
+      <span class="news-hero__tag">{{ $t('news.tag') }}</span>
       <h1 class="news-hero__title">
-        <span class="news-hero__gradient">News</span>
+        <span class="news-hero__gradient">{{ $t('news.heroTitle') }}</span>
       </h1>
-      <p class="news-hero__desc">Project updates, changelog and announcements from the Aeroliths team.</p>
+      <p class="news-hero__desc">{{ $t('news.heroDesc') }}</p>
     </section>
 
     <section class="news-list-wrapper">
-      <div v-if="pending" class="news-state">Loading news...</div>
-      <div v-else-if="error" class="news-state news-state--error">Failed to load news.</div>
-      <div v-else-if="items.length === 0" class="news-state">No news yet - stay tuned!</div>
+      <div v-if="pending" class="news-state">{{ $t('news.loading') }}</div>
+      <div v-else-if="error" class="news-state news-state--error">{{ $t('news.loadFailed') }}</div>
+      <div v-else-if="items.length === 0" class="news-state">{{ $t('news.empty') }}</div>
 
       <div v-else class="news-grid">
         <NuxtLink
@@ -28,7 +28,7 @@
             <p class="news-card__date">{{ formatDate(item.publishedAt) }}</p>
             <h2 class="news-card__title">{{ item.title }}</h2>
             <p v-if="item.excerpt" class="news-card__excerpt">{{ item.excerpt }}</p>
-            <span class="news-card__cta">Read more →</span>
+            <span class="news-card__cta">{{ $t('news.readMore') }}</span>
           </div>
         </NuxtLink>
       </div>
@@ -46,8 +46,10 @@ type NewsListItem = {
   publishedAt: string | null
 }
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: 'News - Aeroliths',
+  title: () => t('news.meta.listTitle'),
   description: 'Project updates, changelog and announcements about Aeroliths.',
 })
 
