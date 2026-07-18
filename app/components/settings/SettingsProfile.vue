@@ -11,8 +11,8 @@
           <span class="avatar-edit-icon">&#x270E;</span>
         </label>
       </div>
-      <h2 class="profile-card-username">{{ formData.username || 'Username' }}</h2>
-      <span class="profile-card-email">{{ formData.email || 'email@example.com' }}</span>
+      <h2 class="profile-card-username">{{ formData.username || $t('settings.profile.usernameFallback') }}</h2>
+      <span class="profile-card-email">{{ formData.email || $t('settings.profile.emailFallback') }}</span>
       <span v-if="userRole" class="profile-card-role" :class="'role-' + userRole">{{ userRole }}</span>
     </div>
 
@@ -31,38 +31,38 @@
       <!-- Profile Picture Actions -->
       <div v-if="formData.profilePicture" class="profile-picture-actions">
         <label for="profile-picture-input" class="change-picture-btn" :class="{ disabled: loading }">
-          Change Picture
+          {{ $t('settings.profile.changePicture') }}
         </label>
         <button type="button" class="remove-picture-btn" @click="removeProfilePicture" :disabled="loading">
-          Remove
+          {{ $t('settings.profile.remove') }}
         </button>
       </div>
       <div v-else class="profile-picture-actions">
         <label for="profile-picture-input" class="change-picture-btn" :class="{ disabled: loading }">
-          Upload Picture
+          {{ $t('settings.profile.uploadPicture') }}
         </label>
       </div>
 
       <!-- Email -->
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">{{ $t('settings.profile.emailLabel') }}</label>
         <input
           id="email"
           v-model="formData.email"
           type="email"
-          placeholder="your@email.com"
+          :placeholder="$t('settings.profile.emailPlaceholder')"
           :disabled="loading"
         />
       </div>
 
       <!-- Username -->
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="username">{{ $t('settings.profile.usernameLabel') }}</label>
         <input
           id="username"
           v-model="formData.username"
           type="text"
-          placeholder="Your username"
+          :placeholder="$t('settings.profile.usernamePlaceholder')"
           :disabled="loading"
         />
       </div>
@@ -71,7 +71,7 @@
       <div v-if="success" class="success-message">{{ success }}</div>
 
       <button type="submit" class="submit-btn" :disabled="loading">
-        {{ loading ? 'Updating...' : 'Save Changes' }}
+        {{ loading ? $t('settings.profile.updating') : $t('settings.profile.saveChanges') }}
       </button>
     </form>
   </div>
@@ -82,6 +82,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { user, initAuth } = useAuth()
+const { t } = useI18n()
 
 const formData = ref({
   email: '',
@@ -144,12 +145,12 @@ const handleSubmit = async () => {
       }
     })
 
-    success.value = 'Profile updated successfully!'
+    success.value = t('settings.profile.success')
     await initAuth()
 
     setTimeout(() => { success.value = '' }, 3000)
   } catch (err: any) {
-    error.value = err.data?.statusMessage || 'An error occurred while updating profile'
+    error.value = err.data?.statusMessage || t('settings.profile.genericError')
   } finally {
     loading.value = false
   }

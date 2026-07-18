@@ -3,7 +3,7 @@
     <!-- Back nav row, sits above the hero -->
     <div class="news-article__nav">
       <NuxtLink to="/news" class="news-article__back">
-        <span aria-hidden="true">←</span> Back to all news
+        <span aria-hidden="true">←</span> {{ $t('news.backToAll') }}
       </NuxtLink>
     </div>
 
@@ -21,7 +21,7 @@
       <div class="news-article__hero-shade" />
 
       <div class="news-article__hero-content">
-        <span class="news-article__chip">News</span>
+        <span class="news-article__chip">{{ $t('news.chip') }}</span>
         <h1 class="news-article__title">{{ news.title }}</h1>
         <div class="news-article__meta">
           <time :datetime="news.publishedAt || ''">{{ formatDate(news.publishedAt) }}</time>
@@ -47,15 +47,17 @@ type NewsItem = {
   publishedAt: string | null
 }
 
+const { t, locale } = useI18n()
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 
 const { data, error } = await useFetch<{ success: boolean; data: NewsItem }>(
-  () => `/api/news/${slug.value}`
+  () => `/api/news/${slug.value}`,
+  { query: { locale } }
 )
 
 if (error.value || !data.value?.data) {
-  throw createError({ statusCode: 404, statusMessage: 'News not found', fatal: true })
+  throw createError({ statusCode: 404, statusMessage: t('news.notFound'), fatal: true })
 }
 
 const news = computed(() => data.value!.data)
@@ -69,14 +71,14 @@ const shareImage = computed(() =>
 
 useSeoMeta({
   title: () => `${news.value.title} - Aeroliths News`,
-  description: () => news.value.excerpt || 'Aeroliths news article.',
+  description: () => news.value.excerpt || t('news.meta.articleFallbackDesc'),
   ogTitle: () => news.value.title,
-  ogDescription: () => news.value.excerpt || 'Aeroliths news article.',
+  ogDescription: () => news.value.excerpt || t('news.meta.articleFallbackDesc'),
   ogType: 'article',
   ogUrl: () => `${SITE_URL}/news/${news.value.slug}`,
   ogImage: () => shareImage.value,
   twitterTitle: () => news.value.title,
-  twitterDescription: () => news.value.excerpt || 'Aeroliths news article.',
+  twitterDescription: () => news.value.excerpt || t('news.meta.articleFallbackDesc'),
   twitterImage: () => shareImage.value,
 })
 

@@ -59,13 +59,13 @@ async function cleanupExpiredUsers() {
         },
         deletionReminderSent: false,
       },
-      select: { id: true, email: true, username: true, deletionRequestedAt: true },
+      select: { id: true, email: true, username: true, locale: true, deletionRequestedAt: true },
     })
 
     for (const account of pendingDeletionAccounts) {
       const deletionDate = new Date(account.deletionRequestedAt!.getTime() + THIRTY_DAYS_MS)
       try {
-        await sendDeletionReminderEmail(account.email, account.username, deletionDate)
+        await sendDeletionReminderEmail(account.email, account.username, deletionDate, account.locale === 'fr' ? 'fr' : 'en')
         await db.postgres.user.update({
           where: { id: account.id },
           data: { deletionReminderSent: true },
@@ -101,12 +101,12 @@ async function cleanupExpiredUsers() {
         warning6MonthsSent: false,
         lastActiveAt: { lt: new Date(now.getTime() - SIX_MONTHS_MS) },
       },
-      select: { id: true, email: true, username: true, lastActiveAt: true },
+      select: { id: true, email: true, username: true, locale: true, lastActiveAt: true },
     })
     for (const account of accounts6Months) {
       const deletionDate = new Date(account.lastActiveAt.getTime() + THREE_YEARS_MS)
       try {
-        await sendInactivityWarningEmail(account.email, account.username, '6months', deletionDate)
+        await sendInactivityWarningEmail(account.email, account.username, '6months', deletionDate, account.locale === 'fr' ? 'fr' : 'en')
         await db.postgres.user.update({ where: { id: account.id }, data: { warning6MonthsSent: true } })
       } catch (err) {
         console.error(`[Cleanup] Failed to send 6-month warning to ${account.email}:`, err)
@@ -121,12 +121,12 @@ async function cleanupExpiredUsers() {
         warning2MonthsSent: false,
         lastActiveAt: { lt: new Date(now.getTime() - (THREE_YEARS_MS - TWO_MONTHS_MS)) },
       },
-      select: { id: true, email: true, username: true, lastActiveAt: true },
+      select: { id: true, email: true, username: true, locale: true, lastActiveAt: true },
     })
     for (const account of accounts2Months) {
       const deletionDate = new Date(account.lastActiveAt.getTime() + THREE_YEARS_MS)
       try {
-        await sendInactivityWarningEmail(account.email, account.username, '2months', deletionDate)
+        await sendInactivityWarningEmail(account.email, account.username, '2months', deletionDate, account.locale === 'fr' ? 'fr' : 'en')
         await db.postgres.user.update({ where: { id: account.id }, data: { warning2MonthsSent: true } })
       } catch (err) {
         console.error(`[Cleanup] Failed to send 2-month warning to ${account.email}:`, err)
@@ -141,12 +141,12 @@ async function cleanupExpiredUsers() {
         warning1MonthSent: false,
         lastActiveAt: { lt: new Date(now.getTime() - (THREE_YEARS_MS - ONE_MONTH_MS)) },
       },
-      select: { id: true, email: true, username: true, lastActiveAt: true },
+      select: { id: true, email: true, username: true, locale: true, lastActiveAt: true },
     })
     for (const account of accounts1Month) {
       const deletionDate = new Date(account.lastActiveAt.getTime() + THREE_YEARS_MS)
       try {
-        await sendInactivityWarningEmail(account.email, account.username, '1month', deletionDate)
+        await sendInactivityWarningEmail(account.email, account.username, '1month', deletionDate, account.locale === 'fr' ? 'fr' : 'en')
         await db.postgres.user.update({ where: { id: account.id }, data: { warning1MonthSent: true } })
       } catch (err) {
         console.error(`[Cleanup] Failed to send 1-month warning to ${account.email}:`, err)
@@ -161,12 +161,12 @@ async function cleanupExpiredUsers() {
         warning1WeekSent: false,
         lastActiveAt: { lt: new Date(now.getTime() - (THREE_YEARS_MS - ONE_WEEK_MS)) },
       },
-      select: { id: true, email: true, username: true, lastActiveAt: true },
+      select: { id: true, email: true, username: true, locale: true, lastActiveAt: true },
     })
     for (const account of accounts1Week) {
       const deletionDate = new Date(account.lastActiveAt.getTime() + THREE_YEARS_MS)
       try {
-        await sendInactivityWarningEmail(account.email, account.username, '1week', deletionDate)
+        await sendInactivityWarningEmail(account.email, account.username, '1week', deletionDate, account.locale === 'fr' ? 'fr' : 'en')
         await db.postgres.user.update({ where: { id: account.id }, data: { warning1WeekSent: true } })
       } catch (err) {
         console.error(`[Cleanup] Failed to send 1-week warning to ${account.email}:`, err)

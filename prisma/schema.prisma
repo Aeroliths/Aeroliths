@@ -12,6 +12,7 @@ model User {
   id             String   @id @default(cuid())
   email          String   @unique
   username       String   @unique
+  locale                     String    @default("en")
   profilePicture             String?
   emailVerified              Boolean   @default(false)
   verificationToken          String?
@@ -237,7 +238,8 @@ model DeckEntry {
 model News {
   id          String    @id @default(cuid())
   title       String
-  slug        String    @unique
+  slug        String
+  locale      String    @default("en")
   excerpt     String?
   content     String
   coverImage  String?
@@ -246,6 +248,7 @@ model News {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  @@unique([slug, locale], name: "slug_locale")
   @@index([published, publishedAt])
   @@map("news")
 }

@@ -42,13 +42,13 @@
         class="stone-tooltip"
         :style="{ left: `${pos.x + 14}px`, top: `${pos.y + 14}px` }"
       >
-        <div class="tt-row"><span class="tt-key">name :</span> {{ name }}</div>
-        <div class="tt-row"><span class="tt-key">element :</span> {{ typeLabel }}</div>
+        <div class="tt-row"><span class="tt-key">{{ $t('play.stone.name') }}</span> {{ name }}</div>
+        <div class="tt-row"><span class="tt-key">{{ $t('play.stone.element') }}</span> {{ typeLabel }}</div>
         <div class="tt-spikes">
-          <span>Up {{ stone.spikeUp }}</span>
-          <span>Right {{ stone.spikeRight }}</span>
-          <span>Down {{ stone.spikeDown }}</span>
-          <span>Left {{ stone.spikeLeft }}</span>
+          <span>{{ $t('play.stone.up') }} {{ stone.spikeUp }}</span>
+          <span>{{ $t('play.stone.right') }} {{ stone.spikeRight }}</span>
+          <span>{{ $t('play.stone.down') }} {{ stone.spikeDown }}</span>
+          <span>{{ $t('play.stone.left') }} {{ stone.spikeLeft }}</span>
         </div>
       </div>
     </Teleport>
@@ -64,8 +64,10 @@ const props = defineProps<{
   owner?: Player
 }>()
 
+const { t } = useI18n()
+
 const name = computed(() => props.stone.name || props.stone.id)
-const typeLabel = computed(() => props.stone.elementName || 'None')
+const typeLabel = computed(() => props.stone.elementName || t('play.stone.none'))
 
 /** Value at/above this reads as a full-length bar. Exact values live in the tooltip. */
 const BAR_CAP = 10

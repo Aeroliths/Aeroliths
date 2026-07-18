@@ -1,0 +1,52 @@
+{
+  "settings": {
+    "title": "Paramètres du compte",
+    "deletion": {
+      "inProgress": "Une demande de suppression est en cours. Votre compte sera supprimé le ",
+      "inProgressSuffix": " si vous ne vous reconnectez pas avant cette date.",
+      "cancelling": "Annulation...",
+      "cancelDeletion": "Annuler la suppression",
+      "deleteMyAccount": "Supprimer mon compte",
+      "modalTitle": "Supprimer mon compte",
+      "modalP1": "Vous pouvez demander la suppression de votre compte. Si vous ne vous reconnectez pas dans les ",
+      "modalP1Bold": "30 jours",
+      "modalP1Suffix": " suivant votre demande, votre compte et toutes vos données seront définitivement supprimés.",
+      "modalP2": "Un email de confirmation vous sera envoyé. Vous pouvez annuler la suppression à tout moment en vous reconnectant.",
+      "cancel": "Annuler",
+      "processing": "Traitement...",
+      "confirmDeletion": "Confirmer la suppression",
+      "requestSent": "Demande envoyée. Vous recevrez un email de confirmation.",
+      "genericError": "Une erreur est survenue.",
+      "cancelledSuccess": "La suppression de votre compte a été annulée."
+    },
+    "password": {
+      "title": "Changer le mot de passe",
+      "newPasswordLabel": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "Nouveau mot de passe",
+      "confirmPasswordLabel": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Confirmer le mot de passe",
+      "changing": "Changement en cours...",
+      "changePassword": "Changer le mot de passe",
+      "tooShort": "Le mot de passe doit contenir au moins 6 caractères",
+      "mismatch": "Les mots de passe ne correspondent pas",
+      "success": "Mot de passe changé avec succès !",
+      "genericError": "Une erreur est survenue lors du changement de mot de passe"
+    },
+    "profile": {
+      "usernameFallback": "Nom d'utilisateur",
+      "emailFallback": "email\\@exemple.com",
+      "changePicture": "Changer la photo",
+      "remove": "Supprimer",
+      "uploadPicture": "Ajouter une photo",
+      "emailLabel": "Email",
+      "emailPlaceholder": "votre\\@email.com",
+      "usernameLabel": "Nom d'utilisateur",
+      "usernamePlaceholder": "Votre nom d'utilisateur",
+      "updating": "Mise à jour...",
+      "saveChanges": "Enregistrer",
+      "success": "Profil mis à jour avec succès !",
+      "genericError": "Une erreur est survenue lors de la mise à jour du profil"
+    },
+    "meta": { "title": "Paramètres - Aeroliths", "description": "Gérez les paramètres de votre compte Aeroliths." }
+  }
+}

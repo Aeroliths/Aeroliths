@@ -1,0 +1,41 @@
+{
+  "home": {
+    "hero": {
+      "tag": "Jeu de stratégie",
+      "tagline": "Jouez. Conquérez. Dominez.",
+      "desc": "Un jeu de stratégie créé par des fans, inspiré de Skylanders Skystones.",
+      "playNow": "Jouer maintenant",
+      "rules": "Règles"
+    },
+    "features": {
+      "fastMatches": { "title": "Parties rapides", "desc": "Des parties rapides sur un plateau 3x3. Chaque coup compte." },
+      "deepStrategy": { "title": "Stratégie profonde", "desc": "4 valeurs directionnelles par pierre. Maîtrisez les mécaniques." },
+      "rankedPlay": { "title": "Parties classées", "desc": "Grimpez dans le classement et prouvez votre valeur." }
+    },
+    "cta": {
+      "title": "Prêt à jouer ?",
+      "desc": "Rejoignez la communauté et lancez votre première partie dès aujourd'hui.",
+      "getStarted": "Commencer",
+      "discord": "Discord"
+    },
+    "about": {
+      "title": "Qu'est-ce qu'Aeroliths ?",
+      "p1": "Aeroliths est un jeu de stratégie en ligne gratuit, créé par des fans et inspiré de Skylanders Skystones. Deux joueurs s'affrontent sur une grille tactique, plaçant tour à tour des Lithos élémentaires pour capturer les pièces adverses. Chaque Lithos possède ses propres valeurs d'attaque sur ses quatre côtés, et le joueur qui contrôle le plus de pierres à la fin de la partie remporte la victoire.",
+      "p2": "Construisez un deck adapté à votre style de jeu, apprenez les forces et faiblesses des quatre éléments (Feu, Eau, Terre et Air), et grimpez dans le classement face à des joueurs du monde entier. Le jeu fonctionne entièrement dans votre navigateur - aucun téléchargement requis.",
+      "featuresTitle": "Fonctionnalités clés",
+      "features": {
+        "free": { "title": "Gratuit", "desc": "sans publicité, sans paywall, sans microtransaction." },
+        "strategy": { "title": "Profondeur stratégique", "desc": "chaque placement compte et les éléments se contrent entre eux." },
+        "deckBuilding": { "title": "Construction de deck", "desc": "collectionnez des Lithos et assemblez le deck parfait." },
+        "online": { "title": "Parties en ligne", "desc": "défiez vos amis ou grimpez dans le classement." },
+        "browser": { "title": "Dans le navigateur", "desc": "jouez instantanément sur ordinateur ou mobile, sans installation." }
+      }
+    },
+    "meta": {
+      "title": "Aeroliths - Jeu de stratégie en ligne gratuit inspiré de Skystones",
+      "description": "Aeroliths est un jeu de stratégie en ligne gratuit, créé par des fans et inspiré de Skylanders Skystones. Construisez votre deck, maîtrisez les quatre éléments et dominez le classement.",
+      "ogTitle": "Aeroliths - Jeu de stratégie en ligne gratuit",
+      "ogDescription": "Construisez votre deck, maîtrisez les quatre éléments et dominez le classement dans ce jeu de stratégie gratuit créé par des fans, inspiré de Skylanders Skystones."
+    }
+  }
+}

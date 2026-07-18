@@ -2,15 +2,13 @@
   <Transition name="cookie-banner">
     <div v-if="showBanner" class="cookie-banner">
       <div class="cookie-banner-content">
-        <h4 class="cookie-banner-title">Cookies</h4>
+        <h4 class="cookie-banner-title">{{ $t('cookieBanner.title') }}</h4>
         <p>
-          This site uses cookies to function. They are required both to keep you signed in
-          and to measure anonymous traffic. By continuing to use the site you accept this.
-          Details on the
-          <NuxtLink href="/legal" class="cookie-link" @click="dismiss">legal page</NuxtLink>.
+          {{ $t('cookieBanner.textBefore') }}
+          <NuxtLink href="/legal" class="cookie-link" @click="dismiss">{{ $t('cookieBanner.legalPageLink') }}</NuxtLink>.
         </p>
         <div class="cookie-banner-actions">
-          <button class="cookie-accept-btn" @click="dismiss">Got it</button>
+          <button class="cookie-accept-btn" @click="dismiss">{{ $t('cookieBanner.accept') }}</button>
         </div>
       </div>
     </div>

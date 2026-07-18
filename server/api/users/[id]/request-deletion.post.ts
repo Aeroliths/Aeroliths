@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     })
 
     try {
-      await sendDeletionRequestEmail(user.email, user.username, deletionDate)
+      await sendDeletionRequestEmail(user.email, user.username, deletionDate, user.locale === 'fr' ? 'fr' : 'en')
     } catch (emailError) {
       console.error('[DeletionRequest] Failed to send confirmation email:', emailError)
     }

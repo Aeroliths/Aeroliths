@@ -1,25 +1,25 @@
 <template>
   <div class="password-section">
-    <h2>Change Password</h2>
+    <h2>{{ $t('settings.password.title') }}</h2>
     <form @submit.prevent="handlePasswordChange" class="settings-form">
       <div class="form-group">
-        <label for="newPassword">New Password</label>
+        <label for="newPassword">{{ $t('settings.password.newPasswordLabel') }}</label>
         <input
           id="newPassword"
           v-model="passwordData.newPassword"
           type="password"
-          placeholder="New password"
+          :placeholder="$t('settings.password.newPasswordPlaceholder')"
           :disabled="passwordLoading"
         />
       </div>
 
       <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
+        <label for="confirmPassword">{{ $t('settings.password.confirmPasswordLabel') }}</label>
         <input
           id="confirmPassword"
           v-model="passwordData.confirmPassword"
           type="password"
-          placeholder="Confirm password"
+          :placeholder="$t('settings.password.confirmPasswordPlaceholder')"
           :disabled="passwordLoading"
         />
       </div>
@@ -28,7 +28,7 @@
       <div v-if="passwordSuccess" class="success-message">{{ passwordSuccess }}</div>
 
       <button type="submit" class="submit-btn" :disabled="passwordLoading">
-        {{ passwordLoading ? 'Changing...' : 'Change Password' }}
+        {{ passwordLoading ? $t('settings.password.changing') : $t('settings.password.changePassword') }}
       </button>
     </form>
   </div>
@@ -39,6 +39,7 @@ import { ref } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { user } = useAuth()
+const { t } = useI18n()
 
 const passwordData = ref({
   newPassword: '',
@@ -57,13 +58,13 @@ const handlePasswordChange = async () => {
   passwordSuccess.value = ''
 
   if (passwordData.value.newPassword.length < 6) {
-    passwordError.value = 'Password must be at least 6 characters long'
+    passwordError.value = t('settings.password.tooShort')
     passwordLoading.value = false
     return
   }
 
   if (passwordData.value.newPassword !== passwordData.value.confirmPassword) {
-    passwordError.value = 'Passwords do not match'
+    passwordError.value = t('settings.password.mismatch')
     passwordLoading.value = false
     return
   }
@@ -74,13 +75,13 @@ const handlePasswordChange = async () => {
       body: { password: passwordData.value.newPassword }
     })
 
-    passwordSuccess.value = 'Password changed successfully!'
+    passwordSuccess.value = t('settings.password.success')
     passwordData.value.newPassword = ''
     passwordData.value.confirmPassword = ''
 
     setTimeout(() => { passwordSuccess.value = '' }, 3000)
   } catch (err: any) {
-    passwordError.value = err.data?.statusMessage || 'An error occurred while changing password'
+    passwordError.value = err.data?.statusMessage || t('settings.password.genericError')
   } finally {
     passwordLoading.value = false
   }

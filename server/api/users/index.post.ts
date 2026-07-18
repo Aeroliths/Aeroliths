@@ -110,12 +110,14 @@ export default defineEventHandler(async (event) => {
     // Generate email verification token
     const { raw: verificationTokenRaw, hashed: verificationTokenHashed } = generateVerificationToken()
     const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+    const locale = resolveRequestLocale(event)
 
     // Create user with authentication in a transaction
     const user = await db.postgres.user.create({
       data: {
         email,
         username,
+        locale,
         emailVerified: false,
         verificationToken: verificationTokenHashed,
         verificationTokenExpiresAt: tokenExpiry,
@@ -133,7 +135,7 @@ export default defineEventHandler(async (event) => {
 
     // Send verification email (don't fail registration if email fails)
     try {
-      await sendVerificationEmail(email, verificationTokenRaw)
+      await sendVerificationEmail(email, verificationTokenRaw, locale)
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError)
     }

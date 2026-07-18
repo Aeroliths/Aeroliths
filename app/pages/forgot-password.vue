@@ -3,19 +3,19 @@
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <h1>Forgot Password</h1>
-          <p>Enter your email to receive a reset link</p>
+          <h1>{{ $t('auth.forgotPassword.title') }}</h1>
+          <p>{{ $t('auth.forgotPassword.subtitle') }}</p>
         </div>
 
         <form v-if="!submitted" @submit.prevent="handleSubmit" class="login-form">
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email">{{ $t('auth.forgotPassword.emailLabel') }}</label>
             <input
               id="email"
               v-model="email"
               type="email"
               required
-              placeholder="your.email@example.com"
+              :placeholder="$t('auth.forgotPassword.emailPlaceholder')"
               :disabled="isLoading"
             />
           </div>
@@ -25,20 +25,20 @@
           </div>
 
           <button type="submit" class="login-button" :disabled="isLoading">
-            <span v-if="!isLoading">Send Reset Link</span>
-            <span v-else>Sending...</span>
+            <span v-if="!isLoading">{{ $t('auth.forgotPassword.submit') }}</span>
+            <span v-else>{{ $t('auth.forgotPassword.submitting') }}</span>
           </button>
         </form>
 
         <div v-else class="reset-success">
-          <p>If an account exists with this email, you will receive a password reset link shortly.</p>
-          <p>Check your inbox and spam folder.</p>
+          <p>{{ $t('auth.forgotPassword.successMessage') }}</p>
+          <p>{{ $t('auth.forgotPassword.checkInbox') }}</p>
         </div>
 
         <div class="login-footer">
           <p>
-            Remember your password?
-            <NuxtLink to="/login">Back to login</NuxtLink>
+            {{ $t('auth.forgotPassword.rememberPassword') }}
+            <NuxtLink to="/login">{{ $t('auth.forgotPassword.backToLogin') }}</NuxtLink>
           </p>
         </div>
       </div>
@@ -52,6 +52,7 @@ definePageMeta({
   middleware: 'guest'
 })
 
+const { t } = useI18n()
 const email = ref('')
 const isLoading = ref(false)
 const errorMessage = ref('')
@@ -68,15 +69,15 @@ const handleSubmit = async () => {
     })
     submitted.value = true
   } catch (error: any) {
-    errorMessage.value = error.data?.message || 'An error occurred. Please try again.'
+    errorMessage.value = error.data?.message || t('auth.forgotPassword.genericError')
   } finally {
     isLoading.value = false
   }
 }
 
 useSeoMeta({
-  title: 'Forgot Password - Aeroliths',
-  description: 'Reset your Aeroliths account password.',
+  title: () => t('auth.forgotPassword.meta.title'),
+  description: () => t('auth.forgotPassword.meta.description'),
   robots: 'noindex, follow',
 })
 </script>

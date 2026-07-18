@@ -7,9 +7,11 @@ definePageMeta({
   middleware: 'auth'
 })
 
+const { t } = useI18n()
+
 useSeoMeta({
-  title: 'Play - Aeroliths',
-  description: 'Play Aeroliths online.',
+  title: () => t('play.meta.title'),
+  description: () => t('play.meta.description'),
   robots: 'noindex, nofollow',
 })
 </script>

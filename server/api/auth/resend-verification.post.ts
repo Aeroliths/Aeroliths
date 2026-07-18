@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
   })
 
   try {
-    await sendVerificationEmail(email, raw)
+    await sendVerificationEmail(email, raw, user.locale === 'fr' ? 'fr' : 'en')
   } catch (emailError) {
     console.error('Failed to resend verification email:', emailError)
     throw createError({

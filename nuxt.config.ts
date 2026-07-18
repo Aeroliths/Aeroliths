@@ -2,8 +2,35 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
-  modules: ['@nuxt/ui', '@vueuse/nuxt', 'nuxt-auth-utils'],
+  modules: ['@nuxt/ui', '@vueuse/nuxt', 'nuxt-auth-utils', '@nuxtjs/i18n'],
   css: ['~/assets/css/global.css'],
+  i18n: {
+    locales: [
+      {
+        code: 'en',
+        language: 'en-US',
+        name: 'English',
+        files: ['en/common.json', 'en/home.json', 'en/rules.json', 'en/play.json', 'en/auth.json', 'en/settings.json', 'en/friends.json', 'en/leaderboard.json', 'en/news.json', 'en/legal.json'],
+      },
+      {
+        code: 'fr',
+        language: 'fr-FR',
+        name: 'Français',
+        files: ['fr/common.json', 'fr/home.json', 'fr/rules.json', 'fr/play.json', 'fr/auth.json', 'fr/settings.json', 'fr/friends.json', 'fr/leaderboard.json', 'fr/news.json', 'fr/legal.json'],
+      },
+    ],
+    defaultLocale: 'en',
+    strategy: 'prefix_except_default',
+    restructureDir: 'app/i18n',
+    langDir: 'locales/',
+    lazy: true,
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'aeroliths_locale',
+      redirectOn: 'root',
+      fallbackLocale: 'en',
+    },
+  },
   runtimeConfig: {
     resendApiKey: process.env.RESEND_API_KEY || '',
     emailFrom: process.env.EMAIL_FROM || 'noreply@aeroliths.fr',

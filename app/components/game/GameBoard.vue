@@ -2,7 +2,7 @@
   <div class="game-board">
     <!-- Open hands: the opponent's hand, face-up and read-only -->
     <div v-if="state.openHands && !readonly && state.status === 'playing'" class="open-hand">
-      <span class="open-hand-label">{{ opponentLabel }} hand</span>
+      <span class="open-hand-label">{{ opponentLabel }} {{ $t('play.board.hand') }}</span>
       <div class="open-hand-cards">
         <div
           v-for="(stone, i) in state.hands[opponent]"
@@ -12,7 +12,7 @@
         >
           <GameStone :stone="stone" :owner="opponent" />
         </div>
-        <span v-if="state.hands[opponent].length === 0" class="empty-hand">No Lithos left</span>
+        <span v-if="state.hands[opponent].length === 0" class="empty-hand">{{ $t('play.board.noLithosLeft') }}</span>
       </div>
     </div>
 
@@ -20,16 +20,16 @@
     <div class="status-bar">
       <div class="score" :class="{ active: state.current === 'A' && state.status === 'playing' }">
         <span class="player-dot dot-a" />
-        <span class="player-label">Player 1</span>
+        <span class="player-label">{{ $t('play.board.player1') }}</span>
         <span class="score-value">{{ score.A }}</span>
       </div>
 
       <div class="status-center">
         <span v-if="state.status === 'playing'" class="turn">
-          {{ state.current === 'A' ? 'Player 1' : 'Player 2' }} to play
+          {{ state.current === 'A' ? $t('play.board.player1') : $t('play.board.player2') }} {{ $t('play.board.toPlay') }}
         </span>
-        <span v-if="suddenDeathRound && suddenDeathRound > 0" class="sd-round">Sudden Death · Round {{ suddenDeathRound }}</span>
-        <span v-if="state.status === 'playing' && emptyCells === 1" class="final-move">Final move!</span>
+        <span v-if="suddenDeathRound && suddenDeathRound > 0" class="sd-round">{{ $t('play.board.suddenDeathRound', { round: suddenDeathRound }) }}</span>
+        <span v-if="state.status === 'playing' && emptyCells === 1" class="final-move">{{ $t('play.board.finalMove') }}</span>
         <span
           v-if="state.status === 'playing' && secondsLeft !== undefined"
           class="turn-timer"
@@ -39,7 +39,7 @@
 
       <div class="score" :class="{ active: state.current === 'B' && state.status === 'playing' }">
         <span class="score-value">{{ score.B }}</span>
-        <span class="player-label">Player 2</span>
+        <span class="player-label">{{ $t('play.board.player2') }}</span>
         <span class="player-dot dot-b" />
       </div>
     </div>
@@ -66,7 +66,7 @@
           :data-cx="x"
           :data-cy="y"
           :title="captureInfo && captureInfo[`${x}-${y}`]
-            ? `Captured by ${captureInfo[`${x}-${y}`].by === 'A' ? 'Player 1' : 'Player 2'} (${captureInfo[`${x}-${y}`].type})`
+            ? `${t('play.board.capturedBy')}${captureInfo[`${x}-${y}`].by === 'A' ? t('play.board.player1') : t('play.board.player2')} (${captureInfo[`${x}-${y}`].type})`
             : undefined"
           :disabled="!!cell || !canPlace || state.status === 'finished'"
           @mouseenter="showPreview(x, y)"
@@ -76,7 +76,7 @@
           <span
             v-if="state.boardElements[y] && state.boardElements[y][x]"
             class="cell-element"
-            :title="`Element: ${state.boardElements[y][x]}`"
+            :title="`${t('play.board.elementPrefix')}${state.boardElements[y][x]}`"
           >
             <img
               v-if="elementSprites && elementSprites[state.boardElements[y][x] as string]"
@@ -102,7 +102,7 @@
 
     <!-- Current player's hand -->
     <div v-if="state.status === 'playing' && !readonly" class="hand">
-      <div class="hand-label">{{ state.current === 'A' ? 'Player 1' : 'Player 2' }} hand</div>
+      <div class="hand-label">{{ state.current === 'A' ? $t('play.board.player1') : $t('play.board.player2') }} {{ $t('play.board.hand') }}</div>
       <div class="hand-cards">
         <button
           v-for="(stone, i) in state.hands[state.current]"
@@ -118,7 +118,7 @@
         >
           <GameStone :stone="stone" :owner="state.current" />
         </button>
-        <div v-if="state.hands[state.current].length === 0" class="empty-hand">No Lithos left</div>
+        <div v-if="state.hands[state.current].length === 0" class="empty-hand">{{ $t('play.board.noLithosLeft') }}</div>
       </div>
     </div>
 
@@ -160,6 +160,8 @@ const emit = defineEmits<{
   (e: 'placeAt', x: number, y: number): void
 }>()
 
+const { t } = useI18n()
+
 const score = computed(() => getScore(props.state))
 const canPlace = computed(
   () => !props.readonly && props.selectedHandIndex !== null && props.state.status === 'playing'
@@ -177,7 +179,7 @@ function isPlayable(i: number): boolean {
 /* ---------- Open hands: show the opponent's hand face-up ---------- */
 
 const opponent = computed<'A' | 'B'>(() => (props.state.current === 'A' ? 'B' : 'A'))
-const opponentLabel = computed(() => (opponent.value === 'A' ? 'Player 1' : 'Player 2'))
+const opponentLabel = computed(() => (opponent.value === 'A' ? t('play.board.player1') : t('play.board.player2')))
 
 /* ---------- Hover preview of would-be captures ---------- */
 
@@ -329,11 +331,11 @@ watch(
     // Centered label: Combo > Plus > Same.
     const types = new Set(events.map((e) => e.type))
     captureLabel.value = types.has('combo')
-      ? 'Combo!'
+      ? t('play.board.combo')
       : types.has('plus')
-        ? 'Plus!'
+        ? t('play.board.plus')
         : types.has('same')
-          ? 'Same!'
+          ? t('play.board.same')
           : ''
     // Per-cell edge + element badge.
     const badges: Record<string, { edge: string; delta: number }> = {}

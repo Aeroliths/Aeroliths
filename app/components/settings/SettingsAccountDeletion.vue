@@ -2,13 +2,13 @@
   <div class="deletion-section-discreet">
     <div v-if="deletionRequestedAt" class="deletion-pending">
       <p class="deletion-pending-text">
-        A deletion request is in progress. Your account will be deleted on
-        <strong>{{ formattedDeletionDate }}</strong> if you do not log in before that date.
+        {{ $t('settings.deletion.inProgress') }}
+        <strong>{{ formattedDeletionDate }}</strong>{{ $t('settings.deletion.inProgressSuffix') }}
       </p>
       <div v-if="error" class="error-message">{{ error }}</div>
       <div v-if="success" class="success-message">{{ success }}</div>
       <button class="cancel-deletion-btn" :disabled="loading" @click="cancelDeletion">
-        {{ loading ? 'Cancelling...' : 'Cancel deletion' }}
+        {{ loading ? $t('settings.deletion.cancelling') : $t('settings.deletion.cancelDeletion') }}
       </button>
     </div>
 
@@ -16,7 +16,7 @@
       <div v-if="error" class="error-message">{{ error }}</div>
       <div v-if="success" class="success-message">{{ success }}</div>
       <button class="request-deletion-btn" @click="showConfirm = true">
-        Delete my account
+        {{ $t('settings.deletion.deleteMyAccount') }}
       </button>
     </div>
 
@@ -24,22 +24,19 @@
     <Teleport to="body">
       <div v-if="showConfirm" class="modal-overlay" @click.self="showConfirm = false">
         <div class="modal">
-          <h3>Delete my account</h3>
+          <h3>{{ $t('settings.deletion.modalTitle') }}</h3>
           <p>
-            You can request the deletion of your account. If you do not log in within
-            <strong>30 days</strong> of your request, your account and all your data will be
-            permanently deleted.
+            {{ $t('settings.deletion.modalP1') }}<strong>{{ $t('settings.deletion.modalP1Bold') }}</strong>{{ $t('settings.deletion.modalP1Suffix') }}
           </p>
           <p>
-            A confirmation email will be sent to you. You can cancel the deletion at any time
-            by logging back in.
+            {{ $t('settings.deletion.modalP2') }}
           </p>
           <div class="modal-actions">
             <button class="cancel-deletion-btn" :disabled="loading" @click="showConfirm = false">
-              Cancel
+              {{ $t('settings.deletion.cancel') }}
             </button>
             <button class="request-deletion-btn" :disabled="loading" @click="requestDeletion">
-              {{ loading ? 'Processing...' : 'Confirm deletion' }}
+              {{ loading ? $t('settings.deletion.processing') : $t('settings.deletion.confirmDeletion') }}
             </button>
           </div>
         </div>
@@ -53,6 +50,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { user, initAuth } = useAuth()
+const { t } = useI18n()
 
 const loading = ref(false)
 const error = ref('')
@@ -80,12 +78,12 @@ const requestDeletion = async () => {
   try {
     await $fetch(`/api/users/${user.value.id}/request-deletion`, { method: 'POST' })
     showConfirm.value = false
-    success.value = 'Request sent. You will receive a confirmation email.'
+    success.value = t('settings.deletion.requestSent')
     await initAuth()
     setTimeout(() => { success.value = '' }, 5000)
   } catch (err: any) {
     showConfirm.value = false
-    error.value = err.data?.statusMessage || 'An error occurred.'
+    error.value = err.data?.statusMessage || t('settings.deletion.genericError')
   } finally {
     loading.value = false
   }
@@ -98,11 +96,11 @@ const cancelDeletion = async () => {
   success.value = ''
   try {
     await $fetch(`/api/users/${user.value.id}/cancel-deletion`, { method: 'POST' })
-    success.value = 'Your account deletion has been cancelled.'
+    success.value = t('settings.deletion.cancelledSuccess')
     await initAuth()
     setTimeout(() => { success.value = '' }, 5000)
   } catch (err: any) {
-    error.value = err.data?.statusMessage || 'An error occurred.'
+    error.value = err.data?.statusMessage || t('settings.deletion.genericError')
   } finally {
     loading.value = false
   }

@@ -1,0 +1,52 @@
+{
+  "settings": {
+    "title": "Account Settings",
+    "deletion": {
+      "inProgress": "A deletion request is in progress. Your account will be deleted on ",
+      "inProgressSuffix": " if you do not log in before that date.",
+      "cancelling": "Cancelling...",
+      "cancelDeletion": "Cancel deletion",
+      "deleteMyAccount": "Delete my account",
+      "modalTitle": "Delete my account",
+      "modalP1": "You can request the deletion of your account. If you do not log in within ",
+      "modalP1Bold": "30 days",
+      "modalP1Suffix": " of your request, your account and all your data will be permanently deleted.",
+      "modalP2": "A confirmation email will be sent to you. You can cancel the deletion at any time by logging back in.",
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "confirmDeletion": "Confirm deletion",
+      "requestSent": "Request sent. You will receive a confirmation email.",
+      "genericError": "An error occurred.",
+      "cancelledSuccess": "Your account deletion has been cancelled."
+    },
+    "password": {
+      "title": "Change Password",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "New password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm password",
+      "changing": "Changing...",
+      "changePassword": "Change Password",
+      "tooShort": "Password must be at least 6 characters long",
+      "mismatch": "Passwords do not match",
+      "success": "Password changed successfully!",
+      "genericError": "An error occurred while changing password"
+    },
+    "profile": {
+      "usernameFallback": "Username",
+      "emailFallback": "email\\@example.com",
+      "changePicture": "Change Picture",
+      "remove": "Remove",
+      "uploadPicture": "Upload Picture",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your\\@email.com",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Your username",
+      "updating": "Updating...",
+      "saveChanges": "Save Changes",
+      "success": "Profile updated successfully!",
+      "genericError": "An error occurred while updating profile"
+    },
+    "meta": { "title": "Settings - Aeroliths", "description": "Manage your Aeroliths account settings." }
+  }
+}

@@ -1,8 +1,11 @@
-// API route to get all published news (public)
-export default defineEventHandler(async () => {
+// API route to get all published news for the active locale (public)
+export default defineEventHandler(async (event) => {
   try {
+    const query = getQuery(event)
+    const locale = query.locale === 'fr' ? 'fr' : 'en'
+
     const news = await db.postgres.news.findMany({
-      where: { published: true },
+      where: { published: true, locale },
       orderBy: { publishedAt: 'desc' },
       select: {
         id: true,

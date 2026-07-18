@@ -1,0 +1,53 @@
+{
+  "leaderboard": {
+    "title": "Leaderboard",
+    "subtitle": "Top players of Aeroliths",
+    "tabs": { "collection": "Collection", "battles": "Battles", "inDev": "In Dev" },
+    "battleSection": {
+      "title": "Battle Leaderboard",
+      "badge": "In Development",
+      "desc": "The battle leaderboard will be available once the combat system is implemented. Track your wins, win streaks, and climb the ranks!",
+      "rank": "#",
+      "player": "Player",
+      "wins": "Wins",
+      "losses": "Losses",
+      "winRate": "Win Rate",
+      "streak": "Streak"
+    },
+    "loading": "Loading leaderboard...",
+    "ptsSuffix": " pts",
+    "ranking": {
+      "rank": "#",
+      "player": "Player",
+      "unique": "Unique",
+      "total": "Total",
+      "completion": "Completion",
+      "badges": "Badges",
+      "score": "Score"
+    },
+    "stats": {
+      "players": "Players",
+      "lithosAvailable": "Lithos Available",
+      "elements": "Elements"
+    },
+    "noPlayersYet": "No players yet. Be the first to start collecting!",
+    "profile": {
+      "loading": "Loading profile...",
+      "memberSince": "Member since ",
+      "pointsSuffix": " points",
+      "reportTitle": "Report this player",
+      "report": "Report",
+      "badgesTitle": "Badges",
+      "collectionTitle": "Collection",
+      "totalLithos": "Total Lithos",
+      "uniqueLithos": "Unique Lithos",
+      "completion": "Completion",
+      "elementProgress": "Element Progress",
+      "rarityProgress": "Rarity Progress"
+    },
+    "reportSubmitted": "Report submitted. Our team will review it.",
+    "loadFailed": "Failed to load leaderboard",
+    "profileLoadFailed": "Failed to load profile",
+    "meta": { "title": "Leaderboard - Aeroliths", "description": "See the top Aeroliths players and collections." }
+  }
+}
