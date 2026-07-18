@@ -11,8 +11,8 @@ until pg_isready -h postgres -p 5432 -U "${POSTGRES_USER:-postgres}" 2>/dev/null
 done
 echo "[Setup] PostgreSQL ready"
 
-# -- Prisma migrations (creates/updates tables) ---------------------
-echo "[Setup] Applying Prisma migrations to database..."
+# -- Prisma migrations (applies pending migrations) ----------------
+echo "[Setup] Applying Prisma migrations..."
 npx prisma migrate deploy 2>&1
 echo "[Setup] Migrations done"
 
