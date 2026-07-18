@@ -1,22 +1,38 @@
 <template>
   <div class="language-switcher">
-    <NuxtLink
+    <button
       v-for="code in availableLocaleCodes"
       :key="code"
-      :to="switchLocalePath(code)"
+      type="button"
       class="language-switcher-option"
       :class="{ 'language-switcher-option--active': locale === code }"
+      @click="selectLocale(code)"
     >
       {{ code.toUpperCase() }}
-    </NuxtLink>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 const { locale, locales } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
+const { isAuthenticated, user } = useAuth()
 
 const availableLocaleCodes = computed(() => locales.value.map((l) => (typeof l === 'string' ? l : l.code)))
+
+async function selectLocale(code: string) {
+  if (code === locale.value) return
+  await navigateTo(switchLocalePath(code))
+  if (isAuthenticated.value && user.value) {
+    try {
+      await $fetch(`/api/users/${user.value.id}`, { method: 'PATCH', body: { locale: code } })
+    } catch (err) {
+      // Non-critical: the routing cookie already reflects the new locale for
+      // this session; DB sync can be retried the next time the user switches.
+      console.error('Failed to persist locale preference:', err)
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -36,6 +52,10 @@ const availableLocaleCodes = computed(() => locales.value.map((l) => (typeof l =
   font-weight: var(--font-semibold);
   color: var(--color-text-secondary);
   transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .language-switcher-option:hover {

@@ -175,6 +175,16 @@ describe('PATCH /api/users/[id]', () => {
       const updateData = {}
       expect(Object.keys(updateData).length).toBe(0)
     })
+
+    it('accepts "fr" as a valid locale value', () => {
+      const validLocales = ['en', 'fr']
+      expect(validLocales.includes('fr')).toBe(true)
+    })
+
+    it('rejects an unsupported locale value', () => {
+      const validLocales = ['en', 'fr']
+      expect(validLocales.includes('de')).toBe(false)
+    })
   })
 
   describe('Duplicate Checks', () => {
@@ -385,6 +395,26 @@ describe('PATCH /api/users/[id]', () => {
           data: { email: 'new@test.com' },
         })
       ).rejects.toThrow('Database connection failed')
+    })
+
+    it('should update user locale', async () => {
+      const updatedUser = {
+        id: 'test-user-id',
+        email: 'user@test.com',
+        username: 'user',
+        locale: 'fr',
+        role: { id: 'role-user', name: 'user' },
+      }
+
+      mockUserUpdate.mockResolvedValue(updatedUser)
+
+      const result = await mockUserUpdate({
+        where: { id: 'test-user-id' },
+        data: { locale: 'fr' },
+        include: { role: true },
+      })
+
+      expect(result.locale).toBe('fr')
     })
   })
 

@@ -111,6 +111,10 @@ export default defineEventHandler(async (event) => {
       updateData.username = body.username
     }
 
+    if (body.locale !== undefined) {
+      updateData.locale = body.locale === 'fr' ? 'fr' : 'en'
+    }
+
     if (body.profilePicture !== undefined) {
       if (typeof body.profilePicture === 'string' && body.profilePicture.startsWith('data:image/')) {
         // Upload new image from Base64

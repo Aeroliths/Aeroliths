@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
       },
     })
 
-    await sendPasswordResetEmail(user.email, user.username, raw)
+    await sendPasswordResetEmail(user.email, user.username, raw, user.locale === 'fr' ? 'fr' : 'en')
 
     return successResponse
   } catch (error: any) {
