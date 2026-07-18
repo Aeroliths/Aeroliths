@@ -1,5 +1,6 @@
 // server/utils/news-helpers.ts
 import DOMPurify from 'isomorphic-dompurify'
+import db from './db'
 
 export const slugify = (input: string): string => {
   return input
@@ -13,12 +14,12 @@ export const slugify = (input: string): string => {
     .replace(/^-|-$/g, '')
 }
 
-export const ensureUniqueSlug = async (base: string, excludeId?: string): Promise<string> => {
+export const ensureUniqueSlug = async (base: string, locale: string, excludeId?: string): Promise<string> => {
   const safeBase = base || 'news'
   let candidate = safeBase
   let suffix = 2
   while (true) {
-    const existing = await db.postgres.news.findUnique({ where: { slug: candidate } })
+    const existing = await db.postgres.news.findUnique({ where: { slug_locale: { slug: candidate, locale } } })
     if (!existing || existing.id === excludeId) return candidate
     candidate = `${safeBase}-${suffix++}`
   }

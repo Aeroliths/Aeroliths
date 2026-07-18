@@ -23,6 +23,7 @@
         <div class="news-admin-body">
           <div class="news-admin-header">
             <h3>{{ item.title }}</h3>
+            <span class="news-admin-badge badge-locale">{{ item.locale.toUpperCase() }}</span>
             <span :class="['news-admin-badge', item.published ? 'badge-published' : 'badge-draft']">
               {{ item.published ? 'Published' : 'Draft' }}
             </span>
@@ -57,6 +58,15 @@
         <div class="form-group">
           <label for="news-title">Title</label>
           <input id="news-title" v-model="form.title" type="text" required maxlength="200" />
+        </div>
+
+        <div class="form-group">
+          <label for="news-locale">Language</label>
+          <select id="news-locale" v-model="form.locale" :disabled="!!form.id">
+            <option value="en">English</option>
+            <option value="fr">French</option>
+          </select>
+          <span v-if="form.id" class="form-hint">Language cannot be changed after creation.</span>
         </div>
 
         <div class="form-group">
@@ -140,6 +150,7 @@ type NewsItem = {
   id: string
   title: string
   slug: string
+  locale: string
   excerpt: string | null
   content: string
   coverImage: string | null
@@ -171,6 +182,7 @@ const modalError = ref('')
 const emptyForm = (): {
   id: string
   title: string
+  locale: 'en' | 'fr'
   excerpt: string
   content: string
   coverImage: string
@@ -179,6 +191,7 @@ const emptyForm = (): {
 } => ({
   id: '',
   title: '',
+  locale: 'en',
   excerpt: '',
   content: '',
   coverImage: '',
@@ -225,6 +238,7 @@ const openEditModal = (item: NewsItem) => {
   form.value = {
     id: item.id,
     title: item.title,
+    locale: item.locale === 'fr' ? 'fr' : 'en',
     excerpt: item.excerpt || '',
     content: item.content || '',
     coverImage: item.coverImage || '',
@@ -280,6 +294,7 @@ const saveNews = async () => {
     } else {
       const body: any = {
         title: form.value.title,
+        locale: form.value.locale,
         excerpt: form.value.excerpt,
         content: form.value.content,
         published: form.value.published,
@@ -443,6 +458,12 @@ onMounted(async () => {
   background: var(--color-warning-bg);
   color: var(--color-warning);
   border: 1px solid var(--color-warning-border);
+}
+
+.badge-locale {
+  background: var(--bg-glass-light);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-light);
 }
 
 .news-admin-slug {

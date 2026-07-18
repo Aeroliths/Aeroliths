@@ -46,14 +46,16 @@ type NewsListItem = {
   publishedAt: string | null
 }
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 useSeoMeta({
   title: () => t('news.meta.listTitle'),
   description: 'Project updates, changelog and announcements about Aeroliths.',
 })
 
-const { data, pending, error } = await useFetch<{ success: boolean; data: NewsListItem[] }>('/api/news')
+const { data, pending, error } = await useFetch<{ success: boolean; data: NewsListItem[] }>('/api/news', {
+  query: { locale },
+})
 const items = computed(() => data.value?.data || [])
 
 const formatDate = (iso: string | null) => {

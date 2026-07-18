@@ -47,12 +47,13 @@ type NewsItem = {
   publishedAt: string | null
 }
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)
 
 const { data, error } = await useFetch<{ success: boolean; data: NewsItem }>(
-  () => `/api/news/${slug.value}`
+  () => `/api/news/${slug.value}`,
+  { query: { locale } }
 )
 
 if (error.value || !data.value?.data) {

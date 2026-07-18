@@ -10,8 +10,11 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    const query = getQuery(event)
+    const locale = query.locale === 'fr' ? 'fr' : 'en'
+
     const news = await db.postgres.news.findUnique({
-      where: { slug },
+      where: { slug_locale: { slug, locale } },
     })
 
     if (!news || !news.published) {

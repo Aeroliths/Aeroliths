@@ -22,13 +22,14 @@ export default defineEventHandler(async (event) => {
     const excerpt = typeof body.excerpt === 'string' && body.excerpt.trim() ? body.excerpt.trim() : null
     const published = Boolean(body.published)
     const content = sanitizeNewsContent(rawContent)
+    const locale = body.locale === 'fr' ? 'fr' : 'en'
 
     // Slug
     const baseSlug = slugify(title)
     if (!baseSlug) {
       throw createError({ statusCode: 400, statusMessage: 'Title must contain at least one alphanumeric character' })
     }
-    const slug = await ensureUniqueSlug(baseSlug)
+    const slug = await ensureUniqueSlug(baseSlug, locale)
 
     // Cover image (optional, Base64)
     let coverImage: string | null = null
@@ -51,6 +52,7 @@ export default defineEventHandler(async (event) => {
       data: {
         title,
         slug,
+        locale,
         excerpt,
         content,
         coverImage,
