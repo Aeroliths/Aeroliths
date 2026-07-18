@@ -1,371 +1,285 @@
 <template>
   <div class="legal-container">
-    <h1 class="legal-title">Legal Notice & Terms of Use</h1>
+    <h1 class="legal-title">{{ $t('legal.title') }}</h1>
 
     <section class="legal-section">
-      <h2>1. Publisher / Developer Identification</h2>
+      <h2>{{ $t('legal.s1.title') }}</h2>
       <div class="legal-content">
-        <p><strong>Game Name:</strong> {{ SITE_INFO.name }}</p>
-        <p><strong>Developer / Studio:</strong> {{ SITE_INFO.developer.name }}</p>
-        <p><strong>Legal Status:</strong> {{ SITE_INFO.developer.status }}</p>
-        <p><strong>Contact / Support:</strong> <a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a></p>
-        <p><strong>Publication Director:</strong> {{ SITE_INFO.developer.director }}</p>
+        <p><strong>{{ $t('legal.s1.gameName') }}</strong> {{ SITE_INFO.name }}</p>
+        <p><strong>{{ $t('legal.s1.developerStudio') }}</strong> {{ SITE_INFO.developer.name }}</p>
+        <p><strong>{{ $t('legal.s1.legalStatus') }}</strong> {{ SITE_INFO.developer.status }}</p>
+        <p><strong>{{ $t('legal.s1.contactSupport') }}</strong> <a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a></p>
+        <p><strong>{{ $t('legal.s1.publicationDirector') }}</strong> {{ SITE_INFO.developer.director }}</p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>2. Hosting / Distribution</h2>
+      <h2>{{ $t('legal.s2.title') }}</h2>
       <div class="legal-content">
-        <p>The game and its official website are hosted by:</p>
-        <p><strong>Hosting Provider:</strong> {{ SITE_INFO.hosting.provider }}</p>
-        <p><strong>Address:</strong> {{ SITE_INFO.hosting.address }}</p>
-        <p><strong>Website:</strong> <a :href="SITE_INFO.hosting.website" target="_blank" rel="noopener noreferrer">{{ SITE_INFO.hosting.website }}</a></p>
+        <p>{{ $t('legal.s2.intro') }}</p>
+        <p><strong>{{ $t('legal.s2.hostingProvider') }}</strong> {{ SITE_INFO.hosting.provider }}</p>
+        <p><strong>{{ $t('legal.s2.address') }}</strong> {{ SITE_INFO.hosting.address }}</p>
+        <p><strong>{{ $t('legal.s2.website') }}</strong> <a :href="SITE_INFO.hosting.website" target="_blank" rel="noopener noreferrer">{{ SITE_INFO.hosting.website }}</a></p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>3. Intellectual Property Rights</h2>
+      <h2>{{ $t('legal.s3.title') }}</h2>
       <div class="legal-content">
-        <h3>Ownership of Original Content</h3>
-        <p>
-          All original elements of the game <strong>{{ SITE_INFO.name }}</strong> are the exclusive
-          intellectual property of <strong>{{ SITE_INFO.developer.name }}</strong>. This includes,
-          but is not limited to:
-        </p>
+        <h3>{{ $t('legal.s3.ownershipTitle') }}</h3>
+        <i18n-t keypath="legal.s3.ownershipIntro" tag="p" scope="global">
+          <template #gameName><strong>{{ SITE_INFO.name }}</strong></template>
+          <template #developer><strong>{{ SITE_INFO.developer.name }}</strong></template>
+        </i18n-t>
         <ul>
-          <li><strong>Source Code:</strong> All programming code, scripts, algorithms, and technical implementations</li>
-          <li><strong>Visual Assets:</strong> Original graphics, artwork, UI/UX designs, icons, and visual effects</li>
-          <li><strong>Audio Content:</strong> Music, sound effects, and audio implementations (excluding third-party licensed content)</li>
-          <li><strong>Game Mechanics:</strong> Original gameplay systems, card mechanics, and strategic elements unique to Aeroliths</li>
-          <li><strong>User Interface:</strong> All interface designs, layouts, navigation systems, and user experience elements</li>
-          <li><strong>Branding:</strong> The Aeroliths name, logo, and associated branding materials</li>
+          <li><strong>{{ $t('legal.s3.sourceCodeLabel') }}</strong> {{ $t('legal.s3.sourceCodeDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.visualAssetsLabel') }}</strong> {{ $t('legal.s3.visualAssetsDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.audioContentLabel') }}</strong> {{ $t('legal.s3.audioContentDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.gameMechanicsLabel') }}</strong> {{ $t('legal.s3.gameMechanicsDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.userInterfaceLabel') }}</strong> {{ $t('legal.s3.userInterfaceDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.brandingLabel') }}</strong> {{ $t('legal.s3.brandingDesc') }}</li>
         </ul>
 
-        <h3>Usage Restrictions</h3>
-        <p>
-          Without prior written authorization from <strong>{{ SITE_INFO.developer.name }}</strong>,
-          you may not:
-        </p>
+        <h3>{{ $t('legal.s3.restrictionsTitle') }}</h3>
+        <i18n-t keypath="legal.s3.restrictionsIntro" tag="p" scope="global">
+          <template #developer><strong>{{ SITE_INFO.developer.name }}</strong></template>
+        </i18n-t>
         <ul>
-          <li>Copy, reproduce, distribute, or create derivative works based on the game</li>
-          <li>Decompile, reverse-engineer, or extract source code from the application</li>
-          <li>Use game assets (graphics, sounds, code) in other projects or applications</li>
-          <li>Commercially exploit the game or any of its components</li>
-          <li>Remove, alter, or obscure any copyright notices, branding, or attribution</li>
-          <li>Use the game's name, logo, or branding for promotional purposes without permission</li>
+          <li>{{ $t('legal.s3.restriction1') }}</li>
+          <li>{{ $t('legal.s3.restriction2') }}</li>
+          <li>{{ $t('legal.s3.restriction3') }}</li>
+          <li>{{ $t('legal.s3.restriction4') }}</li>
+          <li>{{ $t('legal.s3.restriction5') }}</li>
+          <li>{{ $t('legal.s3.restriction6') }}</li>
         </ul>
 
-        <h3>Game Inspiration & Attribution</h3>
-        <p>
-          <strong>{{ SITE_INFO.name }}</strong> is a fan-made game inspired by the <strong>Skystones</strong>
-          mini-game from the <strong>Skylanders</strong> franchise. This project was created as an
-          independent tribute to celebrate the original game mechanics that inspired countless players.
-        </p>
+        <h3>{{ $t('legal.s3.inspirationTitle') }}</h3>
+        <i18n-t keypath="legal.s3.inspirationP1" tag="p" scope="global">
+          <template #gameName><strong>{{ SITE_INFO.name }}</strong></template>
+        </i18n-t>
 
-        <h4>Important Disclaimers</h4>
+        <h4>{{ $t('legal.s3.disclaimersTitle') }}</h4>
         <ul>
-          <li><strong>No Affiliation:</strong> Aeroliths is NOT affiliated with, endorsed by, sponsored by, or officially connected to Activision, Toys for Bob, or any entities associated with the Skylanders franchise</li>
-          <li><strong>Fan Project:</strong> This is a non-commercial fan project created for educational and entertainment purposes</li>
-          <li><strong>Original Implementation:</strong> While inspired by Skystones, all code, assets, and implementations are original creations</li>
-          <li><strong>Respect for Original IP:</strong> We fully respect and acknowledge all intellectual property rights of the original Skylanders franchise</li>
+          <li><strong>{{ $t('legal.s3.noAffiliationLabel') }}</strong> {{ $t('legal.s3.noAffiliationDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.fanProjectLabel') }}</strong> {{ $t('legal.s3.fanProjectDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.originalImplLabel') }}</strong> {{ $t('legal.s3.originalImplDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.respectIpLabel') }}</strong> {{ $t('legal.s3.respectIpDesc') }}</li>
         </ul>
 
-        <h4>Trademark Acknowledgments</h4>
-        <p>
-          <strong>Skylanders</strong> and <strong>Skystones</strong> are registered trademarks of
-          Activision Publishing, Inc. All rights to the Skylanders franchise, including the original
-          Skystones game concept, characters, and related intellectual property, belong to their
-          respective owners.
-        </p>
-        <p>
-          The use of these terms is solely for the purpose of identification and description of the
-          inspiration behind this fan project. No claim of ownership or endorsement is made or implied.
-        </p>
+        <h4>{{ $t('legal.s3.trademarkTitle') }}</h4>
+        <p>{{ $t('legal.s3.trademarkP1') }}</p>
+        <p>{{ $t('legal.s3.trademarkP2') }}</p>
 
-        <h3>Third-Party Components</h3>
-        <p>
-          This project incorporates open-source software and third-party libraries, each governed
-          by their respective licenses:
-        </p>
+        <h3>{{ $t('legal.s3.thirdPartyTitle') }}</h3>
+        <p>{{ $t('legal.s3.thirdPartyIntro') }}</p>
 
-        <h4>Core Technologies</h4>
+        <h4>{{ $t('legal.s3.coreTechTitle') }}</h4>
         <ul>
-          <li><strong>Nuxt.js:</strong> MIT License - A Vue.js framework for building modern web applications</li>
-          <li><strong>Vue.js:</strong> MIT License - Progressive JavaScript framework for building user interfaces</li>
-          <li><strong>Nuxt UI:</strong> MIT License - UI component library for Nuxt applications</li>
-          <li><strong>TypeScript:</strong> Apache 2.0 License - JavaScript with syntax for types</li>
+          <li><strong>{{ $t('legal.s3.nuxtLabel') }}</strong> {{ $t('legal.s3.nuxtDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.vueLabel') }}</strong> {{ $t('legal.s3.vueDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.nuxtUiLabel') }}</strong> {{ $t('legal.s3.nuxtUiDesc') }}</li>
+          <li><strong>{{ $t('legal.s3.typescriptLabel') }}</strong> {{ $t('legal.s3.typescriptDesc') }}</li>
         </ul>
 
-        <h4>Additional Dependencies</h4>
-        <p>
-          A complete list of all third-party libraries, dependencies, and their respective licenses
-          will be made available on a dedicated <strong>Credits</strong> page. We are committed to
-          full transparency and compliance with all open-source licenses.
-        </p>
+        <h4>{{ $t('legal.s3.additionalDepsTitle') }}</h4>
+        <p>{{ $t('legal.s3.additionalDepsP1') }}</p>
 
-        <h3>User-Generated Content</h3>
-        <p>
-          If and when user-generated content features are implemented (such as custom card designs,
-          deck sharing, or community creations):
-        </p>
+        <h3>{{ $t('legal.s3.ugcTitle') }}</h3>
+        <p>{{ $t('legal.s3.ugcIntro') }}</p>
         <ul>
-          <li>You retain ownership of your original content</li>
-          <li>You grant Aeroliths a non-exclusive, worldwide license to display and distribute your content within the game</li>
-          <li>You confirm that your content does not infringe on any third-party rights</li>
-          <li>We reserve the right to remove content that violates our terms or community guidelines</li>
+          <li>{{ $t('legal.s3.ugc1') }}</li>
+          <li>{{ $t('legal.s3.ugc2') }}</li>
+          <li>{{ $t('legal.s3.ugc3') }}</li>
+          <li>{{ $t('legal.s3.ugc4') }}</li>
         </ul>
 
-        <h3>Copyright Infringement Reporting</h3>
+        <h3>{{ $t('legal.s3.dmcaTitle') }}</h3>
         <p>
-          If you believe that content within Aeroliths infringes your copyright or other intellectual
-          property rights, please contact us immediately via our
-          <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer" class="discord-link">Discord server</a>
-          with the following information:
+          {{ $t('legal.s3.dmcaIntro') }}
+          <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer" class="discord-link">{{ $t('legal.s3.discordServerLink') }}</a>
+          {{ $t('legal.s3.dmcaIntroSuffix') }}
         </p>
         <ul>
-          <li>Description of the copyrighted work you claim has been infringed</li>
-          <li>Identification of the material that is allegedly infringing</li>
-          <li>Your contact information (email, name, address)</li>
-          <li>A statement of good faith belief that the use is not authorized</li>
-          <li>A statement that the information provided is accurate</li>
+          <li>{{ $t('legal.s3.dmca1') }}</li>
+          <li>{{ $t('legal.s3.dmca2') }}</li>
+          <li>{{ $t('legal.s3.dmca3') }}</li>
+          <li>{{ $t('legal.s3.dmca4') }}</li>
+          <li>{{ $t('legal.s3.dmca5') }}</li>
         </ul>
-        <p>
-          We take intellectual property rights seriously and will respond promptly to valid
-          infringement claims in accordance with applicable laws.
-        </p>
+        <p>{{ $t('legal.s3.dmcaClosing') }}</p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>4. Health Warning (Photosensitive Seizure Warning)</h2>
+      <h2>{{ $t('legal.s4.title') }}</h2>
       <div class="legal-content">
-        <p>
-          Some individuals may experience epileptic seizures or loss of consciousness when exposed
-          to certain types of strong light stimulation, rapid succession of images, or repetitions
-          of simple geometric shapes, flashes, or explosions. These individuals risk seizures when
-          playing certain video games containing such stimulations.
-        </p>
-        <p>
-          It is recommended to consult a doctor before use if you or a family member have previously
-          shown symptoms related to epilepsy. If you experience dizziness, vision disturbances, or
-          discomfort, stop playing immediately.
-        </p>
+        <p>{{ $t('legal.s4.p1') }}</p>
+        <p>{{ $t('legal.s4.p2') }}</p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>5. Personal Data Protection (GDPR)</h2>
+      <h2>{{ $t('legal.s5.title') }}</h2>
       <div class="legal-content">
-        <h3>What Data We Collect</h3>
-        <p>
-          To provide you with the best gaming experience, <strong>Aeroliths</strong> collects
-          the following personal data when you create an account and play:
-        </p>
+        <h3>{{ $t('legal.s5.collectTitle') }}</h3>
+        <p>{{ $t('legal.s5.collectIntro') }}</p>
         <ul>
-          <li><strong>Account Information:</strong> Username, email address</li>
-          <li><strong>Game Data:</strong> Game statistics, matches played, wins/losses, rankings</li>
-          <li><strong>Technical Data:</strong> IP address, browser type, connection logs</li>
-          <li><strong>Game Progress:</strong> Your card collection, achievements, player level</li>
+          <li><strong>{{ $t('legal.s5.accountInfoLabel') }}</strong> {{ $t('legal.s5.accountInfoDesc') }}</li>
+          <li><strong>{{ $t('legal.s5.gameDataLabel') }}</strong> {{ $t('legal.s5.gameDataDesc') }}</li>
+          <li><strong>{{ $t('legal.s5.technicalDataLabel') }}</strong> {{ $t('legal.s5.technicalDataDesc') }}</li>
+          <li><strong>{{ $t('legal.s5.gameProgressLabel') }}</strong> {{ $t('legal.s5.gameProgressDesc') }}</li>
         </ul>
 
-        <h3>How We Use Your Data</h3>
-        <p>
-          The data collected is used exclusively for the following purposes:
-        </p>
+        <h3>{{ $t('legal.s5.useTitle') }}</h3>
+        <p>{{ $t('legal.s5.useIntro') }}</p>
         <ul>
-          <li>Managing your player account and authentication</li>
-          <li>Saving your game progress and statistics</li>
-          <li>Displaying global and personal leaderboards</li>
-          <li>Matchmaking and multiplayer functionality</li>
-          <li>Detecting bugs and improving game performance</li>
-          <li>Communicating important game updates (with your consent)</li>
+          <li>{{ $t('legal.s5.use1') }}</li>
+          <li>{{ $t('legal.s5.use2') }}</li>
+          <li>{{ $t('legal.s5.use3') }}</li>
+          <li>{{ $t('legal.s5.use4') }}</li>
+          <li>{{ $t('legal.s5.use5') }}</li>
+          <li>{{ $t('legal.s5.use6') }}</li>
         </ul>
 
-        <h3>Data Security</h3>
-        <p>
-          We implement industry-standard security measures to protect your personal data.
-          Your password is encrypted, and we never share your information with third parties
-          for commercial purposes.
-        </p>
+        <h3>{{ $t('legal.s5.securityTitle') }}</h3>
+        <p>{{ $t('legal.s5.securityP1') }}</p>
 
-        <h3>Data Retention</h3>
-        <p>
-          Your game data is retained as long as your account remains active. If you delete
-          your account, all associated personal data will be permanently removed within 30 days.
-        </p>
-        <p>
-          <strong>Development Notice:</strong> As <strong>{{ SITE_INFO.name }}</strong> is still
-          in active development, user accounts may occasionally be deleted, reset, or wiped without
-          prior notice. This may occur during database migrations, schema updates, testing phases,
-          or to address technical issues. By creating an account during this development period,
-          you acknowledge and accept that your account, progress, statistics, and any associated
-          data may be permanently lost at any time. We recommend not relying on the persistence of
-          your data until the game reaches a stable release.
-        </p>
+        <h3>{{ $t('legal.s5.retentionTitle') }}</h3>
+        <p>{{ $t('legal.s5.retentionP1') }}</p>
+        <i18n-t keypath="legal.s5.devNoticeP1" tag="p" scope="global">
+          <template #gameName><strong>{{ SITE_INFO.name }}</strong></template>
+        </i18n-t>
 
-        <h3>Your Rights Under GDPR</h3>
-        <p>
-          In accordance with the General Data Protection Regulation (GDPR), you have the following rights:
-        </p>
+        <h3>{{ $t('legal.s5.rightsTitle') }}</h3>
+        <p>{{ $t('legal.s5.rightsIntro') }}</p>
         <ul>
-          <li><strong>Right to Access:</strong> Request a copy of your personal data</li>
-          <li><strong>Right to Rectification:</strong> Correct any inaccurate data</li>
-          <li><strong>Right to Erasure:</strong> Request deletion of your account and all data</li>
-          <li><strong>Right to Data Portability:</strong> Receive your data in a portable format</li>
-          <li><strong>Right to Object:</strong> Object to certain data processing activities</li>
+          <li><strong>{{ $t('legal.s5.rightAccessLabel') }}</strong> {{ $t('legal.s5.rightAccessDesc') }}</li>
+          <li><strong>{{ $t('legal.s5.rightRectificationLabel') }}</strong> {{ $t('legal.s5.rightRectificationDesc') }}</li>
+          <li><strong>{{ $t('legal.s5.rightErasureLabel') }}</strong> {{ $t('legal.s5.rightErasureDesc') }}</li>
+          <li><strong>{{ $t('legal.s5.rightPortabilityLabel') }}</strong> {{ $t('legal.s5.rightPortabilityDesc') }}</li>
+          <li><strong>{{ $t('legal.s5.rightObjectLabel') }}</strong> {{ $t('legal.s5.rightObjectDesc') }}</li>
         </ul>
         <p>
-          To exercise any of these rights, please contact us at: <strong><a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a></strong>
+          {{ $t('legal.s5.rightsClosing') }} <strong><a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a></strong>
         </p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>6. Cookies and Trackers</h2>
+      <h2>{{ $t('legal.s6.title') }}</h2>
       <div class="legal-content">
         <p>
-          This website uses cookies and local storage entries that are
-          <strong>strictly required</strong> for the site to function. There is no
-          opt-out, because removing them would break the features they support.
+          {{ $t('legal.s6.intro1') }}
+          <strong>{{ $t('legal.s6.intro2') }}</strong>
+          {{ $t('legal.s6.intro3') }}
         </p>
         <ul>
           <li>
-            <strong>Authentication (<code>auth_token</code>):</strong> keeps you
-            signed in to your account.
+            <strong>{{ $t('legal.s6.authLabel') }}</strong> {{ $t('legal.s6.authDesc') }}
           </li>
           <li>
-            <strong>Audience measurement (<code>aer_vid</code>):</strong> a
-            long-lived anonymous identifier used to count unique visitors and
-            visit volume in the admin dashboard. No third-party advertising
-            trackers and no profiling are involved (hCaptcha - described below -
-            is used solely for bot protection on the sign-in and sign-up forms).
+            <strong>{{ $t('legal.s6.audienceLabel') }}</strong> {{ $t('legal.s6.audienceDesc') }}
           </li>
           <li>
-            <strong>UI state (local storage):</strong> small flags such as your
-            cookie-banner dismissal (<code>cookies-info-dismissed</code>) and
-            interface preferences.
+            <strong>{{ $t('legal.s6.uiStateLabel') }}</strong> {{ $t('legal.s6.uiStateDesc') }}
           </li>
           <li>
-            <strong>hCaptcha bot protection:</strong> on the sign-in and sign-up
-            forms, the hCaptcha widget from Intuition Machines, Inc. is loaded
-            to verify that submissions are made by a human. hCaptcha may set
-            technical cookies on its own domain (<code>hcaptcha.com</code>) and
-            process minimal request metadata (IP address, browser signals)
-            strictly for that purpose. See
+            <strong>{{ $t('legal.s6.hcaptchaLabel') }}</strong> {{ $t('legal.s6.hcaptchaDesc') }}
             <a href="https://www.hcaptcha.com/privacy" target="_blank" rel="noopener noreferrer">hcaptcha.com/privacy</a>.
           </li>
         </ul>
         <p>
-          By using the site you accept that these cookies are set. You may still
-          request deletion of visit data linked to your account at
+          {{ $t('legal.s6.closing1') }}
           <a :href="'mailto:' + SITE_INFO.support.email">{{ SITE_INFO.support.email }}</a>.
         </p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>7. Limitation of Liability</h2>
+      <h2>{{ $t('legal.s7.title') }}</h2>
       <div class="legal-content">
-        <p>
-          The game <strong>{{ SITE_INFO.name }}</strong> is provided "as is", without warranty of any kind,
-          express or implied. <strong>{{ SITE_INFO.developer.name }}</strong> cannot be held responsible for
-          direct or indirect damages caused to the user's equipment (bugs, loss of save data, hardware
-          incompatibility, browser compatibility issues) during use of the game.
-        </p>
-        <p>The user acknowledges using this game at their own risk.</p>
+        <i18n-t keypath="legal.s7.p1" tag="p" scope="global">
+          <template #gameName><strong>{{ SITE_INFO.name }}</strong></template>
+          <template #developer><strong>{{ SITE_INFO.developer.name }}</strong></template>
+        </i18n-t>
+        <p>{{ $t('legal.s7.p2') }}</p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>8. User Conduct & Acceptable Use Policy</h2>
+      <h2>{{ $t('legal.s8.title') }}</h2>
       <div class="legal-content">
-        <p>
-          By accessing and using <strong>{{ SITE_INFO.name }}</strong>, you agree to comply with
-          the following code of conduct. These rules ensure a fair, respectful, and enjoyable
-          gaming environment for all players.
-        </p>
+        <i18n-t keypath="legal.s8.intro" tag="p" scope="global">
+          <template #gameName><strong>{{ SITE_INFO.name }}</strong></template>
+        </i18n-t>
 
-        <h3>Prohibited Activities</h3>
-        <p>Users are strictly prohibited from engaging in the following activities:</p>
+        <h3>{{ $t('legal.s8.prohibitedTitle') }}</h3>
+        <p>{{ $t('legal.s8.prohibitedIntro') }}</p>
 
-        <h4>Security & Integrity</h4>
+        <h4>{{ $t('legal.s8.securityTitle') }}</h4>
         <ul>
-          <li><strong>Hacking & Exploitation:</strong> Do not attempt to hack, reverse-engineer, decompile, disassemble, or exploit the game's code, mechanics, or infrastructure</li>
-          <li><strong>Cheating:</strong> Do not use any third-party software, mods, scripts, or tools designed to gain an unfair advantage</li>
-          <li><strong>Automated Tools:</strong> Do not use bots, macros, auto-clickers, or any automated systems to play the game or farm resources</li>
-          <li><strong>Account Sharing:</strong> Do not share, sell, trade, or transfer your account credentials or access to other users</li>
-          <li><strong>Bug Exploitation:</strong> Do not intentionally exploit bugs, glitches, or errors for personal gain. Report them immediately on our Discord</li>
+          <li><strong>{{ $t('legal.s8.hackingLabel') }}</strong> {{ $t('legal.s8.hackingDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.cheatingLabel') }}</strong> {{ $t('legal.s8.cheatingDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.automatedLabel') }}</strong> {{ $t('legal.s8.automatedDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.sharingLabel') }}</strong> {{ $t('legal.s8.sharingDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.bugLabel') }}</strong> {{ $t('legal.s8.bugDesc') }}</li>
         </ul>
 
-        <h4>Community Standards</h4>
+        <h4>{{ $t('legal.s8.communityTitle') }}</h4>
         <ul>
-          <li><strong>Respectful Behavior:</strong> Treat all players with respect and courtesy. No harassment, bullying, threats, or hate speech</li>
-          <li><strong>Appropriate Content:</strong> Do not use offensive, vulgar, discriminatory, or sexually explicit language in usernames, messages, or any user-generated content</li>
-          <li><strong>No Spam:</strong> Do not spam chat, game lobbies, or communication channels with repetitive or irrelevant messages</li>
-          <li><strong>Fair Play:</strong> Do not intentionally disrupt gameplay, sabotage matches, or engage in unsportsmanlike conduct</li>
-          <li><strong>Privacy Respect:</strong> Do not share other players' personal information without their explicit consent</li>
+          <li><strong>{{ $t('legal.s8.respectLabel') }}</strong> {{ $t('legal.s8.respectDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.contentLabel') }}</strong> {{ $t('legal.s8.contentDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.spamLabel') }}</strong> {{ $t('legal.s8.spamDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.fairPlayLabel') }}</strong> {{ $t('legal.s8.fairPlayDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.privacyLabel') }}</strong> {{ $t('legal.s8.privacyDesc') }}</li>
         </ul>
 
-        <h4>Legal Compliance</h4>
+        <h4>{{ $t('legal.s8.legalTitle') }}</h4>
         <ul>
-          <li><strong>Age Requirements:</strong> Users under 13 years old must have parental consent to create an account</li>
-          <li><strong>Impersonation:</strong> Do not impersonate other players, moderators, developers, or public figures</li>
-          <li><strong>Intellectual Property:</strong> Do not infringe on copyrights, trademarks, or other intellectual property rights</li>
-          <li><strong>Illegal Activities:</strong> Do not use the platform for any illegal activities or purposes</li>
+          <li><strong>{{ $t('legal.s8.ageLabel') }}</strong> {{ $t('legal.s8.ageDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.impersonationLabel') }}</strong> {{ $t('legal.s8.impersonationDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.ipLabel') }}</strong> {{ $t('legal.s8.ipDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.illegalLabel') }}</strong> {{ $t('legal.s8.illegalDesc') }}</li>
         </ul>
 
-        <h3>Reporting Violations</h3>
+        <h3>{{ $t('legal.s8.reportingTitle') }}</h3>
         <p>
-          If you witness or experience violations of this code of conduct, please report them
-          immediately through our <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer" class="discord-link">Discord server</a>.
-          Include relevant details such as usernames, timestamps, and screenshots when possible.
+          {{ $t('legal.s8.reportingIntro') }}
+          <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer" class="discord-link">{{ $t('legal.s3.discordServerLink') }}</a>.
+          {{ $t('legal.s8.reportingSuffix') }}
         </p>
 
-        <h3>Consequences of Violations</h3>
-        <p>
-          Violations of these terms may result in disciplinary actions, including but not limited to:
-        </p>
+        <h3>{{ $t('legal.s8.consequencesTitle') }}</h3>
+        <p>{{ $t('legal.s8.consequencesIntro') }}</p>
         <ul>
-          <li><strong>Warning:</strong> First-time minor infractions may result in an official warning</li>
-          <li><strong>Temporary Suspension:</strong> Repeated or moderate violations may lead to temporary account suspension (7-30 days)</li>
-          <li><strong>Permanent Ban:</strong> Severe or repeated violations will result in permanent account termination without refund or appeal</li>
-          <li><strong>Legal Action:</strong> In cases of illegal activities, hacking, or severe misconduct, we reserve the right to pursue legal action</li>
+          <li><strong>{{ $t('legal.s8.warningLabel') }}</strong> {{ $t('legal.s8.warningDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.suspensionLabel') }}</strong> {{ $t('legal.s8.suspensionDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.banLabel') }}</strong> {{ $t('legal.s8.banDesc') }}</li>
+          <li><strong>{{ $t('legal.s8.legalActionLabel') }}</strong> {{ $t('legal.s8.legalActionDesc') }}</li>
         </ul>
 
-        <p>
-          The severity of disciplinary action is determined at our sole discretion based on the
-          nature and frequency of violations. We reserve the right to terminate any account without
-          prior notice if we believe it threatens the safety, security, or integrity of the game
-          or its community.
-        </p>
+        <p>{{ $t('legal.s8.closing') }}</p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>9. Modifications to Terms</h2>
+      <h2>{{ $t('legal.s9.title') }}</h2>
       <div class="legal-content">
-        <p>
-          We reserve the right to modify these terms at any time. Changes will be posted on this page
-          with an updated date. Continued use of the game after modifications constitutes acceptance
-          of the new terms.
-        </p>
+        <p>{{ $t('legal.s9.p1') }}</p>
       </div>
     </section>
 
     <section class="legal-section">
-      <h2>10. Applicable Law</h2>
+      <h2>{{ $t('legal.s10.title') }}</h2>
       <div class="legal-content">
-        <p>
-          These legal notices are governed by French law. In case of dispute, and failing an amicable
-          agreement, French courts will have sole jurisdiction.
-        </p>
-        <p><strong>Last Updated:</strong> {{ SITE_INFO.lastUpdated }}</p>
+        <p>{{ $t('legal.s10.p1') }}</p>
+        <p><strong>{{ $t('legal.s10.lastUpdatedLabel') }}</strong> {{ SITE_INFO.lastUpdated }}</p>
       </div>
     </section>
 
     <div class="legal-footer">
       <NuxtLink to="/" class="back-link">
-        <span class="back-button">Back to Home</span>
+        <span class="back-button">{{ $t('legal.backToHome') }}</span>
       </NuxtLink>
     </div>
   </div>
