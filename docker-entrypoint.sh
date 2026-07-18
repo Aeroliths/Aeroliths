@@ -11,10 +11,10 @@ until pg_isready -h postgres -p 5432 -U "${POSTGRES_USER:-postgres}" 2>/dev/null
 done
 echo "[Setup] PostgreSQL ready"
 
-# -- Prisma schema push (creates/updates tables) -------------------
-echo "[Setup] Pushing Prisma schema to database..."
-npx prisma db push 2>&1
-echo "[Setup] Schema push done"
+# -- Prisma migrations (creates/updates tables) ---------------------
+echo "[Setup] Applying Prisma migrations to database..."
+npx prisma migrate deploy 2>&1
+echo "[Setup] Migrations done"
 
 # -- Seed (uses upsert - safe to run on existing data) -------------
 echo "[Setup] Running seed..."
