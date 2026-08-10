@@ -49,11 +49,12 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const localePath = useLocalePath()
 const { data } = await useFetch('/api/auth/oauth/pending')
 
 // No onboarding session in progress -> send the user back to login
 if (!data.value?.pending) {
-  await navigateTo('/login')
+  await navigateTo(localePath('/login'))
 }
 
 const pendingEmail = computed(() => data.value?.email ?? '')
@@ -82,7 +83,7 @@ const handleSubmit = async () => {
       body: { username: username.value.trim() },
       credentials: 'include',
     })
-    await navigateTo('/play')
+    await navigateTo(localePath('/play'))
   } catch (error: any) {
     errorMessage.value = error.data?.message || error.message || t('auth.chooseUsername.genericError')
   } finally {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { generateTestToken, createTestAdmin, createTestUser } from '../../../utils/auth'
 
 // Mock the auth utilities
@@ -498,6 +498,76 @@ describe('GET /api/admin/users', () => {
       expect(result[0].role).toBeDefined()
       expect(result[0].role.id).toBe('role-user')
       expect(result[0].role.name).toBe('user')
+    })
+  })
+
+  // Unlike the blocks above, this one runs the real route handler. tests/setup.ts
+  // stubs defineEventHandler as identity and exposes db / getAuthUser /
+  // requireRole as globals, which is all the handler needs.
+  describe('OAuth accounts (real handler)', () => {
+    let handler: any
+    let findMany: any
+    let previousUserDelegate: any
+    let previousGetAuthUser: any
+    let previousRequireRole: any
+
+    beforeEach(async () => {
+      findMany = vi.fn().mockResolvedValue([])
+      previousUserDelegate = (globalThis as any).db.postgres.user
+      previousGetAuthUser = (globalThis as any).getAuthUser
+      previousRequireRole = (globalThis as any).requireRole
+      ;(globalThis as any).db.postgres.user = { findMany }
+      ;(globalThis as any).getAuthUser = vi.fn().mockReturnValue(createTestAdmin())
+      ;(globalThis as any).requireRole = vi.fn()
+
+      handler = (await import('~/server/api/admin/users/index.get')).default
+    })
+
+    // The whole suite runs in a single fork (see vitest.config.ts), so these
+    // globals are shared with every other test file. Put them back.
+    afterEach(() => {
+      ;(globalThis as any).db.postgres.user = previousUserDelegate
+      ;(globalThis as any).getAuthUser = previousGetAuthUser
+      ;(globalThis as any).requireRole = previousRequireRole
+    })
+
+    it('asks Prisma for the linked OAuth providers', async () => {
+      await handler({} as any)
+
+      expect(findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          select: expect.objectContaining({
+            oauthAccounts: { select: { provider: true } },
+          }),
+        })
+      )
+    })
+
+    it('returns the linked providers for each user', async () => {
+      findMany.mockResolvedValue([
+        {
+          id: 'user-1',
+          username: 'linked',
+          email: 'linked@test.com',
+          role: { id: 'role-user', name: 'user' },
+          collections: [],
+          oauthAccounts: [{ provider: 'discord' }],
+        },
+        {
+          id: 'user-2',
+          username: 'unlinked',
+          email: 'unlinked@test.com',
+          role: { id: 'role-user', name: 'user' },
+          collections: [],
+          oauthAccounts: [],
+        },
+      ])
+
+      const response: any = await handler({} as any)
+
+      expect(response.success).toBe(true)
+      expect(response.data.users[0].oauthAccounts).toEqual([{ provider: 'discord' }])
+      expect(response.data.users[1].oauthAccounts).toEqual([])
     })
   })
 })

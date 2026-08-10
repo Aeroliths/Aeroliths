@@ -2,9 +2,9 @@
   <article class="news-article" v-if="news">
     <!-- Back nav row, sits above the hero -->
     <div class="news-article__nav">
-      <NuxtLink to="/news" class="news-article__back">
+      <NuxtLinkLocale to="/news" class="news-article__back">
         <span aria-hidden="true">←</span> {{ $t('news.backToAll') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Hero: cover with title overlay, or solid hero when no cover -->

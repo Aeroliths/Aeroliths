@@ -11,14 +11,14 @@
       <div v-else-if="status === 'success'" class="verify-email-card success">
         <h1>{{ $t('auth.verifyEmail.successTitle') }}</h1>
         <p>{{ message }}</p>
-        <NuxtLink to="/login" class="verify-link">{{ $t('auth.verifyEmail.goToLogin') }}</NuxtLink>
+        <NuxtLinkLocale to="/login" class="verify-link">{{ $t('auth.verifyEmail.goToLogin') }}</NuxtLinkLocale>
       </div>
 
       <!-- Error -->
       <div v-else class="verify-email-card error">
         <h1>{{ $t('auth.verifyEmail.failedTitle') }}</h1>
         <p>{{ message }}</p>
-        <NuxtLink to="/register" class="verify-link">{{ $t('auth.verifyEmail.backToRegister') }}</NuxtLink>
+        <NuxtLinkLocale to="/register" class="verify-link">{{ $t('auth.verifyEmail.backToRegister') }}</NuxtLinkLocale>
       </div>
     </div>
   </div>

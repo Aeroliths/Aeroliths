@@ -30,6 +30,6 @@ export default defineOAuthDiscordEventHandler({
   },
   onError(event, error) {
     console.error('Discord OAuth error:', error.message)
-    return sendRedirect(event, '/login?error=oauth_failed')
+    return localeRedirect(event, '/login?error=oauth_failed')
   },
 })

@@ -23,6 +23,9 @@ export default defineEventHandler(async (event) => {
             name: true,
           },
         },
+        oauthAccounts: {
+          select: { provider: true },
+        },
         collections: {
           select: {
             id: true,

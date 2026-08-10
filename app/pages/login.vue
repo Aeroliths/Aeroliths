@@ -62,11 +62,11 @@
 
         <div class="login-footer">
           <p>
-            <NuxtLink to="/forgot-password">{{ $t('auth.login.forgotPassword') }}</NuxtLink>
+            <NuxtLinkLocale to="/forgot-password">{{ $t('auth.login.forgotPassword') }}</NuxtLinkLocale>
           </p>
           <p>
             {{ $t('auth.login.noAccount') }}
-            <NuxtLink to="/register">{{ $t('auth.login.registerHere') }}</NuxtLink>
+            <NuxtLinkLocale to="/register">{{ $t('auth.login.registerHere') }}</NuxtLinkLocale>
           </p>
         </div>
       </div>
@@ -86,6 +86,7 @@ definePageMeta({
 const { login, resendVerification, isLoading } = useAuth()
 const route = useRoute()
 const { t } = useI18n()
+const localePath = useLocalePath()
 
 const oauthErrorMessages: Record<string, string> = {
   oauth_email_unverified: t('auth.login.discordEmailNotVerified'),
@@ -127,7 +128,7 @@ const handleLogin = async () => {
   const result = await login({ ...credentials.value, captchaToken: captchaToken.value })
 
   if (result.success) {
-    navigateTo('/play')
+    navigateTo(localePath('/play'))
   } else if (result.code === 'EMAIL_NOT_VERIFIED') {
     errorMessage.value = result.error || t('auth.login.verifyBeforeLogin')
     showResendOption.value = true

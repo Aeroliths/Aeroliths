@@ -45,7 +45,7 @@
         <div v-else class="reset-success">
           <p>{{ $t('auth.resetPassword.successTitle') }}</p>
           <p>{{ $t('auth.resetPassword.successDesc') }}</p>
-          <NuxtLink to="/login" class="reset-login-link">{{ $t('auth.resetPassword.goToLogin') }}</NuxtLink>
+          <NuxtLinkLocale to="/login" class="reset-login-link">{{ $t('auth.resetPassword.goToLogin') }}</NuxtLinkLocale>
         </div>
       </div>
     </div>
@@ -60,6 +60,7 @@ definePageMeta({
 
 const route = useRoute()
 const { t } = useI18n()
+const localePath = useLocalePath()
 
 const password = ref('')
 const confirmPassword = ref('')
@@ -71,7 +72,7 @@ const token = route.query.token as string
 const email = route.query.email as string
 
 if (!token || !email) {
-  navigateTo('/forgot-password')
+  navigateTo(localePath('/forgot-password'))
 }
 
 const handleReset = async () => {

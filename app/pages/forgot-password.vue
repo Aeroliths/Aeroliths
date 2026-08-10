@@ -38,7 +38,7 @@
         <div class="login-footer">
           <p>
             {{ $t('auth.forgotPassword.rememberPassword') }}
-            <NuxtLink to="/login">{{ $t('auth.forgotPassword.backToLogin') }}</NuxtLink>
+            <NuxtLinkLocale to="/login">{{ $t('auth.forgotPassword.backToLogin') }}</NuxtLinkLocale>
           </p>
         </div>
       </div>

@@ -134,13 +134,17 @@ export const useAuth = () => {
 
   // Logout function
   const logout = async () => {
+    // useAuth is also called from route middleware, so resolve the injection
+    // rather than useLocalePath() - and do it before the first await, while the
+    // Nuxt instance context is still guaranteed.
+    const { $localePath } = useNuxtApp()
     try {
       await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
     } catch {
       // Proceed even if the request fails
     }
     user.value = null
-    navigateTo('/login')
+    navigateTo($localePath('/login'))
   }
 
   // Check if user has a specific role

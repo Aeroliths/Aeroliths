@@ -278,9 +278,9 @@
     </section>
 
     <div class="legal-footer">
-      <NuxtLink to="/" class="back-link">
+      <NuxtLinkLocale to="/" class="back-link">
         <span class="back-button">{{ $t('legal.backToHome') }}</span>
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
   </div>
 </template>

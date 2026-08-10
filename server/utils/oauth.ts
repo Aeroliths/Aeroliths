@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import type { H3Event } from 'h3'
+import { localizePath, resolveRequestLocale } from './locale'
 
 export type OAuthProvider = 'discord'
 
@@ -61,6 +62,15 @@ export function clearOAuthPending(event: H3Event) {
 }
 
 /**
+ * sendRedirect that preserves the visitor's chosen language. Reads the same
+ * cookie @nuxtjs/i18n writes, so an OAuth round-trip lands on /fr/... for a
+ * French visitor instead of dropping them back into English.
+ */
+export function localeRedirect(event: H3Event, path: string) {
+  return sendRedirect(event, localizePath(path, resolveRequestLocale(event)))
+}
+
+/**
  * Core OAuth sign-in logic shared by every provider route.
  * Decides between: returning user, auto-link by verified email, or new-account onboarding.
  * Always ends with a redirect.
@@ -68,7 +78,7 @@ export function clearOAuthPending(event: H3Event) {
 export async function handleOAuthLogin(event: H3Event, profile: NormalizedOAuthProfile) {
   // Only trust providers that confirm the email is verified (account-takeover guard)
   if (!profile.email || !profile.emailVerified) {
-    return sendRedirect(event, '/login?error=oauth_email_unverified')
+    return localeRedirect(event, '/login?error=oauth_email_unverified')
   }
 
   const email = profile.email.toLowerCase()
@@ -97,7 +107,7 @@ export async function handleOAuthLogin(event: H3Event, profile: NormalizedOAuthP
       role: { name: u.role.name },
       tokenVersion: u.authentication?.tokenVersion,
     })
-    return sendRedirect(event, '/play')
+    return localeRedirect(event, '/play')
   }
 
   // 2. Existing account with the same verified email -> link
@@ -128,7 +138,7 @@ export async function handleOAuthLogin(event: H3Event, profile: NormalizedOAuthP
       role: { name: userByEmail.role.name },
       tokenVersion: userByEmail.authentication?.tokenVersion,
     })
-    return sendRedirect(event, '/play')
+    return localeRedirect(event, '/play')
   }
 
   // 3. Brand-new user -> let them pick a username before the account is created
@@ -139,5 +149,5 @@ export async function handleOAuthLogin(event: H3Event, profile: NormalizedOAuthP
     displayName: profile.displayName,
     avatarUrl: profile.avatarUrl,
   })
-  return sendRedirect(event, '/choose-username')
+  return localeRedirect(event, '/choose-username')
 }

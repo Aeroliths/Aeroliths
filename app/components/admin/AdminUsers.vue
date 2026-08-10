@@ -25,6 +25,7 @@
             <th>Username</th>
             <th>Email</th>
             <th>Verified</th>
+            <th>Discord</th>
             <th>Role</th>
             <th>Created</th>
             <th>Actions</th>
@@ -37,6 +38,11 @@
             <td>
               <span :class="['verified-badge', userItem.emailVerified ? 'verified' : 'unverified']">
                 {{ userItem.emailVerified ? '✓ Verified' : '✗ Unverified' }}
+              </span>
+            </td>
+            <td>
+              <span :class="['oauth-badge', hasDiscord(userItem) ? 'linked' : 'unlinked']">
+                {{ hasDiscord(userItem) ? '✓ Linked' : '— Not linked' }}
               </span>
             </td>
             <td>
@@ -363,6 +369,11 @@ const deleteUser = (userItem: any) => {
   )
 }
 
+// Reads the provider list rather than a boolean flag, so a second OAuth
+// provider is a one-line addition here.
+const hasDiscord = (userItem: any) =>
+  userItem.oauthAccounts?.some((account: any) => account.provider === 'discord') ?? false
+
 const formatDate = (date: string) => new Date(date).toLocaleDateString()
 
 onMounted(async () => {
@@ -387,5 +398,24 @@ onMounted(async () => {
 .verified-badge.unverified {
   background: rgba(239, 68, 68, 0.15);
   color: #dc2626;
+}
+
+.oauth-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* Discord brand blue when linked. Not linked is a neutral state, not a
+   failure - grey, unlike the red used for an unverified email. */
+.oauth-badge.linked {
+  background: rgba(88, 101, 242, 0.15);
+  color: #5865f2;
+}
+.oauth-badge.unlinked {
+  background: rgba(148, 163, 184, 0.15);
+  color: #64748b;
 }
 </style>

@@ -75,6 +75,36 @@
   flex-wrap: wrap;
 }
 
+/* Standing "project unfinished" advisory. Amber so it separates from the
+   brand-blue .hero-tag above it. Delete this block, its markup in
+   HomeHero.vue and the home.hero.wip keys once the project ships. */
+.hero-wip {
+  max-width: 34rem;
+  margin: var(--spacing-2xl) auto 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-warning-bg);
+  text-align: left;
+}
+
+.hero-wip__title {
+  display: block;
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-warning);
+  margin-bottom: var(--spacing-xs);
+}
+
+.hero-wip__desc {
+  margin: 0;
+  font-size: var(--font-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
+}
+
 /* =========================================
    BUTTONS
    ========================================= */

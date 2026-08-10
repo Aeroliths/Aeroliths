@@ -5,7 +5,11 @@
       "tagline": "Jouez. Conquérez. Dominez.",
       "desc": "Un jeu de stratégie créé par des fans, inspiré de Skylanders Skystones.",
       "playNow": "Jouer maintenant",
-      "rules": "Règles"
+      "rules": "Règles",
+      "wip": {
+        "title": "Projet en cours de développement",
+        "desc": "Aeroliths est encore en développement actif. Certaines fonctionnalités sont incomplètes ou peuvent évoluer."
+      }
     },
     "features": {
       "fastMatches": { "title": "Parties rapides", "desc": "Des parties rapides sur un plateau 3x3. Chaque coup compte." },

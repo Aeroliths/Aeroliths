@@ -14,7 +14,7 @@
       <div v-else-if="items.length === 0" class="news-state">{{ $t('news.empty') }}</div>
 
       <div v-else class="news-grid">
-        <NuxtLink
+        <NuxtLinkLocale
           v-for="item in items"
           :key="item.id"
           :to="`/news/${item.slug}`"
@@ -30,7 +30,7 @@
             <p v-if="item.excerpt" class="news-card__excerpt">{{ item.excerpt }}</p>
             <span class="news-card__cta">{{ $t('news.readMore') }}</span>
           </div>
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </section>
   </div>

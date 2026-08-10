@@ -22,7 +22,7 @@
         <div class="register-footer">
           <p>
             {{ $t('auth.register.alreadyVerified') }}
-            <NuxtLink to="/login">{{ $t('auth.register.loginHere') }}</NuxtLink>
+            <NuxtLinkLocale to="/login">{{ $t('auth.register.loginHere') }}</NuxtLinkLocale>
           </p>
         </div>
       </div>
@@ -102,7 +102,7 @@
         <div class="register-footer">
           <p>
             {{ $t('auth.register.alreadyHaveAccount') }}
-            <NuxtLink to="/login">{{ $t('auth.register.loginHere2') }}</NuxtLink>
+            <NuxtLinkLocale to="/login">{{ $t('auth.register.loginHere2') }}</NuxtLinkLocale>
           </p>
         </div>
       </div>

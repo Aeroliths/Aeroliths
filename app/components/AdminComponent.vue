@@ -5,7 +5,7 @@
     <div v-if="!isAdmin" class="unauthorized">
       <h1>Access Denied</h1>
       <p>You do not have permission to access this page.</p>
-      <button @click="navigateTo('/')">Go Home</button>
+      <button @click="navigateTo($localePath('/'))">Go Home</button>
     </div>
 
     <!-- Admin Panel -->

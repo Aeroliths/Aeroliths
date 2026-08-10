@@ -4,7 +4,7 @@
     <div class="footer-container">
       <div class="footer-content">
         <div class="footer-info">
-          <NuxtLink href="/" class="footer-brand" aria-label="Aeroliths home">Aeroliths</NuxtLink>
+          <NuxtLinkLocale to="/" class="footer-brand" aria-label="Aeroliths home">Aeroliths</NuxtLinkLocale>
           <p class="footer-desc">{{ SITE_INFO.description }}</p>
           <div class="footer-counters">
             <div class="footer-counter">
@@ -29,14 +29,14 @@
         <div class="footer-groups">
           <div class="footer-group">
             <span class="footer-group-label">{{ $t('footer.community') }}</span>
-            <NuxtLink href="/friends">{{ $t('nav.friends') }}</NuxtLink>
-            <NuxtLink href="/leaderboard">{{ $t('nav.leaderboard') }}</NuxtLink>
+            <NuxtLinkLocale to="/friends">{{ $t('nav.friends') }}</NuxtLinkLocale>
+            <NuxtLinkLocale to="/leaderboard">{{ $t('nav.leaderboard') }}</NuxtLinkLocale>
             <a :href="SITE_INFO.discord.url" target="_blank" rel="noopener noreferrer">{{ $t('footer.discord') }}</a>
           </div>
           <div class="footer-group">
             <span class="footer-group-label">{{ $t('footer.about') }}</span>
-            <NuxtLink href="/legal">{{ $t('footer.legal') }}</NuxtLink>
-            <NuxtLink href="/rules">{{ $t('nav.rules') }}</NuxtLink>
+            <NuxtLinkLocale to="/legal">{{ $t('footer.legal') }}</NuxtLinkLocale>
+            <NuxtLinkLocale to="/rules">{{ $t('nav.rules') }}</NuxtLinkLocale>
             <a :href="`mailto:${SITE_INFO.support.email}`">{{ $t('footer.contact') }}</a>
           </div>
         </div>

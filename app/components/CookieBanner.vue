@@ -5,7 +5,7 @@
         <h4 class="cookie-banner-title">{{ $t('cookieBanner.title') }}</h4>
         <p>
           {{ $t('cookieBanner.textBefore') }}
-          <NuxtLink href="/legal" class="cookie-link" @click="dismiss">{{ $t('cookieBanner.legalPageLink') }}</NuxtLink>.
+          <NuxtLinkLocale to="/legal" class="cookie-link" @click="dismiss">{{ $t('cookieBanner.legalPageLink') }}</NuxtLinkLocale>.
         </p>
         <div class="cookie-banner-actions">
           <button class="cookie-accept-btn" @click="dismiss">{{ $t('cookieBanner.accept') }}</button>

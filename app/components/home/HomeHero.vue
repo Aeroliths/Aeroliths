@@ -10,12 +10,16 @@
         {{ $t('home.hero.desc') }}
       </p>
       <div class="hero-buttons">
-        <NuxtLink to="/play" class="btn btn--primary">
+        <NuxtLinkLocale to="/play" class="btn btn--primary">
           {{ $t('home.hero.playNow') }}
-        </NuxtLink>
-        <NuxtLink to="/rules" class="btn btn--ghost">
+        </NuxtLinkLocale>
+        <NuxtLinkLocale to="/rules" class="btn btn--ghost">
           {{ $t('home.hero.rules') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
+      </div>
+      <div class="hero-wip" role="note">
+        <span class="hero-wip__title">{{ $t('home.hero.wip.title') }}</span>
+        <p class="hero-wip__desc">{{ $t('home.hero.wip.desc') }}</p>
       </div>
     </div>
   </section>

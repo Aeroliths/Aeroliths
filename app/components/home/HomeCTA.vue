@@ -3,9 +3,9 @@
     <h2 class="cta-title">{{ $t('home.cta.title') }}</h2>
     <p class="cta-desc">{{ $t('home.cta.desc') }}</p>
     <div class="cta-buttons">
-      <NuxtLink to="/register" class="btn btn--primary btn--lg">
+      <NuxtLinkLocale to="/register" class="btn btn--primary btn--lg">
         {{ $t('home.cta.getStarted') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
       <a
         :href="SITE_INFO.discord.url"
         target="_blank"
