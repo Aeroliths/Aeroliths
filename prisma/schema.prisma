@@ -177,6 +177,24 @@ model Elements {
   @@map("elements")
 }
 
+model MediaAsset {
+  id        String   @id @default(cuid())
+  category  String // "lithos" | "elements"
+  path      String   @unique // "/app/uploads/lithos/lithos-123-abc.png"
+  label     String
+  hash      String // SHA-256 of the file contents
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Scoped per category: the two libraries are separate, so the same file may
+  // legitimately exist in both and deduplication applies within one library.
+  @@unique([category, hash])
+  @@index([category, createdAt])
+  @@map("media_assets")
+}
+
 model WeaknessElements {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
