@@ -61,20 +61,12 @@
           <input id="lithos-name" v-model="lithosForm.name" type="text" required />
         </div>
         <div class="form-group">
-          <label for="lithos-sprite">Sprite Image</label>
-          <input
-            id="lithos-sprite"
-            type="file"
-            accept="image/*"
-            @change="handleSpriteUpload"
-            :required="!lithosForm.sprite"
-            style="display: block; width: 100%; padding: 8px; margin-top: 4px;"
+          <label>Sprite Image</label>
+          <MediaPicker
+            v-model="lithosForm.mediaId"
+            category="lithos"
+            :initial-path="lithosForm.sprite"
           />
-          <div v-if="uploadingSprite" class="upload-loading">Uploading image...</div>
-          <div v-if="lithosForm.sprite" class="sprite-preview">
-            <img :src="lithosForm.sprite" alt="Sprite preview" />
-            <button type="button" @click="removeSprite" class="btn-remove-sprite">Remove</button>
-          </div>
         </div>
         <div class="form-group">
           <label for="lithos-element">Element (Optional)</label>
@@ -216,11 +208,9 @@ const confirmAction = async () => {
 // Lithos modal
 const showLithosModal = ref(false)
 const lithosForm = ref({
-  id: '', name: '', sprite: '', rarity: 'common', elementId: '',
+  id: '', name: '', sprite: '', mediaId: '', rarity: 'common', elementId: '',
   spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0,
 })
-const selectedFile = ref<File | null>(null)
-const uploadingSprite = ref(false)
 const modalLoading = ref(false)
 const modalError = ref('')
 
@@ -244,31 +234,8 @@ const fetchElements = async () => {
   } catch {}
 }
 
-const handleSpriteUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-
-  modalError.value = ''
-  selectedFile.value = file
-
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    lithosForm.value.sprite = e.target?.result as string
-  }
-  reader.readAsDataURL(file)
-}
-
-const removeSprite = () => {
-  lithosForm.value.sprite = ''
-  selectedFile.value = null
-  const fileInput = document.getElementById('lithos-sprite') as HTMLInputElement
-  if (fileInput) fileInput.value = ''
-}
-
 const openCreateLithosModal = () => {
-  lithosForm.value = { id: '', name: '', sprite: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0 }
-  selectedFile.value = null
+  lithosForm.value = { id: '', name: '', sprite: '', mediaId: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0 }
   modalError.value = ''
   showLithosModal.value = true
 }
@@ -277,7 +244,9 @@ const openEditLithosModal = (lithos: any) => {
   lithosForm.value = {
     id: lithos.id,
     name: lithos.name,
+    // sprite feeds the picker's initial-path so it can preselect the matching asset
     sprite: lithos.sprite,
+    mediaId: '',
     rarity: lithos.rarity || 'common',
     elementId: lithos.elementId || '',
     spikeUp: lithos.spikeUp,
@@ -285,27 +254,30 @@ const openEditLithosModal = (lithos: any) => {
     spikeDown: lithos.spikeDown,
     spikeLeft: lithos.spikeLeft,
   }
-  selectedFile.value = null
   modalError.value = ''
   showLithosModal.value = true
 }
 
 const closeLithosModal = () => {
   showLithosModal.value = false
-  lithosForm.value = { id: '', name: '', sprite: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0 }
-  selectedFile.value = null
+  lithosForm.value = { id: '', name: '', sprite: '', mediaId: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0 }
   modalError.value = ''
 }
 
 const saveLithos = async () => {
+  // The picker replaced the required file input, so the check lives here now
+  if (!lithosForm.value.mediaId) {
+    modalError.value = 'Please select or upload a sprite image'
+    return
+  }
+
   modalLoading.value = true
   modalError.value = ''
 
   try {
     const bodyData: any = {
       name: lithosForm.value.name,
-      sprite: lithosForm.value.sprite,
-      folder: 'lithos',
+      mediaId: lithosForm.value.mediaId,
       rarity: lithosForm.value.rarity,
       spikeUp: lithosForm.value.spikeUp,
       spikeRight: lithosForm.value.spikeRight,

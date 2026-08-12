@@ -62,20 +62,12 @@
           <input id="element-name" v-model="elementForm.name" type="text" required />
         </div>
         <div class="form-group">
-          <label for="element-sprite">Sprite Image</label>
-          <input
-            id="element-sprite"
-            type="file"
-            accept="image/*"
-            @change="handleElementSpriteUpload"
-            :required="!elementForm.sprite"
-            style="display: block; width: 100%; padding: 8px; margin-top: 4px;"
+          <label>Sprite Image</label>
+          <MediaPicker
+            v-model="elementForm.mediaId"
+            category="elements"
+            :initial-path="elementForm.sprite"
           />
-          <div v-if="uploadingElementSprite" class="upload-loading">Uploading image...</div>
-          <div v-if="elementForm.sprite" class="sprite-preview">
-            <img :src="elementForm.sprite" alt="Sprite preview" />
-            <button type="button" @click="removeElementSprite" class="btn-remove-sprite">Remove</button>
-          </div>
         </div>
         <div class="form-group" v-if="!elementForm.id">
           <label for="element-weaknesses">Weaknesses (Optional)</label>
@@ -268,8 +260,7 @@ const confirmAction = async () => {
 
 // Element modal
 const showElementModal = ref(false)
-const elementForm = ref({ id: '', name: '', sprite: '', folder: 'elements', weaknesses: [] as string[], strengths: [] as string[] })
-const uploadingElementSprite = ref(false)
+const elementForm = ref({ id: '', name: '', sprite: '', mediaId: '', weaknesses: [] as string[], strengths: [] as string[] })
 const modalLoading = ref(false)
 const modalError = ref('')
 
@@ -297,45 +288,32 @@ const fetchElements = async () => {
   }
 }
 
-const handleElementSpriteUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-
-  modalError.value = ''
-
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    elementForm.value.sprite = e.target?.result as string
-  }
-  reader.readAsDataURL(file)
-}
-
-const removeElementSprite = () => {
-  elementForm.value.sprite = ''
-  const fileInput = document.getElementById('element-sprite') as HTMLInputElement
-  if (fileInput) fileInput.value = ''
-}
-
 const openCreateElementModal = () => {
-  elementForm.value = { id: '', name: '', sprite: '', weaknesses: [], strengths: [] }
+  elementForm.value = { id: '', name: '', sprite: '', mediaId: '', weaknesses: [], strengths: [] }
   modalError.value = ''
   showElementModal.value = true
 }
 
 const openEditElementModal = (element: any) => {
-  elementForm.value = { id: element.id, name: element.name, sprite: element.sprite, weaknesses: [], strengths: [] }
+  // sprite feeds the picker's initial-path so it can preselect the matching asset
+  elementForm.value = { id: element.id, name: element.name, sprite: element.sprite, mediaId: '', weaknesses: [], strengths: [] }
   modalError.value = ''
   showElementModal.value = true
 }
 
 const closeElementModal = () => {
   showElementModal.value = false
-  elementForm.value = { id: '', name: '', sprite: '', weaknesses: [], strengths: [] }
+  elementForm.value = { id: '', name: '', sprite: '', mediaId: '', weaknesses: [], strengths: [] }
   modalError.value = ''
 }
 
 const saveElement = async () => {
+  // The picker replaced the required file input, so the check lives here now
+  if (!elementForm.value.mediaId) {
+    modalError.value = 'Please select or upload a sprite image'
+    return
+  }
+
   modalLoading.value = true
   modalError.value = ''
 
@@ -343,15 +321,13 @@ const saveElement = async () => {
     if (elementForm.value.id) {
       await $fetch(`/api/admin/elements/${elementForm.value.id}`, {
         method: 'PATCH',
-  
-        body: { name: elementForm.value.name, sprite: elementForm.value.sprite, folder: elementForm.value.folder },
+        body: { name: elementForm.value.name, mediaId: elementForm.value.mediaId },
       })
       elementsSuccess.value = 'Element updated successfully'
     } else {
       const response = await $fetch<any>('/api/admin/elements', {
         method: 'POST',
-  
-        body: { name: elementForm.value.name, sprite: elementForm.value.sprite, folder: elementForm.value.folder },
+        body: { name: elementForm.value.name, mediaId: elementForm.value.mediaId },
       })
 
       const newElementId = response.data.id
