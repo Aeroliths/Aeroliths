@@ -10,16 +10,18 @@ vi.mock('~/server/utils/db', () => ({
   },
 }))
 
-describe('ensureUniqueSlug', () => {
-  let ensureUniqueSlug: typeof import('~/server/utils/news-helpers').ensureUniqueSlug
-  let mockFindUnique: any
+// Imported statically on purpose. A first `await import()` inside a hook charges
+// the module's cold transform against the hook timeout, and news-helpers pulls
+// in isomorphic-dompurify, which does not fit in 10s when the whole suite runs
+// in a single fork.
+import { ensureUniqueSlug } from '~/server/utils/news-helpers'
+import db from '~/server/utils/db'
 
-  beforeEach(async () => {
+describe('ensureUniqueSlug', () => {
+  const mockFindUnique = db.postgres.news.findUnique as any
+
+  beforeEach(() => {
     vi.clearAllMocks()
-    const helpers = await import('~/server/utils/news-helpers')
-    ensureUniqueSlug = helpers.ensureUniqueSlug
-    const dbModule = await import('~/server/utils/db')
-    mockFindUnique = dbModule.default.postgres.news.findUnique as any
   })
 
   it('returns the base slug when it is free for that locale', async () => {

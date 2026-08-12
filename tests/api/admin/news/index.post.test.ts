@@ -25,6 +25,12 @@ vi.mock('~/server/utils/news-helpers', async () => {
   }
 })
 
+// Imported statically on purpose. A first `await import()` inside a test body
+// charges the module's cold transform against the test timeout, and news-helpers
+// pulls in isomorphic-dompurify through importActual, which does not fit in the
+// default budget when the whole suite runs in a single fork.
+import { ensureUniqueSlug } from '~/server/utils/news-helpers'
+
 describe('locale validation for news creation', () => {
   beforeEach(() => vi.clearAllMocks())
 
@@ -49,11 +55,10 @@ describe('locale validation for news creation', () => {
   })
 
   it('passes the resolved locale into ensureUniqueSlug', async () => {
-    const helpers = await import('~/server/utils/news-helpers')
-    const mockEnsureUniqueSlug = helpers.ensureUniqueSlug as any
+    const mockEnsureUniqueSlug = ensureUniqueSlug as any
     mockEnsureUniqueSlug.mockResolvedValue('patch-1-0')
     const result = await mockEnsureUniqueSlug('patch-1-0', 'fr')
     expect(mockEnsureUniqueSlug).toHaveBeenCalledWith('patch-1-0', 'fr')
     expect(result).toBe('patch-1-0')
-  }, 20000)
+  })
 })

@@ -12,7 +12,13 @@ declare global {
   // eslint-disable-next-line no-var
   var readBody: Mock
   // eslint-disable-next-line no-var
+  var getQuery: Mock
+  // eslint-disable-next-line no-var
   var getRouterParam: Mock
+  // eslint-disable-next-line no-var
+  var upload_image: Mock
+  // eslint-disable-next-line no-var
+  var delete_image: Mock
   // eslint-disable-next-line no-var
   var getAuthUser: Mock
   // eslint-disable-next-line no-var
