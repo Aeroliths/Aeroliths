@@ -1,10 +1,16 @@
 export default defineEventHandler(async (event) => {
-  let uploadedImagePath: string | undefined;
   try {
     const user = getAuthUser(event)
     requireRole(user, ['admin'])
 
     const body = await readBody(event)
+
+    if (!body) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Invalid request body',
+      })
+    }
 
     if (!body.name || typeof body.name !== 'string') {
       throw createError({
@@ -13,48 +19,44 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    if (!body) {
+    let sprite: string
+
+    if (body.mediaId) {
+      // Reuse an image already in the library.
+      const asset = await db.postgres.mediaAsset.findUnique({
+        where: { id: body.mediaId },
+      })
+
+      if (!asset) {
         throw createError({
-            statusCode: 400,
-            statusMessage: 'Invalid request body',
+          statusCode: 404,
+          statusMessage: 'Media asset not found',
         })
-    }
+      }
 
-    // Process the Base64 sprite string into a file object structure
-    let fileField: any = null
-    if (typeof body.sprite === 'string' && body.sprite.startsWith('data:image/')) {
-        const matches = body.sprite.match(/^data:(image\/\w+);base64,(.+)$/)
-        if (matches) {
-            fileField = {
-                filename: 'upload', // Dummy name; handle-upload-images generates its own
-                type: matches[1],
-                data: Buffer.from(matches[2], 'base64'),
-                DirName: body.folder || 'elements'
-            }
-        }
-    }
-
-    if (!fileField || !fileField.filename) {
+      if (asset.category !== 'elements') {
         throw createError({
-            statusCode: 400,
-            statusMessage: 'Invalid or missing sprite image',
+          statusCode: 400,
+          statusMessage: 'This image belongs to another library',
         })
-    }
+      }
 
-    // Validate file type
-    const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']
-    if (!ALLOWED_TYPES.includes(fileField.type || '')) {
-        throw createError({ statusCode: 415, statusMessage: 'Invalid file type.' })
+      sprite = asset.path
+    } else if (body.sprite) {
+      // Direct upload, also filed in the library so it can be reused later.
+      const { asset } = await registerMediaAsset('elements', body.sprite, user)
+      sprite = asset.path
+    } else {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Either mediaId or sprite is required',
+      })
     }
-
-    // Upload the image using the utility function
-    const spritePath = await upload_image(fileField, user)
-    uploadedImagePath = spritePath
 
     const element = await db.postgres.elements.create({
       data: {
         name: body.name,
-        sprite: uploadedImagePath,
+        sprite,
       },
     })
 

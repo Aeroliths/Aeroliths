@@ -22,14 +22,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Delete the associated sprite image
-    if (existing.sprite) {
-      try {
-        await delete_image(existing.sprite, user)
-      } catch (error: any) {
-        console.warn('Failed to delete sprite image:', existing.sprite, ' error:', error.message)
-      }
-    }
+    // The sprite is left in the media library so it can be reused. Images are
+    // only removed from DELETE /api/admin/media/:id.
 
     await db.postgres.elements.delete({
       where: { id },

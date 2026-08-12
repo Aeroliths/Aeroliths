@@ -36,32 +36,31 @@ export default defineEventHandler(async (event) => {
       updateData.name = body.name
     }
 
-    if (body.sprite !== undefined) {
-        if (typeof body.sprite === 'string' && body.sprite.startsWith('data:image/')) {
-            // Upload new image from Base64
-            const matches = body.sprite.match(/^data:(image\/\w+);base64,(.+)$/)
-            if (matches) {
-                const fileField = {
-                    filename: 'upload',
-                    type: matches[1],
-                    data: Buffer.from(matches[2], 'base64'),
-                    DirName: body.folder || 'elements'
-                }
-                updateData.sprite = await upload_image(fileField, user)
+    // The previous sprite is deliberately left on disk, it stays available in
+    // the media library.
+    if (body.mediaId !== undefined) {
+      const asset = await db.postgres.mediaAsset.findUnique({
+        where: { id: body.mediaId },
+      })
 
-                // Cleanup old sprite if it exists
-                console.log('Existing sprite path:', existing.sprite)
-                if (existing.sprite) {
-                    try { await delete_image(existing.sprite, user) } catch (error: any) {
-                        console.warn('Failed to delete old sprite:', existing.sprite, ' error:', error.message)
-                    }
-                }
-            } else {
-                throw createError({ statusCode: 400, statusMessage: 'Invalid image format' })
-            }
-        } else {
-            updateData.sprite = body.sprite
-        }
+      if (!asset) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Media asset not found',
+        })
+      }
+
+      if (asset.category !== 'elements') {
+        throw createError({
+          statusCode: 400,
+          statusMessage: 'This image belongs to another library',
+        })
+      }
+
+      updateData.sprite = asset.path
+    } else if (body.sprite !== undefined) {
+      const { asset } = await registerMediaAsset('elements', body.sprite, user)
+      updateData.sprite = asset.path
     }
 
     if (Object.keys(updateData).length === 0) {
