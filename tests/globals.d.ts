@@ -25,6 +25,12 @@ declare global {
   var requireRole: Mock
   // eslint-disable-next-line no-var
   var db: any
+  // eslint-disable-next-line no-var
+  var isMediaCategory: typeof import('../server/utils/media').isMediaCategory
+  // eslint-disable-next-line no-var
+  var countMediaUsage: typeof import('../server/utils/media').countMediaUsage
+  // eslint-disable-next-line no-var
+  var registerMediaAsset: typeof import('../server/utils/media').registerMediaAsset
 }
 
 export {}

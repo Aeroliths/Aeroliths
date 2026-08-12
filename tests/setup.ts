@@ -1,4 +1,9 @@
 import { vi } from 'vitest'
+import {
+  isMediaCategory,
+  countMediaUsage,
+  registerMediaAsset,
+} from '~/server/utils/media'
 
 // Mock environment variables
 process.env.JWT_SECRET = 'test-jwt-secret-key'
@@ -18,6 +23,13 @@ global.requireRole = vi.fn()
 // Mock the upload helpers (auto-imported by Nuxt)
 global.upload_image = vi.fn()
 global.delete_image = vi.fn()
+
+// Media helpers (auto-imported by Nuxt). The real implementations are exposed
+// rather than mocked: they run against the mocked db above, and the route tests
+// assert on their actual behaviour.
+global.isMediaCategory = isMediaCategory
+global.countMediaUsage = countMediaUsage
+global.registerMediaAsset = registerMediaAsset
 
 // Mock database (auto-imported by Nuxt)
 global.db = {
