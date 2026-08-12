@@ -29,14 +29,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Delete the associated sprite image
-    if (existingLithos.sprite) {
-      try {
-        await delete_image(existingLithos.sprite, user)
-      } catch (error: any) {
-        console.warn('Failed to delete sprite image:', existingLithos.sprite, ' error:', error.message)
-      }
-    }
+    // The sprite is left in the media library so it can be reused. Images are
+    // only removed from DELETE /api/admin/media/:id.
 
     // Delete the lithos (collections will be deleted by cascade)
     await db.postgres.lithos.delete({

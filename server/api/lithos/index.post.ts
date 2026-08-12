@@ -2,7 +2,6 @@ import { JWTPayload } from '~~/server/utils/auth';
 
 // API route to create a new lithos (admin only)
 export default defineEventHandler(async (event) => {
-    let uploadedImagePath: string | undefined;
     let user: JWTPayload | undefined;
     try {
         // Verify user is authenticated
@@ -21,36 +20,39 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        // Process the Base64 sprite string into a file object structure
-        let fileField: any = null
-        if (typeof form.sprite === 'string' && form.sprite.startsWith('data:image/')) {
-            const matches = form.sprite.match(/^data:(image\/\w+);base64,(.+)$/)
-            if (matches) {
-                fileField = {
-                    filename: 'upload', // Dummy name; handle-upload-images generates its own
-                    type: matches[1],
-                    data: Buffer.from(matches[2], 'base64'),
-                    DirName: form.folder || 'lithos'
-                }
-            }
-        }
+        let spritePath: string
 
-        if (!fileField || !fileField.filename) {
+        if (form.mediaId) {
+            // Reuse an image already in the library.
+            const asset = await db.postgres.mediaAsset.findUnique({
+                where: { id: form.mediaId }
+            })
+
+            if (!asset) {
+                throw createError({
+                    statusCode: 404,
+                    statusMessage: 'Media asset not found'
+                })
+            }
+
+            if (asset.category !== 'lithos') {
+                throw createError({
+                    statusCode: 400,
+                    statusMessage: 'This image belongs to another library'
+                })
+            }
+
+            spritePath = asset.path
+        } else if (form.sprite) {
+            // Direct upload, also filed in the library so it can be reused later.
+            const { asset } = await registerMediaAsset('lithos', form.sprite, user)
+            spritePath = asset.path
+        } else {
             throw createError({
                 statusCode: 400,
-                statusMessage: 'Invalid or missing sprite image',
+                statusMessage: 'Either mediaId or sprite is required'
             })
         }
-
-        // Validate file type
-        const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']
-        if (!ALLOWED_TYPES.includes(fileField.type || '')) {
-            throw createError({ statusCode: 415, statusMessage: 'Invalid file type.' })
-        }
-
-        // Upload the image using the utility function
-        const spritePath = await upload_image(fileField, user)
-        uploadedImagePath = spritePath
 
         // Validate required fields
         if (!form.name || !spritePath || !form.rarity) {
@@ -113,16 +115,15 @@ export default defineEventHandler(async (event) => {
             throw error
         }
 
-        console.error('Error creating lithos:', error)
-        
-        // If we have an uploaded image path, delete it
-        if (uploadedImagePath) {
-            try {
-                await delete_image(uploadedImagePath, user)
-            } catch (deleteError) {
-                console.error('Error deleting uploaded image:', deleteError)
-            }
+        // Re-throw known errors (400, 404, 415) instead of burying them in a 500
+        if (error.statusCode) {
+            throw error
         }
+
+        console.error('Error creating lithos:', error)
+
+        // An image uploaded before the failure stays in the library. Deleting
+        // the file here would leave its MediaAsset row pointing at nothing.
 
         throw createError({
             statusCode: 500,
