@@ -29,6 +29,9 @@
         </div>
         <h3>{{ lithos.name }}</h3>
         <p class="lithos-type">Rarity: {{ lithos.rarity }}</p>
+        <p v-if="lithos.isStarter" class="lithos-starter">
+          Starter pool: {{ lithos.starterQuantity }}x
+        </p>
         <p v-if="lithos.element" class="lithos-element">Element: {{ lithos.element.name }}</p>
         <div class="lithos-spikes">
           <span>⬆️ {{ lithos.spikeUp }}</span>
@@ -85,6 +88,22 @@
             <option value="epic">Epic</option>
             <option value="legendary">Legendary</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label for="lithos-starter">
+            <input id="lithos-starter" v-model="lithosForm.isStarter" type="checkbox" />
+            Part of the starter pool
+          </label>
+        </div>
+        <div v-if="lithosForm.isStarter" class="form-group">
+          <label for="lithos-starter-quantity">Starter quantity</label>
+          <input
+            id="lithos-starter-quantity"
+            v-model.number="lithosForm.starterQuantity"
+            type="number"
+            min="1"
+            required
+          />
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -210,6 +229,7 @@ const showLithosModal = ref(false)
 const lithosForm = ref({
   id: '', name: '', sprite: '', mediaId: '', rarity: 'common', elementId: '',
   spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0,
+  isStarter: false, starterQuantity: 1,
 })
 const modalLoading = ref(false)
 const modalError = ref('')
@@ -235,7 +255,7 @@ const fetchElements = async () => {
 }
 
 const openCreateLithosModal = () => {
-  lithosForm.value = { id: '', name: '', sprite: '', mediaId: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0 }
+  lithosForm.value = { id: '', name: '', sprite: '', mediaId: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0, isStarter: false, starterQuantity: 1 }
   modalError.value = ''
   showLithosModal.value = true
 }
@@ -253,6 +273,8 @@ const openEditLithosModal = (lithos: any) => {
     spikeRight: lithos.spikeRight,
     spikeDown: lithos.spikeDown,
     spikeLeft: lithos.spikeLeft,
+    isStarter: lithos.isStarter ?? false,
+    starterQuantity: lithos.starterQuantity ?? 1,
   }
   modalError.value = ''
   showLithosModal.value = true
@@ -260,7 +282,7 @@ const openEditLithosModal = (lithos: any) => {
 
 const closeLithosModal = () => {
   showLithosModal.value = false
-  lithosForm.value = { id: '', name: '', sprite: '', mediaId: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0 }
+  lithosForm.value = { id: '', name: '', sprite: '', mediaId: '', rarity: 'common', elementId: '', spikeUp: 0, spikeRight: 0, spikeDown: 0, spikeLeft: 0, isStarter: false, starterQuantity: 1 }
   modalError.value = ''
 }
 
@@ -283,6 +305,8 @@ const saveLithos = async () => {
       spikeRight: lithosForm.value.spikeRight,
       spikeDown: lithosForm.value.spikeDown,
       spikeLeft: lithosForm.value.spikeLeft,
+      isStarter: lithosForm.value.isStarter,
+      starterQuantity: lithosForm.value.isStarter ? lithosForm.value.starterQuantity : 1,
     }
 
     if (lithosForm.value.elementId) {

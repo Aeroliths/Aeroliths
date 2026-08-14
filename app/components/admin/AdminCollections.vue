@@ -6,6 +6,9 @@
       <button @click="openGiveAllModal" class="btn-create" :disabled="actionLoading">
         Give a Lithos to all users
       </button>
+      <button @click="confirmGiveStarterPool" class="btn-create" :disabled="actionLoading || starterPoolLoading">
+        {{ starterPoolLoading ? 'Giving...' : 'Give starter pool to players who never received it' }}
+      </button>
       <div class="search-bar">
         <input
           v-model="userSearchQuery"
@@ -324,6 +327,33 @@ const confirmGiveAll = () => {
       }
     },
     'Give to all'
+  )
+}
+
+const starterPoolLoading = ref(false)
+
+const confirmGiveStarterPool = () => {
+  openConfirmModal(
+    'Give the starter pool',
+    'Give the starter pool to every player who never received it? Players already served are skipped.',
+    async () => {
+      starterPoolLoading.value = true
+      giveAllError.value = ''
+      try {
+        const response = await $fetch<any>('/api/admin/collections/starter-pool', {
+          method: 'POST',
+        })
+        giveAllSuccess.value = response.message || 'Starter pool given successfully'
+        await fetchUsers()
+        setTimeout(() => { giveAllSuccess.value = '' }, 4000)
+      } catch (error: any) {
+        giveAllError.value = error.data?.statusMessage || 'Failed to give the starter pool'
+        throw error
+      } finally {
+        starterPoolLoading.value = false
+      }
+    },
+    'Give starter pool'
   )
 }
 

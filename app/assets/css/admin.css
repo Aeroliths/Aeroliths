@@ -455,6 +455,13 @@ tr:hover td {
   font-weight: var(--font-medium);
 }
 
+.lithos-starter {
+  margin: var(--spacing-xs) 0;
+  font-size: var(--font-sm);
+  color: var(--color-brand-primary);
+  font-weight: var(--font-medium);
+}
+
 .lithos-spikes {
   display: flex;
   justify-content: space-around;
