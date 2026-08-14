@@ -21,6 +21,8 @@ model User {
   resetTokenExpiresAt        DateTime?
   lastActiveAt               DateTime  @default(now())
   deletionRequestedAt        DateTime?
+  // Set once, the first time the player receives the starter pool.
+  starterPoolGrantedAt       DateTime?
   deletionReminderSent       Boolean   @default(false)
   warning6MonthsSent         Boolean   @default(false)
   warning2MonthsSent         Boolean   @default(false)
@@ -121,6 +123,10 @@ model Lithos {
   spikeUp    Int
   spikeDown  Int
   rarity     String
+  // Lithos handed out to every player through the starter pool.
+  // starterQuantity is only read when isStarter is true.
+  isStarter       Boolean @default(false)
+  starterQuantity Int     @default(1)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
