@@ -462,6 +462,32 @@ tr:hover td {
   font-weight: var(--font-medium);
 }
 
+.starter-summary {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.starter-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-sm);
+  margin: var(--spacing-xs) 0;
+  cursor: pointer;
+}
+
+.starter-qty {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-sm);
+}
+
+.lithos-card.starter-selected {
+  border-color: var(--color-brand-primary);
+}
+
 .lithos-spikes {
   display: flex;
   justify-content: space-around;

@@ -30,6 +30,9 @@
         <button :class="{ active: activeTab === 'collections' }" @click="activeTab = 'collections'">
           Collections Management
         </button>
+        <button :class="{ active: activeTab === 'starterPool' }" @click="activeTab = 'starterPool'">
+          Starter Pool
+        </button>
         <button :class="{ active: activeTab === 'news' }" @click="activeTab = 'news'">
           News
         </button>
@@ -46,6 +49,7 @@
       <AdminElements v-if="activeTab === 'elements'" />
       <AdminLithos v-if="activeTab === 'lithos'" />
       <AdminCollections v-if="activeTab === 'collections'" />
+      <AdminStarterPool v-if="activeTab === 'starterPool'" />
       <AdminNews v-if="activeTab === 'news'" />
       <AdminStats v-if="activeTab === 'stats'" />
     </div>
@@ -59,7 +63,7 @@ import { useAuth } from '~/composables/useAuth'
 const { user, initAuth } = useAuth()
 
 const isAdmin = computed(() => user.value?.role?.name === 'admin')
-const activeTab = ref<'users' | 'reports' | 'elements' | 'lithos' | 'collections' | 'news' | 'stats'>('users')
+const activeTab = ref<'users' | 'reports' | 'elements' | 'lithos' | 'collections' | 'starterPool' | 'news' | 'stats'>('users')
 const pendingReportsCount = ref(0)
 
 const fetchPendingReportsCount = async () => {
