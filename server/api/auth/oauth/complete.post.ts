@@ -129,6 +129,10 @@ export default defineEventHandler(async (event) => {
       include: { role: true },
     })
 
+    // Only this branch creates an account. The two branches above link a
+    // provider to an existing one, which is the admin backfill's job.
+    await grantStarterPoolSafely(user.id)
+
     return finishWithSession({ ...user, tokenVersion: 0 })
   } catch (error) {
     if (error && typeof error === 'object' && 'statusCode' in error) {

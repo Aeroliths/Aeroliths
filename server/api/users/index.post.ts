@@ -133,6 +133,10 @@ export default defineEventHandler(async (event) => {
       },
     })
 
+    // Starter pool first, so a verified player finds their lithos already there.
+    // Failures are logged, never fatal to the registration.
+    await grantStarterPoolSafely(user.id)
+
     // Send verification email (don't fail registration if email fails)
     try {
       await sendVerificationEmail(email, verificationTokenRaw, locale)
