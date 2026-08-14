@@ -31,6 +31,10 @@ declare global {
   var countMediaUsage: typeof import('../server/utils/media').countMediaUsage
   // eslint-disable-next-line no-var
   var registerMediaAsset: typeof import('../server/utils/media').registerMediaAsset
+  // eslint-disable-next-line no-var
+  var grantStarterPool: typeof import('../server/utils/starter-pool').grantStarterPool
+  // eslint-disable-next-line no-var
+  var grantStarterPoolSafely: typeof import('../server/utils/starter-pool').grantStarterPoolSafely
 }
 
 export {}

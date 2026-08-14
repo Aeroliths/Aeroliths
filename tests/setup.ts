@@ -4,6 +4,7 @@ import {
   countMediaUsage,
   registerMediaAsset,
 } from '~/server/utils/media'
+import { grantStarterPool, grantStarterPoolSafely } from '~/server/utils/starter-pool'
 
 // Mock environment variables
 process.env.JWT_SECRET = 'test-jwt-secret-key'
@@ -31,6 +32,11 @@ global.isMediaCategory = isMediaCategory
 global.countMediaUsage = countMediaUsage
 global.registerMediaAsset = registerMediaAsset
 
+// Starter pool helpers (auto-imported by Nuxt). Real implementations again:
+// they run against the mocked db and the tests assert on their behaviour.
+global.grantStarterPool = grantStarterPool
+global.grantStarterPoolSafely = grantStarterPoolSafely
+
 // Mock database (auto-imported by Nuxt)
 global.db = {
   postgres: {
@@ -57,7 +63,29 @@ global.db = {
       delete: vi.fn(),
       findMany: vi.fn(),
     },
+    user: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      count: vi.fn(),
+    },
+    collections: {
+      upsert: vi.fn(),
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+    },
+    $transaction: vi.fn(),
   },
 }
+
+// Prisma accepts both an array of promises and an interactive callback. The mock
+// mirrors that so route code can use either form against the mocked models.
+// vi.clearAllMocks() clears calls but keeps this implementation.
+global.db.postgres.$transaction.mockImplementation((arg: any) =>
+  typeof arg === 'function' ? arg(global.db.postgres) : Promise.all(arg)
+)
 
 // Global test utilities can be added here
