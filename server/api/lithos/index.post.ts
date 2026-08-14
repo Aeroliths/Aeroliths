@@ -91,6 +91,21 @@ export default defineEventHandler(async (event) => {
             data.elementId = form.elementId
         }
 
+        if (form.isStarter !== undefined) {
+            data.isStarter = Boolean(form.isStarter)
+        }
+
+        if (form.starterQuantity !== undefined) {
+            const starterQuantity = Number(form.starterQuantity)
+            if (isNaN(starterQuantity) || starterQuantity < 1) {
+                throw createError({
+                    statusCode: 400,
+                    statusMessage: 'starterQuantity must be at least 1'
+                })
+            }
+            data.starterQuantity = starterQuantity
+        }
+
         // Create the lithos
         const lithos = await db.postgres.lithos.create({
             data

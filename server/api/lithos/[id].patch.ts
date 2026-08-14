@@ -120,6 +120,21 @@ export default defineEventHandler(async (event) => {
             updateData.elementId = body.elementId || null
         }
 
+        if (body.isStarter !== undefined) {
+            updateData.isStarter = Boolean(body.isStarter)
+        }
+
+        if (body.starterQuantity !== undefined) {
+            const starterQuantity = Number(body.starterQuantity)
+            if (isNaN(starterQuantity) || starterQuantity < 1) {
+                throw createError({
+                    statusCode: 400,
+                    statusMessage: 'starterQuantity must be at least 1'
+                })
+            }
+            updateData.starterQuantity = starterQuantity
+        }
+
         // Check if there's anything to update
         if (Object.keys(updateData).length === 0) {
             throw createError({
