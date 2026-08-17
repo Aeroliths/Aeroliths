@@ -1,478 +1,140 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { generateTestToken, createTestUser, createTestAdmin } from '../../../utils/auth'
-import bcrypt from 'bcrypt'
+import handler from '~~/server/api/users/[id]/password.patch'
+import { createTestAdmin, createTestUser } from '../../../utils/auth'
 
-// Mock bcrypt
 vi.mock('bcrypt', () => ({
   default: {
-    compare: vi.fn(),
-    hash: vi.fn(),
+    compare: vi.fn(async () => true),
+    hash: vi.fn(async () => 'new-hash'),
   },
 }))
 
-// Mock the auth utilities
-vi.mock('~~/server/utils/auth', () => ({
-  getAuthUser: vi.fn(),
-}))
+import bcrypt from 'bcrypt'
 
-// Mock the database
-vi.mock('~~/server/utils/db', () => ({
-  default: {
-    postgres: {
-      user: {
-        findUnique: vi.fn(),
-      },
-      authentication: {
-        update: vi.fn(),
-      },
-    },
-  },
-}))
+const event = {} as any
+const compare = bcrypt.compare as unknown as ReturnType<typeof vi.fn>
+const STRONG_PASSWORD = 'Str0ng-Passw0rd!'
+
+function storedUser(overrides: Record<string, any> = {}) {
+  return {
+    id: 'test-user-id',
+    email: 'user@test.com',
+    authentication: { password: 'old-hash', tokenVersion: 4 },
+    role: { id: 'role-1', name: 'user' },
+    ...overrides,
+  }
+}
 
 describe('PATCH /api/users/[id]/password', () => {
-  let mockGetAuthUser: any
-  let mockUserFindUnique: any
-  let mockAuthenticationUpdate: any
-  let mockBcryptCompare: any
-  let mockBcryptHash: any
-
-  beforeEach(async () => {
-    // Reset mocks before each test
+  beforeEach(() => {
     vi.clearAllMocks()
-
-    // Import mocked modules
-    const authModule = await import('~~/server/utils/auth')
-    const dbModule = await import('~~/server/utils/db')
-    const bcryptModule = await import('bcrypt')
-
-    mockGetAuthUser = authModule.getAuthUser as any
-    mockUserFindUnique = dbModule.default.postgres.user.findUnique as any
-    mockAuthenticationUpdate = dbModule.default.postgres.authentication.update as any
-    mockBcryptCompare = bcryptModule.default.compare as any
-    mockBcryptHash = bcryptModule.default.hash as any
+    global.rateLimit.mockReturnValue(undefined)
+    global.getAuthUser.mockReturnValue(createTestUser())
+    global.getRouterParam.mockReturnValue('test-user-id')
+    global.readBody.mockResolvedValue({
+      currentPassword: 'old password',
+      newPassword: STRONG_PASSWORD,
+    })
+    global.db.postgres.user.findUnique.mockResolvedValue(storedUser())
+    global.db.postgres.authentication.update.mockResolvedValue({})
+    compare.mockResolvedValue(true)
   })
 
-  describe('Authentication and Authorization', () => {
-    it('should require authentication', () => {
-      mockGetAuthUser.mockImplementation(() => {
-        throw createError({
-          statusCode: 401,
-          statusMessage: 'Unauthorized',
-        })
-      })
+  it('changes the password of the caller', async () => {
+    const result = await handler(event)
 
-      expect(() => mockGetAuthUser({})).toThrow()
-    })
-
-    it('should allow user to update their own password', async () => {
-      const testUser = createTestUser()
-      mockGetAuthUser.mockReturnValue(testUser)
-
-      const mockUser = {
-        id: 'test-user-id', // Same as testUser.userId
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      }
-
-      mockUserFindUnique.mockResolvedValue(mockUser)
-
-      const user = await mockUserFindUnique({
-        where: { id: 'test-user-id' },
-        include: { authentication: true, role: true },
-      })
-
-      // User owns this account
-      expect(user.id).toBe(testUser.userId)
-      expect(user.authentication).toBeDefined()
-    })
-
-    it('should prevent user from updating another user password', async () => {
-      const testUser = createTestUser()
-      mockGetAuthUser.mockReturnValue(testUser)
-
-      const mockOtherUser = {
-        id: 'other-user-id', // Different from testUser.userId
-        email: 'other@test.com',
-        username: 'otheruser',
-        authentication: {
-          id: 'auth-2',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      }
-
-      mockUserFindUnique.mockResolvedValue(mockOtherUser)
-
-      const user = await mockUserFindUnique({
-        where: { id: 'other-user-id' },
-        include: { authentication: true, role: true },
-      })
-
-      // User does not own this account and is not admin
-      expect(user.id).not.toBe(testUser.userId)
-      expect(testUser.role).toBe('user')
-    })
-
-    it('should allow admin to update any user password', async () => {
-      const testAdmin = createTestAdmin()
-      mockGetAuthUser.mockReturnValue(testAdmin)
-
-      const mockUser = {
-        id: 'any-user-id',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      }
-
-      mockUserFindUnique.mockResolvedValue(mockUser)
-
-      const user = await mockUserFindUnique({
-        where: { id: 'any-user-id' },
-        include: { authentication: true, role: true },
-      })
-
-      // Admin can update any user password
-      expect(testAdmin.role).toBe('admin')
-      expect(user.id).toBeDefined()
-    })
+    expect(result.success).toBe(true)
+    expect(global.db.postgres.authentication.update).toHaveBeenCalledTimes(1)
   })
 
-  describe('Validation', () => {
-    beforeEach(() => {
-      const testUser = createTestUser()
-      mockGetAuthUser.mockReturnValue(testUser)
-    })
+  it('invalidates every existing session', async () => {
+    await handler(event)
 
-    it('should reject missing user ID', () => {
-      const id = undefined
-      expect(id).toBeUndefined()
-    })
-
-    it('should reject missing new password', () => {
-      const body = {
-        currentPassword: 'oldpassword',
-        // Missing newPassword
-      }
-
-      expect((body as any).newPassword).toBeUndefined()
-    })
-
-    it('should reject new password shorter than 8 characters', () => {
-      const shortPasswords = ['1234567', 'abc', 'pass', '']
-
-      shortPasswords.forEach(password => {
-        expect(password.length).toBeLessThan(8)
-      })
-    })
-
-    it('should accept new password with 8 or more characters', () => {
-      const validPasswords = ['12345678', 'newpassword123', 'verylongpassword']
-
-      validPasswords.forEach(password => {
-        expect(password.length).toBeGreaterThanOrEqual(8)
-      })
-    })
-
-    it('should reject non-existent user', async () => {
-      mockUserFindUnique.mockResolvedValue(null)
-
-      const result = await mockUserFindUnique({
-        where: { id: 'non-existent' },
-        include: { authentication: true, role: true },
-      })
-
-      expect(result).toBeNull()
-    })
-
-    it('should reject user without authentication', async () => {
-      mockUserFindUnique.mockResolvedValue({
-        id: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: null,
-        role: { id: 'role-user', name: 'user' },
-      })
-
-      const result = await mockUserFindUnique({
-        where: { id: 'user-1' },
-        include: { authentication: true, role: true },
-      })
-
-      expect(result.authentication).toBeNull()
-    })
+    const { data } = global.db.postgres.authentication.update.mock.calls[0]![0]
+    expect(data.tokenVersion).toEqual({ increment: 1 })
   })
 
-  describe('Current Password Verification (Regular User)', () => {
-    beforeEach(() => {
-      const testUser = createTestUser()
-      mockGetAuthUser.mockReturnValue(testUser)
+  it('stores the new password hashed', async () => {
+    await handler(event)
 
-      mockUserFindUnique.mockResolvedValue({
-        id: 'test-user-id',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          userId: 'test-user-id',
-          password: 'hashed_old_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      })
-    })
-
-    it('should require current password for regular users', () => {
-      const body = {
-        newPassword: 'newpassword123',
-        // Missing currentPassword
-      }
-
-      expect((body as any).currentPassword).toBeUndefined()
-    })
-
-    it('should reject incorrect current password', async () => {
-      mockBcryptCompare.mockResolvedValue(false)
-
-      const result = await mockBcryptCompare('wrongpassword', 'hashed_old_password')
-
-      expect(result).toBe(false)
-    })
-
-    it('should accept correct current password', async () => {
-      mockBcryptCompare.mockResolvedValue(true)
-
-      const result = await mockBcryptCompare('correctpassword', 'hashed_old_password')
-
-      expect(result).toBe(true)
-    })
+    const { data } = global.db.postgres.authentication.update.mock.calls[0]![0]
+    expect(data.password).toBe('new-hash')
+    expect(data.password).not.toBe(STRONG_PASSWORD)
   })
 
-  describe('Admin Password Update', () => {
-    beforeEach(() => {
-      const testAdmin = createTestAdmin()
-      mockGetAuthUser.mockReturnValue(testAdmin)
+  it('refuses to change another user password', async () => {
+    global.db.postgres.user.findUnique.mockResolvedValue(storedUser({ id: 'someone-else' }))
 
-      mockUserFindUnique.mockResolvedValue({
-        id: 'any-user-id',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          userId: 'any-user-id',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      })
-    })
-
-    it('should not require current password for admin', () => {
-      const body = {
-        newPassword: 'newpassword123',
-        // currentPassword not required for admin
-      }
-
-      expect(body.newPassword).toBeDefined()
-      // Admin doesn't need currentPassword
-    })
-
-    it('should allow admin to reset password without current password', async () => {
-      mockBcryptHash.mockResolvedValue('hashed_new_password')
-
-      const hashedPassword = await mockBcryptHash('newpassword123', 10)
-
-      expect(hashedPassword).toBe('hashed_new_password')
-      expect(mockBcryptHash).toHaveBeenCalledWith('newpassword123', 10)
-    })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 403 })
+    expect(global.db.postgres.authentication.update).not.toHaveBeenCalled()
   })
 
-  describe('Password Hashing', () => {
-    beforeEach(() => {
-      const testUser = createTestUser()
-      mockGetAuthUser.mockReturnValue(testUser)
+  it('requires the current password when changing your own', async () => {
+    global.readBody.mockResolvedValue({ newPassword: STRONG_PASSWORD })
 
-      mockUserFindUnique.mockResolvedValue({
-        id: 'test-user-id',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          userId: 'test-user-id',
-          password: 'hashed_old_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      })
-
-      mockBcryptCompare.mockResolvedValue(true)
-    })
-
-    it('should hash new password with bcrypt', async () => {
-      const newPassword = 'newpassword123'
-      const hashedPassword = 'hashed_new_password'
-
-      mockBcryptHash.mockResolvedValue(hashedPassword)
-
-      const result = await mockBcryptHash(newPassword, 10)
-
-      expect(result).toBe(hashedPassword)
-      expect(mockBcryptHash).toHaveBeenCalledWith(newPassword, 10)
-    })
-
-    it('should use salt rounds of 10', async () => {
-      mockBcryptHash.mockResolvedValue('hashed_password')
-
-      await mockBcryptHash('password123', 10)
-
-      expect(mockBcryptHash).toHaveBeenCalledWith('password123', 10)
-    })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+    expect(global.db.postgres.authentication.update).not.toHaveBeenCalled()
   })
 
-  describe('Database Operations', () => {
-    beforeEach(() => {
-      const testUser = createTestUser()
-      mockGetAuthUser.mockReturnValue(testUser)
+  it('refuses a wrong current password', async () => {
+    compare.mockResolvedValue(false)
 
-      mockUserFindUnique.mockResolvedValue({
-        id: 'test-user-id',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          userId: 'test-user-id',
-          password: 'hashed_old_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      })
-
-      mockBcryptCompare.mockResolvedValue(true)
-      mockBcryptHash.mockResolvedValue('hashed_new_password')
-    })
-
-    it('should update authentication password', async () => {
-      const updatedAuth = {
-        id: 'auth-1',
-        userId: 'test-user-id',
-        password: 'hashed_new_password',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-
-      mockAuthenticationUpdate.mockResolvedValue(updatedAuth)
-
-      const result = await mockAuthenticationUpdate({
-        where: { userId: 'test-user-id' },
-        data: { password: 'hashed_new_password' },
-      })
-
-      expect(result.password).toBe('hashed_new_password')
-      expect(mockAuthenticationUpdate).toHaveBeenCalledWith({
-        where: { userId: 'test-user-id' },
-        data: { password: 'hashed_new_password' },
-      })
-    })
-
-    it('should handle database errors', async () => {
-      mockAuthenticationUpdate.mockRejectedValue(new Error('Database connection failed'))
-
-      await expect(
-        mockAuthenticationUpdate({
-          where: { userId: 'test-user-id' },
-          data: { password: 'hashed_new_password' },
-        })
-      ).rejects.toThrow('Database connection failed')
-    })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 401 })
+    expect(global.db.postgres.authentication.update).not.toHaveBeenCalled()
   })
 
-  describe('Response Format', () => {
-    it('should return success response without password data', async () => {
-      const testUser = createTestUser()
-      mockGetAuthUser.mockReturnValue(testUser)
+  it('lets an admin reset any password without knowing the old one', async () => {
+    global.getAuthUser.mockReturnValue(createTestAdmin())
+    global.getRouterParam.mockReturnValue('someone-else')
+    global.db.postgres.user.findUnique.mockResolvedValue(storedUser({ id: 'someone-else' }))
+    global.readBody.mockResolvedValue({ newPassword: STRONG_PASSWORD })
 
-      mockUserFindUnique.mockResolvedValue({
-        id: 'test-user-id',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          userId: 'test-user-id',
-          password: 'hashed_old_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      })
+    const result = await handler(event)
 
-      mockBcryptCompare.mockResolvedValue(true)
-      mockBcryptHash.mockResolvedValue('hashed_new_password')
-      mockAuthenticationUpdate.mockResolvedValue({
-        id: 'auth-1',
-        userId: 'test-user-id',
-        password: 'hashed_new_password',
-      })
-
-      const expectedResponse = {
-        success: true,
-        message: 'Password updated successfully',
-      }
-
-      expect(expectedResponse.success).toBe(true)
-      expect(expectedResponse.message).toBe('Password updated successfully')
-      expect((expectedResponse as any).data).toBeUndefined()
-      expect((expectedResponse as any).password).toBeUndefined()
-    })
+    expect(result.success).toBe(true)
+    expect(compare).not.toHaveBeenCalled()
   })
 
-  describe('Edge Cases', () => {
-    it('should handle user updating their own password as admin', async () => {
-      const testAdmin = createTestAdmin()
-      mockGetAuthUser.mockReturnValue(testAdmin)
+  it('enforces password strength', async () => {
+    global.readBody.mockResolvedValue({ currentPassword: 'old password', newPassword: 'short' })
 
-      mockUserFindUnique.mockResolvedValue({
-        id: 'test-admin-id', // Same as admin's userId
-        email: 'admin@test.com',
-        username: 'admin',
-        authentication: {
-          id: 'auth-admin',
-          userId: 'test-admin-id',
-          password: 'hashed_old_password',
-        },
-        role: { id: 'role-admin', name: 'admin' },
-      })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+    expect(global.db.postgres.user.findUnique).not.toHaveBeenCalled()
+  })
 
-      mockBcryptHash.mockResolvedValue('hashed_new_password')
+  it('rejects a request with no new password', async () => {
+    global.readBody.mockResolvedValue({ currentPassword: 'old password' })
 
-      // Admin updating their own password - doesn't need current password
-      expect(testAdmin.role).toBe('admin')
-      expect(testAdmin.userId).toBe('test-admin-id')
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('answers 404 for an unknown account', async () => {
+    global.db.postgres.user.findUnique.mockResolvedValue(null)
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('answers 404 when the account has no authentication row', async () => {
+    global.db.postgres.user.findUnique.mockResolvedValue(storedUser({ authentication: null }))
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 404 })
+  })
+
+  it('requires authentication', async () => {
+    global.getAuthUser.mockImplementation(() => {
+      throw { statusCode: 401, statusMessage: 'Unauthorized' }
     })
 
-    it('should handle same password change', async () => {
-      const testUser = createTestUser()
-      mockGetAuthUser.mockReturnValue(testUser)
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 401 })
+    expect(global.db.postgres.authentication.update).not.toHaveBeenCalled()
+  })
 
-      mockUserFindUnique.mockResolvedValue({
-        id: 'test-user-id',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          userId: 'test-user-id',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      })
-
-      mockBcryptCompare.mockResolvedValue(true)
-      mockBcryptHash.mockResolvedValue('hashed_new_password')
-
-      // Even if new password is same as old, it will be hashed differently
-      const newHash = await mockBcryptHash('samepassword', 10)
-      expect(newHash).toBeDefined()
+  it('applies the rate limit before anything else', async () => {
+    global.rateLimit.mockImplementation(() => {
+      throw { statusCode: 429, statusMessage: 'Too many requests' }
     })
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 429 })
+    expect(global.getAuthUser).not.toHaveBeenCalled()
   })
 })

@@ -54,6 +54,10 @@ declare global {
   // eslint-disable-next-line no-var
   var validatePassword: typeof import('../server/utils/password-validation').validatePassword
   // eslint-disable-next-line no-var
+  var validateUsernameContent: typeof import('../server/utils/username-moderation').validateUsernameContent
+  // eslint-disable-next-line no-var
+  var resolveRequestLocale: Mock
+  // eslint-disable-next-line no-var
   var db: any
   // eslint-disable-next-line no-var
   var isMediaCategory: typeof import('../server/utils/media').isMediaCategory

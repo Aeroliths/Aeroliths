@@ -7,6 +7,7 @@ import {
 import { grantStarterPool, grantStarterPoolSafely } from '~~/server/utils/starter-pool'
 import { generateVerificationToken, hashToken } from '~~/server/utils/email'
 import { validatePassword } from '~~/server/utils/password-validation'
+import { validateUsernameContent } from '~~/server/utils/username-moderation'
 
 // Mock environment variables
 process.env.JWT_SECRET = 'test-jwt-secret-key'
@@ -48,6 +49,11 @@ global.sendDeletionRequestEmail = vi.fn()
 global.generateVerificationToken = generateVerificationToken
 global.hashToken = hashToken
 global.validatePassword = validatePassword
+global.validateUsernameContent = validateUsernameContent
+
+// Reads a cookie, which the tests do not set up; the default is what an
+// anonymous visitor gets. Tests that care override it.
+global.resolveRequestLocale = vi.fn(() => 'en')
 
 // Mock the upload helpers (auto-imported by Nuxt)
 global.upload_image = vi.fn()

@@ -151,12 +151,23 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // Update the user
+    // Update the user. Select explicitly rather than include: the row carries
+    // the verification and reset tokens, and returning them would hand an admin
+    // editing a member that member's live password reset link.
     const updatedUser = await db.postgres.user.update({
       where: { id },
       data: updateData,
-      include: {
-        role: true,
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        locale: true,
+        profilePicture: true,
+        emailVerified: true,
+        lastActiveAt: true,
+        deletionRequestedAt: true,
+        createdAt: true,
+        role: { select: { id: true, name: true } },
       },
     })
 

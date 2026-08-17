@@ -1,418 +1,193 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import bcrypt from 'bcrypt'
+import handler from '~~/server/api/users/index.post'
 
-// Mock bcrypt
 vi.mock('bcrypt', () => ({
-  default: {
-    hash: vi.fn(),
-  },
+  default: { hash: vi.fn(async () => 'hashed-password') },
 }))
 
-// Mock the database
-vi.mock('~~/server/utils/db', () => ({
-  default: {
-    postgres: {
-      user: {
-        findFirst: vi.fn(),
-        create: vi.fn(),
-      },
-      role: {
-        findUnique: vi.fn(),
-        create: vi.fn(),
-      },
-    },
-  },
-}))
+const event = {} as any
 
-// Mock the captcha verifier so handler-style tests can opt-in to a passing/failing captcha
-vi.mock('~~/server/utils/captcha', () => ({
-  verifyCaptcha: vi.fn().mockResolvedValue(undefined),
-}))
+const VALID = {
+  email: 'player@example.com',
+  username: 'player',
+  password: 'Str0ng-Passw0rd!',
+  captchaToken: 'token',
+}
+
+function createdUser() {
+  return {
+    id: 'user-1',
+    email: VALID.email,
+    username: VALID.username,
+    locale: 'en',
+    emailVerified: false,
+    verificationToken: 'stored-hash',
+    createdAt: new Date('2026-08-01'),
+    role: { id: 'role-1', name: 'user' },
+  }
+}
 
 describe('POST /api/users', () => {
-  let mockUserFindFirst: any
-  let mockUserCreate: any
-  let mockRoleFindUnique: any
-  let mockRoleCreate: any
-  let mockBcryptHash: any
-
-  beforeEach(async () => {
-    // Reset mocks before each test
+  beforeEach(() => {
     vi.clearAllMocks()
-
-    // Import mocked modules
-    const dbModule = await import('~~/server/utils/db')
-    const bcryptModule = await import('bcrypt')
-
-    mockUserFindFirst = dbModule.default.postgres.user.findFirst as any
-    mockUserCreate = dbModule.default.postgres.user.create as any
-    mockRoleFindUnique = dbModule.default.postgres.role.findUnique as any
-    mockRoleCreate = dbModule.default.postgres.role.create as any
-    mockBcryptHash = bcryptModule.default.hash as any
+    global.rateLimit.mockReturnValue(undefined)
+    global.verifyCaptcha.mockResolvedValue(undefined)
+    global.validateEmailTrust.mockResolvedValue(null)
+    global.resolveRequestLocale.mockReturnValue('en')
+    global.readBody.mockResolvedValue({ ...VALID })
+    global.db.postgres.role.findUnique.mockResolvedValue({ id: 'role-1', name: 'user' })
+    global.db.postgres.user.findFirst.mockResolvedValue(null)
+    global.db.postgres.user.create.mockResolvedValue(createdUser())
+    global.db.postgres.lithos.count.mockResolvedValue(0)
+    global.sendVerificationEmail.mockResolvedValue(undefined)
   })
 
-  describe('Validation', () => {
-    it('should reject request without required fields', () => {
-      const body = {
-        email: 'user@test.com',
-        // Missing username and password
-      }
+  it('creates the account', async () => {
+    const result = await handler(event)
 
-      expect(body.email).toBeDefined()
-      expect((body as any).username).toBeUndefined()
-      expect((body as any).password).toBeUndefined()
-    })
-
-    it('should reject invalid email format', () => {
-      const invalidEmails = [
-        'notanemail',
-        'missing@domain',
-        '@nodomain.com',
-        'spaces in@email.com',
-        'double@@email.com',
-      ]
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-      invalidEmails.forEach(email => {
-        expect(emailRegex.test(email)).toBe(false)
-      })
-    })
-
-    it('should accept valid email format', () => {
-      const validEmails = [
-        'user@test.com',
-        'test.user@example.com',
-        'user+tag@domain.co.uk',
-      ]
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-      validEmails.forEach(email => {
-        expect(emailRegex.test(email)).toBe(true)
-      })
-    })
-
-    it('should reject password shorter than 8 characters', () => {
-      const shortPasswords = ['1234567', 'abc', 'pass', '']
-
-      shortPasswords.forEach(password => {
-        expect(password.length).toBeLessThan(8)
-      })
-    })
-
-    it('should accept password with 8 or more characters', () => {
-      const validPasswords = ['12345678', 'password123', 'verylongpassword']
-
-      validPasswords.forEach(password => {
-        expect(password.length).toBeGreaterThanOrEqual(8)
-      })
-    })
-
-    it('should reject invalid JSON format', () => {
-      const invalidJson = '{ invalid json }'
-
-      expect(() => JSON.parse(invalidJson)).toThrow()
-    })
-
-    it('should parse valid JSON string', () => {
-      const validJson = '{"email":"user@test.com","username":"user","password":"password123"}'
-
-      const parsed = JSON.parse(validJson)
-      expect(parsed.email).toBe('user@test.com')
-      expect(parsed.username).toBe('user')
-      expect(parsed.password).toBe('password123')
-    })
+    expect(result.success).toBe(true)
+    expect(global.db.postgres.user.create).toHaveBeenCalledTimes(1)
   })
 
-  describe('Duplicate Checks', () => {
-    beforeEach(() => {
-      const mockRole = { id: 'role-user', name: 'user' }
-      mockRoleFindUnique.mockResolvedValue(mockRole)
-      mockBcryptHash.mockResolvedValue('hashed_password')
-    })
+  it('creates it unverified', async () => {
+    await handler(event)
 
-    it('should reject duplicate email', async () => {
-      const existingUser = {
-        id: 'user-1',
-        email: 'existing@test.com',
-        username: 'differentuser',
-      }
-
-      mockUserFindFirst.mockResolvedValue(existingUser)
-
-      const result = await mockUserFindFirst({
-        where: {
-          OR: [
-            { email: 'existing@test.com' },
-            { username: 'newuser' },
-          ],
-        },
-      })
-
-      expect(result).toEqual(existingUser)
-      expect(result.email).toBe('existing@test.com')
-    })
-
-    it('should reject duplicate username', async () => {
-      const existingUser = {
-        id: 'user-1',
-        email: 'different@test.com',
-        username: 'existinguser',
-      }
-
-      mockUserFindFirst.mockResolvedValue(existingUser)
-
-      const result = await mockUserFindFirst({
-        where: {
-          OR: [
-            { email: 'new@test.com' },
-            { username: 'existinguser' },
-          ],
-        },
-      })
-
-      expect(result).toEqual(existingUser)
-      expect(result.username).toBe('existinguser')
-    })
-
-    it('should allow unique email and username', async () => {
-      mockUserFindFirst.mockResolvedValue(null)
-
-      const result = await mockUserFindFirst({
-        where: {
-          OR: [
-            { email: 'new@test.com' },
-            { username: 'newuser' },
-          ],
-        },
-      })
-
-      expect(result).toBeNull()
-    })
+    const { data } = global.db.postgres.user.create.mock.calls[0]![0]
+    expect(data.emailVerified).toBe(false)
   })
 
-  describe('Role Management', () => {
-    it('should use existing user role', async () => {
-      const mockRole = { id: 'role-user', name: 'user' }
-      mockRoleFindUnique.mockResolvedValue(mockRole)
+  it('stores the password hashed and never returns it', async () => {
+    const result = await handler(event)
 
-      const result = await mockRoleFindUnique({ where: { name: 'user' } })
-
-      expect(result).toEqual(mockRole)
-      expect(result.name).toBe('user')
-    })
-
-    it('should create user role if it does not exist', async () => {
-      const mockRole = { id: 'role-user', name: 'user' }
-      mockRoleFindUnique.mockResolvedValue(null)
-      mockRoleCreate.mockResolvedValue(mockRole)
-
-      const existingRole = await mockRoleFindUnique({ where: { name: 'user' } })
-      expect(existingRole).toBeNull()
-
-      const newRole = await mockRoleCreate({ data: { name: 'user' } })
-      expect(newRole).toEqual(mockRole)
-    })
+    const { data } = global.db.postgres.user.create.mock.calls[0]![0]
+    expect(data.authentication.create.password).toBe('hashed-password')
+    expect(JSON.stringify(result)).not.toContain(VALID.password)
+    expect(result.data).not.toHaveProperty('authentication')
   })
 
-  describe('Password Hashing', () => {
-    it('should hash password with bcrypt', async () => {
-      const password = 'password123'
-      const hashedPassword = 'hashed_password_here'
+  it('stores the verification token hashed and emails only the raw one', async () => {
+    await handler(event)
 
-      mockBcryptHash.mockResolvedValue(hashedPassword)
+    const { data } = global.db.postgres.user.create.mock.calls[0]![0]
+    const [, rawToken] = global.sendVerificationEmail.mock.calls[0]!
 
-      const result = await mockBcryptHash(password, 10)
-
-      expect(result).toBe(hashedPassword)
-      expect(mockBcryptHash).toHaveBeenCalledWith(password, 10)
-    })
+    expect(data.verificationToken).toBe(global.hashToken(rawToken))
+    expect(data.verificationToken).not.toBe(rawToken)
   })
 
-  describe('Database Operations', () => {
-    beforeEach(() => {
-      const mockRole = { id: 'role-user', name: 'user' }
-      mockRoleFindUnique.mockResolvedValue(mockRole)
-      mockUserFindFirst.mockResolvedValue(null)
-      mockBcryptHash.mockResolvedValue('hashed_password')
-    })
+  it('never returns the verification token', async () => {
+    const result = await handler(event)
 
-    it('should create user with authentication', async () => {
-      const userData = {
-        email: 'newuser@test.com',
-        username: 'newuser',
-        name: 'New',
-        surname: 'User',
-      }
-
-      const mockUser = {
-        id: 'user-new',
-        ...userData,
-        roleId: 'role-user',
-        role: { id: 'role-user', name: 'user' },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-
-      mockUserCreate.mockResolvedValue(mockUser)
-
-      const result = await mockUserCreate({
-        data: {
-          email: userData.email,
-          username: userData.username,
-          name: userData.name,
-          surname: userData.surname,
-          roleId: 'role-user',
-          authentication: {
-            create: {
-              password: 'hashed_password',
-            },
-          },
-        },
-        include: {
-          role: true,
-        },
-      })
-
-      expect(result).toEqual(mockUser)
-      expect(result.email).toBe(userData.email)
-      expect(result.username).toBe(userData.username)
-      expect(result.role).toBeDefined()
-    })
-
-    it('should handle null optional fields', async () => {
-      const userData = {
-        email: 'user@test.com',
-        username: 'user',
-        name: null,
-        surname: null,
-      }
-
-      const mockUser = {
-        id: 'user-1',
-        ...userData,
-        roleId: 'role-user',
-        role: { id: 'role-user', name: 'user' },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-
-      mockUserCreate.mockResolvedValue(mockUser)
-
-      const result = await mockUserCreate({
-        data: {
-          email: userData.email,
-          username: userData.username,
-          name: null,
-          surname: null,
-          roleId: 'role-user',
-          authentication: {
-            create: {
-              password: 'hashed_password',
-            },
-          },
-        },
-        include: {
-          role: true,
-        },
-      })
-
-      expect(result.name).toBeNull()
-      expect(result.surname).toBeNull()
-    })
-
-    it('should handle database errors', async () => {
-      mockUserCreate.mockRejectedValue(new Error('Database connection failed'))
-
-      await expect(
-        mockUserCreate({
-          data: {
-            email: 'user@test.com',
-            username: 'user',
-            roleId: 'role-user',
-            authentication: {
-              create: { password: 'hashed' },
-            },
-          },
-        })
-      ).rejects.toThrow('Database connection failed')
-    })
+    expect(result.data).not.toHaveProperty('verificationToken')
   })
 
-  describe('Captcha Verification', () => {
-    it('should call verifyCaptcha with the token from the request body', async () => {
-      const { verifyCaptcha } = await import('~~/server/utils/captcha')
-      const mockVerify = verifyCaptcha as any
-      mockVerify.mockResolvedValue(undefined)
+  it('drops the starter lithos into the new collection', async () => {
+    // The real helper runs here, against the mocked database.
+    global.db.postgres.user.findUnique.mockResolvedValue({ starterPoolGrantedAt: null })
+    global.db.postgres.lithos.findMany.mockResolvedValue([
+      { id: 'lithos-1', starterQuantity: 2 },
+    ])
+    global.db.postgres.user.updateMany.mockResolvedValue({ count: 1 })
+    global.db.postgres.collections.upsert.mockResolvedValue({})
 
-      await mockVerify('valid-token', {} as any)
+    await handler(event)
 
-      expect(mockVerify).toHaveBeenCalledWith('valid-token', expect.anything())
-    })
-
-    it('should reject registration when verifyCaptcha throws (no user.create call)', async () => {
-      const { verifyCaptcha } = await import('~~/server/utils/captcha')
-      const mockVerify = verifyCaptcha as any
-      mockVerify.mockRejectedValue({ statusCode: 400, message: 'Captcha verification failed' })
-
-      await expect(mockVerify('bad-token', {} as any)).rejects.toMatchObject({
-        statusCode: 400,
-        message: 'Captcha verification failed',
-      })
-      expect(mockUserCreate).not.toHaveBeenCalled()
-    })
-
-    it('should reject when captcha token is missing', async () => {
-      const { verifyCaptcha } = await import('~~/server/utils/captcha')
-      const mockVerify = verifyCaptcha as any
-      mockVerify.mockRejectedValue({ statusCode: 400, message: 'Captcha is required' })
-
-      await expect(mockVerify(undefined, {} as any)).rejects.toMatchObject({
-        statusCode: 400,
-        message: 'Captcha is required',
-      })
-      expect(mockUserCreate).not.toHaveBeenCalled()
-    })
+    expect(global.db.postgres.collections.upsert).toHaveBeenCalledTimes(1)
   })
 
-  describe('Response Format', () => {
-    it('should return success response without authentication data', async () => {
-      const mockUser = {
-        id: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        name: 'Test',
-        surname: 'User',
-        roleId: 'role-user',
-        role: { id: 'role-user', name: 'user' },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        authentication: {
-          id: 'auth-1',
-          password: 'hashed_password',
-        },
-      }
+  it('still registers the account when the starter pool cannot be granted', async () => {
+    global.db.postgres.user.findUnique.mockRejectedValue(new Error('database hiccup'))
 
-      mockRoleFindUnique.mockResolvedValue({ id: 'role-user', name: 'user' })
-      mockUserFindFirst.mockResolvedValue(null)
-      mockBcryptHash.mockResolvedValue('hashed_password')
-      mockUserCreate.mockResolvedValue(mockUser)
+    const result = await handler(event)
 
-      // Simulate removing authentication data
-      const { authentication, ...userWithoutAuth } = mockUser
+    // The marker stays null, so the admin backfill picks the player up later.
+    expect(result.success).toBe(true)
+  })
 
-      const expectedResponse = {
-        success: true,
-        data: userWithoutAuth,
-        message: 'User created successfully',
-      }
+  it('still registers the account when the email cannot be sent', async () => {
+    global.sendVerificationEmail.mockRejectedValue(new Error('smtp down'))
 
-      expect(expectedResponse.success).toBe(true)
-      expect(expectedResponse.message).toBe('User created successfully')
-      expect((expectedResponse.data as any).authentication).toBeUndefined()
-      expect(expectedResponse.data.email).toBe('user@test.com')
-      expect(expectedResponse.data.username).toBe('user')
+    const result = await handler(event)
+
+    expect(result.success).toBe(true)
+  })
+
+  it('applies the rate limit and the captcha before touching the database', async () => {
+    global.rateLimit.mockImplementation(() => {
+      throw { statusCode: 429, statusMessage: 'Too many requests' }
     })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 429 })
+
+    vi.clearAllMocks()
+    global.rateLimit.mockReturnValue(undefined)
+    global.readBody.mockResolvedValue({ ...VALID })
+    global.verifyCaptcha.mockRejectedValue({ statusCode: 400, statusMessage: 'Captcha failed' })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+
+    expect(global.db.postgres.user.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a malformed email', async () => {
+    global.readBody.mockResolvedValue({ ...VALID, email: 'not-an-email' })
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+    expect(global.db.postgres.user.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a disposable email', async () => {
+    global.validateEmailTrust.mockResolvedValue('Disposable email addresses are not allowed')
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+    expect(global.db.postgres.user.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a malformed username', async () => {
+    for (const username of ['ab', 'a'.repeat(31), 'has space', 'has/slash']) {
+      global.readBody.mockResolvedValue({ ...VALID, username })
+
+      await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+    }
+    expect(global.db.postgres.user.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a weak password', async () => {
+    global.readBody.mockResolvedValue({ ...VALID, password: 'short' })
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+    expect(global.db.postgres.user.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects an email already registered', async () => {
+    global.db.postgres.user.findFirst.mockResolvedValue({
+      email: VALID.email,
+      username: 'someone-else',
+    })
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 409 })
+    expect(global.db.postgres.user.create).not.toHaveBeenCalled()
+  })
+
+  it('rejects a username already taken', async () => {
+    global.db.postgres.user.findFirst.mockResolvedValue({
+      email: 'someone@else.com',
+      username: VALID.username,
+    })
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 409 })
+    expect(global.db.postgres.user.create).not.toHaveBeenCalled()
+  })
+
+  it('records the locale the visitor is browsing in', async () => {
+    global.resolveRequestLocale.mockReturnValue('fr')
+
+    await handler(event)
+
+    const { data } = global.db.postgres.user.create.mock.calls[0]![0]
+    expect(data.locale).toBe('fr')
+    expect(global.sendVerificationEmail).toHaveBeenCalledWith(
+      VALID.email,
+      expect.any(String),
+      'fr',
+    )
   })
 })
