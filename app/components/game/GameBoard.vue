@@ -44,6 +44,10 @@
       </div>
     </div>
 
+    <!-- Spoken status. Visually redundant with the bar above, but the bar is a
+         set of coloured dots and numbers that a screen reader cannot narrate. -->
+    <p class="sr-only" aria-live="polite">{{ spokenStatus }}</p>
+
     <!-- Board grid -->
     <div
       class="grid"
@@ -66,6 +70,7 @@
           :data-cx="x"
           :data-cy="y"
           :title="capturedTitle(x, y)"
+          :aria-label="cellLabel(x, y, cell)"
           :disabled="!!cell || !canPlace || state.status === 'finished'"
           @mouseenter="showPreview(x, y)"
           @mouseleave="clearPreview"
@@ -112,6 +117,7 @@
           ]"
           :disabled="!isPlayable(i)"
           @pointerdown="onPointerDown($event, i)"
+          @click="selectFromKeyboard(i)"
           @dragstart.prevent
         >
           <GameStone :stone="stone" :owner="state.current" />
@@ -139,7 +145,7 @@
 import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import GameStone from './GameStone.vue'
 import { getScore, previewCaptures } from '~/game/engine/match'
-import type { CaptureEvent, MatchState, Stone } from '~/game/engine/types'
+import type { CaptureEvent, Cell, MatchState, Stone } from '~/game/engine/types'
 
 const props = defineProps<{
   state: MatchState
@@ -181,6 +187,29 @@ function capturedTitle(x: number, y: number): string | undefined {
   const by = info.by === 'A' ? t('play.board.player1') : t('play.board.player2')
   return `${t('play.board.capturedBy')}${by} (${info.type})`
 }
+
+/** Keyboard activation: a button reached with Enter fires click and nothing else. */
+function selectFromKeyboard(index: number) {
+  if (!isPlayable(index)) return
+  emit('selectHand', index)
+}
+
+/** What a screen reader should hear for a cell, since the board is a colour grid. */
+function cellLabel(x: number, y: number, cell: Cell): string {
+  const position = `${x + 1}, ${y + 1}`
+  if (!cell) return `${position} ${t('play.board.emptyCell')}`
+  const owner = cell.owner === 'A' ? t('play.board.player1') : t('play.board.player2')
+  return `${position} ${cell.stone.name ?? ''} ${owner}`.trim()
+}
+
+/** Turn, then result: the one line worth speaking as the match moves. */
+const spokenStatus = computed(() => {
+  const player = props.state.current === 'A' ? t('play.board.player1') : t('play.board.player2')
+  if (props.state.status === 'playing') return `${player} ${t('play.board.toPlay')}`
+  if (props.state.winner === 'draw') return t('play.board.resultDraw')
+  const winner = props.state.winner === 'A' ? t('play.board.player1') : t('play.board.player2')
+  return `${winner} ${t('play.board.resultWins')}`
+})
 
 /* ---------- Open hands: show the opponent's hand face-up ---------- */
 
@@ -667,5 +696,18 @@ watch(
 @media (prefers-reduced-motion: reduce) {
   .cell.capturing { animation: none; box-shadow: 0 0 18px rgba(99, 102, 241, 0.6); }
   .ghost-card { animation: none; }
+}
+
+/* Kept in the accessibility tree but out of the layout. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 </style>

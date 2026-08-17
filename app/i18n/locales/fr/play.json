@@ -36,7 +36,10 @@
       "elementPrefix": "Élément : ",
       "same": "Identique !",
       "plus": "Plus !",
-      "combo": "Combo !"
+      "combo": "Combo !",
+      "emptyCell": "vide",
+      "resultDraw": "Match nul",
+      "resultWins": "gagne"
     },
     "stone": {
       "none": "Aucun",
