@@ -23,6 +23,8 @@ model User {
   deletionRequestedAt        DateTime?
   // Set once, the first time the player receives the starter pool.
   starterPoolGrantedAt       DateTime?
+  // Running total. Every increment is backed by a Match row.
+  xp                         Int       @default(0)
   deletionReminderSent       Boolean   @default(false)
   warning6MonthsSent         Boolean   @default(false)
   warning2MonthsSent         Boolean   @default(false)
@@ -36,6 +38,7 @@ model User {
   role           Role            @relation(fields: [roleId], references: [id])
   roleId         String
   collections    Collections[]
+  matches        Match[]
   deck           Deck?
   loginHistory   LoginHistory[]
   oauthAccounts  OAuthAccount[]
@@ -164,6 +167,27 @@ model Collections {
   // A user can only have one entry per Lithos
   @@unique([userId, lithosId])
   @@map("collections")
+}
+
+model Match {
+  id            String   @id @default(cuid())
+  // "bot" today; the online mode will add its own kind.
+  opponent      String
+  // Declared by the client and unverifiable by design: it only scales XP.
+  difficulty    String
+  boardSize     Int
+  // Seen from the submitting player: "win" | "loss" | "draw".
+  result        String
+  scoreSelf     Int
+  scoreOpponent Int
+  xpAwarded     Int
+  playedAt      DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, playedAt])
+  @@map("matches")
 }
 
 model Elements {

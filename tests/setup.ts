@@ -21,6 +21,10 @@ global.getRouterParam = vi.fn()
 global.getAuthUser = vi.fn()
 global.requireRole = vi.fn()
 
+// Rate limiting is auto-imported by Nuxt. The default lets the handler through;
+// tests that care about it override this to throw.
+global.rateLimit = vi.fn()
+
 // Mock the upload helpers (auto-imported by Nuxt)
 global.upload_image = vi.fn()
 global.delete_image = vi.fn()
@@ -75,6 +79,12 @@ global.db = {
     collections: {
       upsert: vi.fn(),
       findUnique: vi.fn(),
+      findMany: vi.fn(),
+    },
+    match: {
+      create: vi.fn(),
+      aggregate: vi.fn(),
+      count: vi.fn(),
       findMany: vi.fn(),
     },
     $transaction: vi.fn(),

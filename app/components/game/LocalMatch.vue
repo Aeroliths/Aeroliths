@@ -211,6 +211,10 @@
             <span class="es-sep">/</span>
             <span class="es-b">{{ $t('play.board.player2') }} : {{ animScore.B }}</span>
           </div>
+          <div v-if="lastAward !== null" class="end-xp">
+            <span class="end-xp-amount">{{ $t('play.localMatch.xpAwarded', { xp: lastAward }) }}</span>
+            <span v-if="cappedToday" class="end-xp-capped">{{ $t('play.localMatch.xpCapped') }}</span>
+          </div>
           <div class="end-recap">
             <span>{{ $t('play.localMatch.biggestCapturePrefix') }}{{ highlights.biggestCapture }}{{ highlights.biggestBy ? ` (${highlights.biggestBy === 'A' ? $t('play.localMatch.p1') : $t('play.localMatch.p2')})` : '' }}</span>
             <span>{{ $t('play.localMatch.same') }} {{ highlights.same }} · {{ $t('play.localMatch.plus') }} {{ highlights.plus }} · {{ $t('play.localMatch.combo') }} {{ highlights.combo }}</span>
@@ -244,6 +248,7 @@ import { useMatchPersistence } from '~/composables/useMatchPersistence'
 import { useMatchReplay } from '~/composables/useMatchReplay'
 import { useMatchOutcome } from '~/composables/useMatchOutcome'
 import { useBotOpponent, BOT_PLAYER } from '~/composables/useBotOpponent'
+import { useMatchSubmission } from '~/composables/useMatchSubmission'
 import type { CaptureEvent, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
 type Phase = 'setup' | 'play'
@@ -322,6 +327,16 @@ const match = ref<MatchState | null>(null)
 const timeline = ref<TimelineEntry[]>([])
 const selectedHandIndex = ref<number | null>(null)
 const lastEvents = ref<CaptureEvent[]>([])
+
+// The timeline stores states, and lastMove records only the cell, so the hand
+// index would be lost. A submission needs the moves themselves.
+const moves = ref<{ handIndex: number; x: number; y: number }[]>([])
+// The engine consumes the hands as the match runs, so the submission needs them
+// as they stood at the opening move.
+const startingHands = ref<Record<Player, Stone[]>>({ A: [], B: [] })
+/** False for a resumed match, whose move list could not be restored. */
+const submittable = ref(true)
+let submitted = false
 const canUndo = computed(() => timeline.value.length > 1 && match.value?.status === 'playing')
 
 const {
@@ -360,6 +375,34 @@ const { thinking: botThinking } = useBotOpponent({
   suspended: replaying,
   onMove: playAt,
 })
+
+/* ---------- Submitting a finished bot match ---------- */
+
+const { submit, lastAward, cappedToday } = useMatchSubmission()
+
+watch(
+  () => match.value?.status,
+  (status) => {
+    if (status !== 'finished') return
+    if (!botEnabled.value || !submittable.value || submitted) return
+    const state = match.value!
+    submitted = true
+    submit({
+      difficulty: botDifficulty.value,
+      size: state.size,
+      rules: state.rules,
+      handRule: state.handRule,
+      openHands: state.openHands,
+      startingPlayer: lastStarter.value,
+      boardElements: state.boardElements,
+      hands: {
+        A: startingHands.value.A.map((stone) => stone.id),
+        B: startingHands.value.B.map((stone) => stone.id),
+      },
+      moves: moves.value,
+    })
+  },
+)
 
 /* ---------- Turn timer ---------- */
 
@@ -416,6 +459,10 @@ function beginMatch(
   })
   lastStarter.value = startingPlayer
   timeline.value = [{ state: match.value, events: [] }]
+  moves.value = []
+  startingHands.value = { A: [...handA], B: [...handB] }
+  submittable.value = true
+  submitted = false
   selectedHandIndex.value = null
   lastEvents.value = []
   stopReplay()
@@ -465,11 +512,15 @@ function selectHand(index: number) {
 function undo() {
   if (timeline.value.length <= 1) return
   timeline.value.pop()
+  moves.value.pop()
   // Against the bot, undoing a single ply hands the turn straight back to it and
   // it replays at once, so the button looks broken. Step back past its reply.
   if (botEnabled.value && timeline.value.length > 1) {
     const previous = timeline.value[timeline.value.length - 1]!.state
-    if (previous.current === BOT_PLAYER) timeline.value.pop()
+    if (previous.current === BOT_PLAYER) {
+      timeline.value.pop()
+      moves.value.pop()
+    }
   }
   match.value = timeline.value[timeline.value.length - 1]!.state
   selectedHandIndex.value = null
@@ -498,6 +549,7 @@ function playAt(handIndex: number, x: number, y: number) {
   match.value = state
   lastEvents.value = events
   timeline.value.push({ state, events })
+  moves.value.push({ handIndex, x, y })
   selectedHandIndex.value = null
   sound.play('place')
   if (events.length > 0) sound.play('capture')
@@ -517,6 +569,10 @@ function resumeMatch() {
   if (!saved) return
   match.value = saved
   timeline.value = [{ state: saved, events: [] }]
+  // A match restored from storage has lost its move list, so it can never be
+  // submitted: the server would have nothing to replay.
+  moves.value = []
+  submittable.value = false
   selectedHandIndex.value = null
   lastEvents.value = []
   phase.value = 'play'

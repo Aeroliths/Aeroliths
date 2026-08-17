@@ -58,6 +58,8 @@
       "botMedium": "Moyen",
       "botHard": "Difficile",
       "botThinking": "Le bot réfléchit",
+      "xpAwarded": "+{xp} XP",
+      "xpCapped": "Limite d'XP quotidienne atteinte",
       "turnTimer": "Minuteur de tour",
       "turnTimerOff": "Désactivé",
       "handModeRandom": "Aléatoire",

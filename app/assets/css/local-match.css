@@ -389,3 +389,21 @@
   font-size: var(--font-sm);
   color: var(--color-text-muted);
 }
+
+.end-xp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.end-xp-amount {
+  font-size: var(--font-lg, 1.1rem);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary, #6366f1);
+}
+
+.end-xp-capped {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
