@@ -7,7 +7,9 @@
       "deckBuilderTitle": "Deck Builder",
       "deckBuilderDesc": "Manage your collection and deck",
       "localMatchTitle": "Local Match",
-      "localMatchDesc": "Take on a friend in a local 1v1"
+      "localMatchDesc": "Take on a friend in a local 1v1",
+      "botMatchTitle": "Vs Bot",
+      "botMatchDesc": "Play solo against three difficulty levels"
     },
     "board": {
       "hand": "hand",
@@ -50,6 +52,12 @@
       "handRuleChaos": "Chaos",
       "firstPlayer": "First player",
       "firstPlayerRandom": "Random",
+      "botPlayer": "Bot",
+      "botDifficulty": "Bot difficulty",
+      "botEasy": "Easy",
+      "botMedium": "Medium",
+      "botHard": "Hard",
+      "botThinking": "The bot is thinking",
       "turnTimer": "Turn timer",
       "turnTimerOff": "Off",
       "handModeRandom": "Random",

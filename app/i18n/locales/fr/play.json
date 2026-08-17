@@ -7,7 +7,9 @@
       "deckBuilderTitle": "Constructeur de deck",
       "deckBuilderDesc": "Gérez votre collection et votre deck",
       "localMatchTitle": "Partie locale",
-      "localMatchDesc": "Affrontez un ami en 1 contre 1 en local"
+      "localMatchDesc": "Affrontez un ami en 1 contre 1 en local",
+      "botMatchTitle": "Contre le bot",
+      "botMatchDesc": "Jouez en solo contre trois niveaux de difficulté"
     },
     "board": {
       "hand": "main",
@@ -50,6 +52,12 @@
       "handRuleChaos": "Chaos",
       "firstPlayer": "Premier joueur",
       "firstPlayerRandom": "Aléatoire",
+      "botPlayer": "Bot",
+      "botDifficulty": "Difficulté du bot",
+      "botEasy": "Facile",
+      "botMedium": "Moyen",
+      "botHard": "Difficile",
+      "botThinking": "Le bot réfléchit",
       "turnTimer": "Minuteur de tour",
       "turnTimerOff": "Désactivé",
       "handModeRandom": "Aléatoire",

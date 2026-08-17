@@ -383,3 +383,9 @@
 @media (prefers-reduced-motion: reduce) {
   .end-overlay, .end-modal { animation: none; }
 }
+
+.bot-thinking {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}

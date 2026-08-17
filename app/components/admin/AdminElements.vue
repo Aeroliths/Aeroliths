@@ -181,6 +181,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
+// Auto-import registers this one as AdminMediaPicker, after its directory, so
+// the template name only resolves through an explicit import.
+import MediaPicker from '~/components/admin/MediaPicker.vue'
 
 const { initAuth } = useAuth()
 

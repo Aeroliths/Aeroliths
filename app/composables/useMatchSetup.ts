@@ -1,5 +1,6 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { handSizeFor } from '~/game/engine/match'
+import type { BotDifficulty } from '~/game/bot'
 import { generateBoardElements, randomHand, buildDraftPool } from '~/game/engine/setup'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
 import type { CaptureRules, ElementGraph, HandRule, Player, Stone } from '~/game/engine/types'
@@ -20,6 +21,8 @@ export function useMatchSetup() {
   const openHands = ref(false)
   const suddenDeath = ref(false)
   const handRule = ref<HandRule>('none')
+  const opponentKind = ref<'human' | 'bot'>('human')
+  const botDifficulty = ref<BotDifficulty>('easy')
 
   const catalog = ref<Stone[]>([])
   const elements = ref<ElementGraph>({ strongAgainst: {} })
@@ -63,6 +66,17 @@ export function useMatchSetup() {
       hands.value[player].push(pick)
     }
   }
+
+  // The bot's column fills itself: nobody should have to build their own
+  // opponent's hand. It stays editable, and clearing it does not refill it,
+  // since only the opponent kind and the catalog arriving trigger this.
+  watch(
+    [opponentKind, catalog],
+    ([kind]) => {
+      if (kind === 'bot' && catalog.value.length > 0 && !handFull('B')) autoFill('B')
+    },
+    { immediate: true },
+  )
 
   /* ---------- Hand modes: Random / Mirror / Draft ---------- */
 
@@ -166,6 +180,8 @@ export function useMatchSetup() {
     openHands,
     suddenDeath,
     handRule,
+    opponentKind,
+    botDifficulty,
     catalog,
     elements,
     hands,

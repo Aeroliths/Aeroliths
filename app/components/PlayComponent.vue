@@ -25,11 +25,27 @@
           <span class="mode-title">{{ $t('play.playComponent.localMatchTitle') }}</span>
           <span class="mode-desc">{{ $t('play.playComponent.localMatchDesc') }}</span>
         </button>
+        <button
+          class="mode-card"
+          :class="{ active: mode === 'bot' }"
+          @click="mode = 'bot'"
+        >
+          <span class="mode-icon" aria-hidden="true">🤖</span>
+          <span class="mode-title">{{ $t('play.playComponent.botMatchTitle') }}</span>
+          <span class="mode-desc">{{ $t('play.playComponent.botMatchDesc') }}</span>
+        </button>
       </div>
 
+      <!-- The two match modes share one component, keyed apart so switching
+           cards starts a clean setup rather than carrying the previous one. -->
       <Transition name="mode-fade" mode="out-in">
         <DeckBuilder v-if="mode === 'deck'" key="deck" />
-        <LocalMatch v-else key="local" @active-change="matchActive = $event" />
+        <LocalMatch
+          v-else
+          :key="mode"
+          :opponent="mode === 'bot' ? 'bot' : 'human'"
+          @active-change="matchActive = $event"
+        />
       </Transition>
     </div>
   </div>
@@ -42,7 +58,7 @@ import DeckBuilder from '~/components/DeckBuilder.vue'
 import LocalMatch from '~/components/game/LocalMatch.vue'
 
 const { user } = useAuth()
-const mode = ref<'deck' | 'local'>('deck')
+const mode = ref<'deck' | 'local' | 'bot'>('deck')
 const matchActive = ref(false)
 </script>
 
@@ -51,7 +67,9 @@ const matchActive = ref(false)
 <style scoped>
 .mode-cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Three cards fit side by side when there is room and wrap when there is not,
+     rather than being crushed at intermediate widths. */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.75rem;
   margin-bottom: 1.5rem;
 }

@@ -41,6 +41,14 @@
             <option value="B">{{ $t('play.board.player2') }}</option>
           </select>
         </label>
+        <label v-if="opponentKind === 'bot'" class="size-picker bot-difficulty">
+          {{ $t('play.localMatch.botDifficulty') }}
+          <select v-model="botDifficulty">
+            <option value="easy">{{ $t('play.localMatch.botEasy') }}</option>
+            <option value="medium">{{ $t('play.localMatch.botMedium') }}</option>
+            <option value="hard">{{ $t('play.localMatch.botHard') }}</option>
+          </select>
+        </label>
         <label class="size-picker">
           {{ $t('play.localMatch.turnTimer') }}
           <select v-model.number="turnSeconds">
@@ -86,7 +94,7 @@
           :data-hand-owner="p"
         >
           <div class="player-col-header">
-            <span class="player-name">{{ p === 'A' ? $t('play.board.player1') : $t('play.board.player2') }}</span>
+            <span class="player-name">{{ playerLabel(p) }}</span>
             <span class="player-count">{{ hands[p].length }}/{{ handSize(p) }}</span>
             <button class="ghost-btn sm" @click="autoFill(p)">{{ $t('play.localMatch.autoFill') }}</button>
             <button class="ghost-btn sm" @click="hands[p] = []">{{ $t('play.localMatch.clear') }}</button>
@@ -170,6 +178,8 @@
         @place-at="play"
       />
 
+      <p v-if="botThinking" class="bot-thinking">{{ $t('play.localMatch.botThinking') }}</p>
+
       <div v-if="replaying" class="replay-bar">
         <button class="ghost-btn sm" :disabled="replayIndex === 0" @click="replayStep(-1)">◀</button>
         <span>{{ replayIndex }} / {{ timeline.length - 1 }}</span>
@@ -233,15 +243,25 @@ import { useTurnTimer } from '~/composables/useTurnTimer'
 import { useMatchPersistence } from '~/composables/useMatchPersistence'
 import { useMatchReplay } from '~/composables/useMatchReplay'
 import { useMatchOutcome } from '~/composables/useMatchOutcome'
+import { useBotOpponent, BOT_PLAYER } from '~/composables/useBotOpponent'
 import type { CaptureEvent, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
 type Phase = 'setup' | 'play'
+
+const props = withDefaults(
+  defineProps<{
+    /** Who sits in the second seat. The mode card decides, not a control here. */
+    opponent?: 'human' | 'bot'
+  }>(),
+  { opponent: 'human' },
+)
 
 const emit = defineEmits<{
   (e: 'activeChange', active: boolean): void
 }>()
 
 const sound = useSound()
+const { t } = useI18n()
 
 /* ---------- Pre-match state: options, catalog, hands ---------- */
 
@@ -255,6 +275,8 @@ const {
   openHands,
   suddenDeath,
   handRule,
+  opponentKind,
+  botDifficulty,
   catalog,
   elements,
   hands,
@@ -280,6 +302,14 @@ const {
 
 // Dropping a stone on a full column is a no-op: addToHand already refuses it.
 const { drag, dragOverPlayer, onCatalogPointerDown } = useCatalogDrag(addToHand)
+
+opponentKind.value = props.opponent
+
+/** Column heading: the second seat is named after who actually holds it. */
+function playerLabel(player: Player): string {
+  if (player === 'A') return t('play.board.player1')
+  return opponentKind.value === 'bot' ? t('play.localMatch.botPlayer') : t('play.board.player2')
+}
 
 /* ---------- Match state ---------- */
 
@@ -317,14 +347,35 @@ const {
 
 const { remaining, arm: armClock, stop: stopTimer } = useTurnTimer(playTimedOutMove)
 
+/* ---------- Bot opponent ---------- */
+
+const botEnabled = computed(() => opponentKind.value === 'bot')
+
+const { thinking: botThinking } = useBotOpponent({
+  match,
+  enabled: botEnabled,
+  difficulty: botDifficulty,
+  catalog,
+  forcedHandIndex,
+  suspended: replaying,
+  onMove: playAt,
+})
+
 /* ---------- Turn timer ---------- */
 
 function armTimer() {
-  if (!match.value || match.value.status !== 'playing' || replaying.value) {
+  const state = match.value
+  if (!state || state.status !== 'playing' || replaying.value) {
     stopTimer()
     return
   }
-  armClock(match.value.turnSeconds)
+  // The bot is not on the clock: a search cut short by a timeout would be handed
+  // a random move, which is a bug wearing the costume of a rule.
+  if (botEnabled.value && state.current === BOT_PLAYER) {
+    stopTimer()
+    return
+  }
+  armClock(state.turnSeconds)
 }
 
 /** The clock ran out: play for the current player, honouring Order/Chaos. */
@@ -414,6 +465,12 @@ function selectHand(index: number) {
 function undo() {
   if (timeline.value.length <= 1) return
   timeline.value.pop()
+  // Against the bot, undoing a single ply hands the turn straight back to it and
+  // it replays at once, so the button looks broken. Step back past its reply.
+  if (botEnabled.value && timeline.value.length > 1) {
+    const previous = timeline.value[timeline.value.length - 1]!.state
+    if (previous.current === BOT_PLAYER) timeline.value.pop()
+  }
   match.value = timeline.value[timeline.value.length - 1]!.state
   selectedHandIndex.value = null
   lastEvents.value = []
