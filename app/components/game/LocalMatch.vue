@@ -222,15 +222,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
-import { createMatch, placeStoneWithEvents, getScore, handSizeFor, randomMove, suddenDeathHands } from '~/game/engine/match'
-import { generateBoardElements, randomHand, buildDraftPool } from '~/game/engine/setup'
-import { matchHighlights, buildCaptureInfo } from '~/game/engine/analysis'
+import { createMatch, placeStoneWithEvents, handSizeFor, randomMove, suddenDeathHands } from '~/game/engine/match'
 import { useSound } from '~/composables/useSound'
-import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
-import type { CaptureEvent, CaptureRules, ElementGraph, HandRule, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
+import { useMatchSetup } from '~/composables/useMatchSetup'
+import { useCatalogDrag } from '~/composables/useCatalogDrag'
+import { useTurnTimer } from '~/composables/useTurnTimer'
+import { useMatchPersistence } from '~/composables/useMatchPersistence'
+import { useMatchReplay } from '~/composables/useMatchReplay'
+import { useMatchOutcome } from '~/composables/useMatchOutcome'
+import type { CaptureEvent, MatchState, Player, Stone, TimelineEntry } from '~/game/engine/types'
 
 type Phase = 'setup' | 'play'
 
@@ -239,211 +242,108 @@ const emit = defineEmits<{
 }>()
 
 const sound = useSound()
-const { t } = useI18n()
+
+/* ---------- Pre-match state: options, catalog, hands ---------- */
+
+const {
+  loading,
+  size,
+  rules,
+  startingChoice,
+  elementalCells,
+  turnSeconds,
+  openHands,
+  suddenDeath,
+  handRule,
+  catalog,
+  elements,
+  hands,
+  elementSprites,
+  handSize,
+  handFull,
+  canStart,
+  addToHand,
+  removeFromHand,
+  autoFill,
+  fillRandom,
+  fillMirror,
+  draftActive,
+  draftPool,
+  draftTurn,
+  startDraft,
+  pickDraft,
+  cancelDraft,
+  resolveStartingPlayer,
+  makeBoardElements,
+  load,
+} = useMatchSetup()
+
+// Dropping a stone on a full column is a no-op: addToHand already refuses it.
+const { drag, dragOverPlayer, onCatalogPointerDown } = useCatalogDrag(addToHand)
+
+/* ---------- Match state ---------- */
 
 const phase = ref<Phase>('setup')
-const loading = ref(true)
-const size = ref(3)
-
-const rules = ref<CaptureRules>({ same: false, plus: false, combo: false, wall: false })
-const startingChoice = ref<'A' | 'B' | 'random'>('random')
-const elementalCells = ref(false)
-const turnSeconds = ref(0)
-const openHands = ref(false)
-const suddenDeath = ref(false)
-const handRule = ref<HandRule>('none')
 const lastStarter = ref<Player>('A')
 const suddenDeathRound = ref(0)
 const forcedHandIndex = ref<number | null>(null)
-const remaining = ref(0)
-const replaying = ref(false)
-const replayIndex = ref(0)
-let timerId: ReturnType<typeof setInterval> | null = null
-let replayTimer: ReturnType<typeof setInterval> | null = null
-const elementSprites = computed<Record<string, string>>(() => {
-  const map: Record<string, string> = {}
-  for (const s of catalog.value) {
-    if (s.elementId && s.elementSprite) map[s.elementId] = s.elementSprite
-  }
-  return map
-})
-
-function resolveStartingPlayer(): Player {
-  if (startingChoice.value === 'random') return Math.random() < 0.5 ? 'A' : 'B'
-  return startingChoice.value
-}
-
-const catalog = ref<Stone[]>([])
-const elements = ref<ElementGraph>({ strongAgainst: {} })
-const hands = ref<Record<Player, Stone[]>>({ A: [], B: [] })
 
 const match = ref<MatchState | null>(null)
-const selectedHandIndex = ref<number | null>(null)
 const timeline = ref<TimelineEntry[]>([])
-const canUndo = computed(() => timeline.value.length > 1 && match.value?.status === 'playing')
+const selectedHandIndex = ref<number | null>(null)
 const lastEvents = ref<CaptureEvent[]>([])
+const canUndo = computed(() => timeline.value.length > 1 && match.value?.status === 'playing')
 
-const finalScore = computed(() => (match.value ? getScore(match.value) : { A: 0, B: 0 }))
-const resultTitle = computed(() => {
-  const w = match.value?.winner
-  if (w === 'draw') return t('play.localMatch.draw')
-  if (w === 'A') return t('play.localMatch.player1Wins')
-  if (w === 'B') return t('play.localMatch.player2Wins')
-  return ''
-})
-const resultClass = computed(() => {
-  const w = match.value?.winner
-  return w === 'draw' ? 'is-draw' : `is-${w}`
-})
+const {
+  resumable,
+  save: saveState,
+  clear: clearSave,
+  check: checkSavedMatch,
+  discard: discardResume,
+} = useMatchPersistence()
 
-const cellCount = computed(() => size.value * size.value)
-function handSize(player: Player): number {
-  // While the starter is random, size both hands to the larger half so either
-  // assignment is valid; hands are trimmed to the real sizes when the game starts.
-  if (startingChoice.value === 'random') return Math.ceil(cellCount.value / 2)
-  return handSizeFor(size.value, player, startingChoice.value)
-}
-function handFull(player: Player): boolean {
-  return hands.value[player].length >= handSize(player)
-}
-const canStart = computed(() => handFull('A') && handFull('B'))
+const { resultTitle, resultClass, highlights, captureInfo, animScore } = useMatchOutcome(match, timeline)
 
-function addToHand(player: Player, stone: Stone) {
-  if (handFull(player)) return
-  hands.value[player].push(stone)
-}
-function removeFromHand(player: Player, index: number) {
-  hands.value[player].splice(index, 1)
-}
-function autoFill(player: Player) {
-  while (!handFull(player) && catalog.value.length > 0) {
-    const pick = catalog.value[hands.value[player].length % catalog.value.length]!
-    hands.value[player].push(pick)
+const {
+  replaying,
+  index: replayIndex,
+  state: replayState,
+  events: replayEvents,
+  start: beginReplay,
+  stop: stopReplay,
+  step: replayStep,
+  auto: replayAuto,
+} = useMatchReplay(timeline, match)
+
+const { remaining, arm: armClock, stop: stopTimer } = useTurnTimer(playTimedOutMove)
+
+/* ---------- Turn timer ---------- */
+
+function armTimer() {
+  if (!match.value || match.value.status !== 'playing' || replaying.value) {
+    stopTimer()
+    return
   }
+  armClock(match.value.turnSeconds)
 }
 
-/* ---------- Hand modes: Random / Mirror / Draft ---------- */
-
-function fillRandom() {
-  if (catalog.value.length === 0) return
-  hands.value.A = randomHand(catalog.value, handSize('A'))
-  hands.value.B = randomHand(catalog.value, handSize('B'))
+/** The clock ran out: play for the current player, honouring Order/Chaos. */
+function playTimedOutMove() {
+  if (!match.value) return
+  const move = randomMove(match.value)
+  if (!move) return
+  let handIndex = move.handIndex
+  if (match.value.handRule === 'order') handIndex = 0
+  else if (match.value.handRule === 'chaos' && forcedHandIndex.value !== null) handIndex = forcedHandIndex.value
+  playAt(handIndex, move.x, move.y)
 }
 
-function fillMirror() {
-  if (catalog.value.length === 0) return
-  const a = randomHand(catalog.value, handSize('A'))
-  hands.value.A = a
-  hands.value.B = a.slice(0, handSize('B'))
+/* ---------- Match lifecycle ---------- */
+
+function saveMatch() {
+  if (!match.value || replaying.value) return
+  saveState(match.value)
 }
-
-const draftActive = ref(false)
-const draftPool = ref<Stone[]>([])
-const draftTurn = ref<Player>('A')
-
-function startDraft() {
-  if (catalog.value.length === 0) return
-  hands.value.A = []
-  hands.value.B = []
-  draftPool.value = buildDraftPool(catalog.value, handSize('A') + handSize('B'))
-  draftTurn.value = 'A'
-  draftActive.value = true
-}
-
-function nextDraftTurn() {
-  if (handFull('A') && handFull('B')) { draftActive.value = false; return }
-  const other: Player = draftTurn.value === 'A' ? 'B' : 'A'
-  draftTurn.value = handFull(other) ? draftTurn.value : other
-}
-
-function pickDraft(i: number) {
-  if (!draftActive.value || handFull(draftTurn.value)) return
-  const [stone] = draftPool.value.splice(i, 1)
-  if (stone) hands.value[draftTurn.value].push(stone)
-  nextDraftTurn()
-}
-
-function cancelDraft() {
-  draftActive.value = false
-  draftPool.value = []
-  hands.value.A = []
-  hands.value.B = []
-}
-
-/* ---------- Drag a Lithos from the catalog onto a player column ----------
-   Same pointer-based pattern as GameBoard: a Teleported ghost follows the
-   cursor, and the drop target is resolved via document.elementFromPoint. */
-
-interface CatalogDrag {
-  stone: Stone
-  x: number
-  y: number
-}
-
-const drag = ref<CatalogDrag | null>(null)
-const dragOverPlayer = ref<Player | null>(null)
-const DRAG_THRESHOLD = 6
-let startX = 0
-let startY = 0
-let pendingStone: Stone | null = null
-
-function onCatalogPointerDown(e: PointerEvent, stone: Stone) {
-  e.preventDefault()
-  startX = e.clientX
-  startY = e.clientY
-  pendingStone = stone
-  window.addEventListener('pointermove', onPointerMove)
-  window.addEventListener('pointerup', onPointerUp)
-  window.addEventListener('pointercancel', onPointerCancel)
-}
-
-function playerAtPoint(x: number, y: number): Player | null {
-  const zone = document.elementFromPoint(x, y)?.closest('[data-hand-owner]') as HTMLElement | null
-  const owner = zone?.dataset.handOwner
-  return owner === 'A' || owner === 'B' ? owner : null
-}
-
-function onPointerMove(e: PointerEvent) {
-  if (!pendingStone) return
-  if (!drag.value) {
-    const moved = Math.hypot(e.clientX - startX, e.clientY - startY)
-    if (moved < DRAG_THRESHOLD) return
-    drag.value = { stone: pendingStone, x: e.clientX, y: e.clientY }
-  } else {
-    drag.value.x = e.clientX
-    drag.value.y = e.clientY
-  }
-  dragOverPlayer.value = playerAtPoint(e.clientX, e.clientY)
-}
-
-function removeDragListeners() {
-  window.removeEventListener('pointermove', onPointerMove)
-  window.removeEventListener('pointerup', onPointerUp)
-  window.removeEventListener('pointercancel', onPointerCancel)
-}
-
-function endDrag() {
-  removeDragListeners()
-  drag.value = null
-  dragOverPlayer.value = null
-  pendingStone = null
-}
-
-function onPointerCancel() {
-  endDrag()
-}
-
-function onPointerUp(e: PointerEvent) {
-  if (drag.value && pendingStone) {
-    const player = playerAtPoint(e.clientX, e.clientY)
-    if (player && !handFull(player)) addToHand(player, pendingStone)
-  }
-  endDrag()
-}
-
-onBeforeUnmount(removeDragListeners)
-onBeforeUnmount(stopTimer)
-onBeforeUnmount(() => { if (replayTimer) clearInterval(replayTimer) })
 
 function beginMatch(
   handA: Stone[],
@@ -480,11 +380,8 @@ function start() {
   const startingPlayer = resolveStartingPlayer()
   const handA = [...hands.value.A].slice(0, handSizeFor(size.value, 'A', startingPlayer))
   const handB = [...hands.value.B].slice(0, handSizeFor(size.value, 'B', startingPlayer))
-  const boardElements = elementalCells.value
-    ? generateBoardElements(size.value, Object.keys(elements.value.strongAgainst))
-    : undefined
   suddenDeathRound.value = 0
-  beginMatch(handA, handB, startingPlayer, boardElements)
+  beginMatch(handA, handB, startingPlayer, makeBoardElements())
 }
 
 function rollChaos() {
@@ -551,32 +448,18 @@ function playAt(handIndex: number, x: number, y: number) {
   else saveMatch()
 }
 
-/* ---------- Auto-save & resume ---------- */
-
-const SAVE_KEY = 'aeroliths.localMatch'
-const resumable = ref<MatchState | null>(null)
-
-function saveMatch() {
-  if (!match.value || replaying.value) return
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(match.value)) } catch { /* quota */ }
-}
-function clearSave() {
-  try { localStorage.removeItem(SAVE_KEY) } catch { /* ignore */ }
+function play(x: number, y: number) {
+  if (selectedHandIndex.value === null) return
+  playAt(selectedHandIndex.value, x, y)
 }
 
-function checkResume() {
-  try {
-    const raw = localStorage.getItem(SAVE_KEY)
-    if (!raw) return
-    const saved = JSON.parse(raw) as MatchState
-    if (saved && saved.status === 'playing') resumable.value = saved
-  } catch { clearSave() }
-}
+/* ---------- Resume a match left in progress ---------- */
 
 function resumeMatch() {
-  if (!resumable.value) return
-  match.value = resumable.value
-  timeline.value = [{ state: resumable.value, events: [] }]
+  const saved = resumable.value
+  if (!saved) return
+  match.value = saved
+  timeline.value = [{ state: saved, events: [] }]
   selectedHandIndex.value = null
   lastEvents.value = []
   phase.value = 'play'
@@ -586,36 +469,11 @@ function resumeMatch() {
   armTimer()
 }
 
-function discardResume() { resumable.value = null; clearSave() }
+/* ---------- End of game ---------- */
 
-function play(x: number, y: number) {
-  if (selectedHandIndex.value === null) return
-  playAt(selectedHandIndex.value, x, y)
-}
-
-/* ---------- Turn timer ---------- */
-
-function stopTimer() {
-  if (timerId !== null) { clearInterval(timerId); timerId = null }
-}
-
-function armTimer() {
+function startReplay() {
   stopTimer()
-  if (!match.value || match.value.turnSeconds <= 0 || match.value.status !== 'playing' || replaying.value) return
-  remaining.value = match.value.turnSeconds
-  timerId = setInterval(() => {
-    remaining.value -= 1
-    if (remaining.value <= 0) {
-      stopTimer()
-      const mv = match.value ? randomMove(match.value) : null
-      if (mv) {
-        let hi = mv.handIndex
-        if (match.value!.handRule === 'order') hi = 0
-        else if (match.value!.handRule === 'chaos' && forcedHandIndex.value !== null) hi = forcedHandIndex.value
-        playAt(hi, mv.x, mv.y)
-      }
-    }
-  }, 1000)
+  beginReplay()
 }
 
 watch(
@@ -626,467 +484,10 @@ watch(
   },
 )
 
-/* ---------- End-of-game: replay, highlights, animated score ---------- */
-
-const replayState = computed(() => timeline.value[replayIndex.value]?.state ?? match.value)
-const replayEvents = computed(() => timeline.value[replayIndex.value]?.events ?? [])
-const highlights = computed(() => matchHighlights(timeline.value))
-const captureInfo = computed(() => buildCaptureInfo(timeline.value))
-
-function startReplay() { replaying.value = true; replayIndex.value = 0; stopTimer() }
-function stopReplay() {
-  replaying.value = false
-  if (replayTimer) { clearInterval(replayTimer); replayTimer = null }
-}
-function replayStep(d: number) {
-  replayIndex.value = Math.min(timeline.value.length - 1, Math.max(0, replayIndex.value + d))
-}
-function replayAuto() {
-  if (replayTimer) { clearInterval(replayTimer); replayTimer = null; return }
-  replayTimer = setInterval(() => {
-    if (replayIndex.value >= timeline.value.length - 1) {
-      clearInterval(replayTimer!); replayTimer = null; return
-    }
-    replayIndex.value += 1
-  }, 1000)
-}
-
-const animScore = ref({ A: 0, B: 0 })
-watch(
-  () => match.value?.status,
-  (s) => {
-    if (s !== 'finished') return
-    const target = finalScore.value
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    if (reduce) { animScore.value = { ...target }; return }
-    const startT = performance.now()
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - startT) / 600)
-      animScore.value = { A: Math.round(target.A * t), B: Math.round(target.B * t) }
-      if (t < 1) requestAnimationFrame(tick)
-    }
-    requestAnimationFrame(tick)
-  },
-)
-
-async function loadData() {
-  loading.value = true
-  try {
-    const [lithosRes, elementsRes] = await Promise.all([
-      $fetch<{ data: LithosRecord[] }>('/api/lithos'),
-      $fetch<{ data: ElementRecord[] }>('/api/elements'),
-    ])
-    catalog.value = lithosRes.data.map(toStone)
-    elements.value = toElementGraph(elementsRes.data)
-
-    // Prefill Player 1 from the saved deck (expanded by quantity).
-    try {
-      const deckRes = await $fetch<{ data: { entries: { quantity: number; lithos: LithosRecord }[] } }>(
-        '/api/deck'
-      )
-      const fromDeck: Stone[] = []
-      for (const entry of deckRes.data.entries) {
-        for (let n = 0; n < entry.quantity; n++) fromDeck.push(toStone(entry.lithos))
-      }
-      hands.value.A = fromDeck.slice(0, handSize('A'))
-    } catch {
-      // No deck or not logged in: leave Player 1 hand empty.
-    }
-  } finally {
-    loading.value = false
-  }
-}
-
 onMounted(() => {
-  loadData()
-  checkResume()
+  load()
+  checkSavedMatch()
 })
 </script>
 
-<style scoped>
-.local-match {
-  width: 100%;
-}
-
-/* ---- Setup ---- */
-.setup {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.setup-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.size-picker {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: var(--font-sm);
-  color: var(--color-text-muted);
-}
-
-.size-picker select {
-  background: var(--bg-glass-light);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
-  padding: 0.35rem 0.5rem;
-}
-
-.size-picker select option {
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-}
-
-.rule-toggles {
-  display: flex;
-  gap: 0.75rem;
-  font-size: var(--font-sm);
-  color: var(--color-text-muted);
-}
-
-.rule-toggles label {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  cursor: pointer;
-}
-
-.hand-modes { display: flex; gap: 0.5rem; }
-.draft { display: flex; flex-direction: column; gap: 0.5rem; }
-.draft-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: var(--font-sm);
-  color: var(--color-text-muted);
-}
-.draft-pool {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 0.6rem;
-  max-height: 40vh;
-  overflow-y: auto;
-}
-
-/* ---- Two player columns ---- */
-.players {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.player-col {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  padding: 0.75rem;
-  border-radius: var(--radius-xl, 1rem);
-  border: 2px solid var(--color-border-light);
-  background: var(--bg-glass-light);
-  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
-}
-
-.player-col.owner-A { border-color: color-mix(in srgb, var(--owner-a, #3b82f6) 45%, transparent); }
-.player-col.owner-B { border-color: color-mix(in srgb, var(--owner-b, #ef4444) 45%, transparent); }
-
-/* Highlight the column currently hovered while dragging. */
-.player-col.drop-target.owner-A {
-  border-color: var(--owner-a, #3b82f6);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-}
-.player-col.drop-target.owner-B {
-  border-color: var(--owner-b, #ef4444);
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
-}
-
-/* A full column refuses further drops. */
-.player-col.full.drop-target {
-  box-shadow: none;
-  cursor: not-allowed;
-}
-
-.player-col-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.player-name { font-weight: var(--font-semibold); }
-.player-col.owner-A .player-name { color: var(--owner-a, #3b82f6); }
-.player-col.owner-B .player-name { color: var(--owner-b, #ef4444); }
-
-.player-count {
-  font-size: var(--font-sm);
-  color: var(--color-text-muted);
-  margin-right: auto;
-}
-
-.player-hand {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  min-height: 64px;
-  align-items: center;
-  align-content: flex-start;
-}
-
-.drop-hint {
-  color: var(--color-text-muted);
-  font-size: var(--font-sm);
-  opacity: 0.7;
-}
-
-.ghost-btn {
-  padding: 0.4rem 0.8rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-light);
-  background: var(--bg-glass-light);
-  color: var(--color-text-primary);
-  cursor: pointer;
-  font-size: var(--font-sm);
-}
-
-.ghost-btn:hover { background: var(--bg-glass-medium); }
-
-.ghost-btn.sm { padding: 0.25rem 0.55rem; font-size: 0.72rem; }
-
-.hint {
-  font-size: var(--font-sm);
-  color: var(--color-text-muted);
-  margin: 0;
-}
-
-.mini-card {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--color-border-light);
-  background: var(--bg-glass-medium);
-  padding: 0;
-  cursor: pointer;
-}
-
-.mini-card.owner-A { border-color: var(--owner-a, #3b82f6); }
-.mini-card.owner-B { border-color: var(--owner-b, #ef4444); }
-
-.catalog {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 0.6rem;
-  max-height: 40vh;
-  overflow-y: auto;
-  padding: 0.25rem;
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-xl);
-}
-
-.catalog-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.4rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
-  background: var(--bg-glass-medium);
-  cursor: grab;
-  touch-action: none;
-  transition: transform 0.12s, opacity 0.12s;
-}
-
-.catalog-card { aspect-ratio: auto; }
-.catalog-card > :first-child { width: 64px; height: 64px; }
-.catalog-card:active { cursor: grabbing; }
-.catalog-card:hover { transform: translateY(-2px); }
-.catalog-card.dragging { opacity: 0.4; }
-
-.catalog-name {
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
-  text-align: center;
-}
-
-.start-btn {
-  align-self: flex-start;
-  padding: 0.6rem 1.4rem;
-  border-radius: var(--radius-lg);
-  border: none;
-  background: var(--color-primary, #6366f1);
-  color: #fff;
-  font-weight: var(--font-semibold);
-  cursor: pointer;
-}
-
-.start-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-.empty {
-  color: var(--color-text-muted);
-  font-size: var(--font-sm);
-}
-
-/* ---- Catalog drag ghost (follows the cursor, Teleported to body) ---- */
-.drag-ghost {
-  position: fixed;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 2000;
-}
-
-.ghost-card {
-  width: 76px;
-  height: 76px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-lg);
-  border: 2px solid var(--color-primary, #6366f1);
-  background: var(--bg-glass-medium);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.45);
-}
-
-.ghost-card > :first-child { width: 60px; height: 60px; }
-
-@media (max-width: 720px) {
-  .players { grid-template-columns: 1fr; }
-}
-
-/* ---- Play ---- */
-.play {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  align-items: center;
-}
-
-.play-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-}
-
-.replay-bar { display: flex; align-items: center; gap: 0.5rem; justify-content: center; }
-
-.vol { width: 90px; }
-
-.resume-banner {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 0.8rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
-  background: var(--bg-glass-light);
-  font-size: var(--font-sm);
-}
-
-.end-recap {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  font-size: var(--font-sm);
-  color: var(--color-text-muted);
-  margin-bottom: 1rem;
-}
-
-.owner-A {}
-.owner-B {}
-
-/* ---- End-of-game overlay (absolute inside .play, scoped) ---- */
-.end-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(10, 12, 18, 0.72);
-  backdrop-filter: blur(2px);
-  border-radius: var(--radius-2xl, 1rem);
-  animation: end-fade 0.18s ease-out;
-}
-
-.end-modal {
-  width: min(90%, 360px);
-  background: var(--color-bg-primary, #252830);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-2xl, 1rem);
-  padding: 1.75rem 1.5rem;
-  text-align: center;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  animation: end-pop 0.22s ease-out;
-}
-
-.end-result {
-  font-size: var(--font-2xl, 1.6rem);
-  font-weight: var(--font-bold);
-  margin-bottom: 0.5rem;
-  color: var(--color-text-primary);
-}
-
-.end-result.is-A { color: var(--owner-a, #3b82f6); }
-.end-result.is-B { color: var(--owner-b, #ef4444); }
-.end-result.is-draw { color: var(--color-text-muted); }
-
-.end-score {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  font-size: var(--font-base);
-  color: var(--color-text-muted);
-  margin-bottom: 1.5rem;
-}
-
-.end-score .es-a { color: var(--owner-a, #3b82f6); }
-.end-score .es-b { color: var(--owner-b, #ef4444); }
-.end-score .es-sep { color: var(--color-text-muted); }
-
-.end-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-}
-
-.end-btn {
-  padding: 0.6rem 1.2rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
-  background: var(--bg-glass-light);
-  color: var(--color-text-primary);
-  font-weight: var(--font-semibold);
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-}
-
-.end-btn:hover { background: var(--bg-glass-medium); transform: translateY(-1px); }
-
-.end-btn-primary {
-  background: var(--color-primary, #6366f1);
-  border-color: var(--color-primary, #6366f1);
-  color: #fff;
-}
-
-.end-btn-primary:hover { filter: brightness(1.08); }
-
-@keyframes end-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes end-pop {
-  from { opacity: 0; transform: scale(0.92) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .end-overlay, .end-modal { animation: none; }
-}
-</style>
+<style scoped src="~/assets/css/local-match.css"></style>
