@@ -2,17 +2,19 @@
   "leaderboard": {
     "title": "Leaderboard",
     "subtitle": "Top players of Aeroliths",
-    "tabs": { "collection": "Collection", "battles": "Battles", "inDev": "In Dev" },
+    "tabs": {
+      "collection": "Collection",
+      "battles": "Battles"
+    },
     "battleSection": {
       "title": "Battle Leaderboard",
-      "badge": "In Development",
-      "desc": "The battle leaderboard will be available once the combat system is implemented. Track your wins, win streaks, and climb the ranks!",
       "rank": "#",
       "player": "Player",
       "wins": "Wins",
       "losses": "Losses",
       "winRate": "Win Rate",
-      "streak": "Streak"
+      "level": "Level",
+      "empty": "No match has been played yet."
     },
     "loading": "Loading leaderboard...",
     "ptsSuffix": " pts",
@@ -48,6 +50,9 @@
     "reportSubmitted": "Report submitted. Our team will review it.",
     "loadFailed": "Failed to load leaderboard",
     "profileLoadFailed": "Failed to load profile",
-    "meta": { "title": "Leaderboard - Aeroliths", "description": "See the top Aeroliths players and collections." }
+    "meta": {
+      "title": "Leaderboard - Aeroliths",
+      "description": "See the top Aeroliths players and collections."
+    }
   }
 }

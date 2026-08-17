@@ -9,34 +9,41 @@
         <button :class="{ active: activeTab === 'collection' }" @click="activeTab = 'collection'">
           {{ $t('leaderboard.tabs.collection') }}
         </button>
-        <button :class="{ active: activeTab === 'battles' }" @click="activeTab = 'battles'" class="tab-dev">
+        <button :class="{ active: activeTab === 'battles' }" @click="activeTab = 'battles'">
           {{ $t('leaderboard.tabs.battles') }}
-          <span class="tab-dev-badge">{{ $t('leaderboard.tabs.inDev') }}</span>
         </button>
       </div>
 
-      <!-- Battles Tab (In Development) -->
-      <div v-if="activeTab === 'battles'" class="leaderboard-dev">
-        <div class="dev-icon">&#x2694;&#xFE0F;</div>
-        <h2>{{ $t('leaderboard.battleSection.title') }}</h2>
-        <span class="dev-badge">{{ $t('leaderboard.battleSection.badge') }}</span>
-        <p>{{ $t('leaderboard.battleSection.desc') }}</p>
-        <div class="dev-preview">
-          <div class="dev-preview-header">
+      <!-- Battles Tab -->
+      <div v-if="activeTab === 'battles'" class="battle-board">
+        <div v-if="battlesLoading" class="loading">{{ $t('leaderboard.loading') }}</div>
+        <div v-if="battlesError" class="error-message">{{ battlesError }}</div>
+
+        <div v-if="!battlesLoading && !battlesError && battles.length === 0" class="battle-empty">
+          {{ $t('leaderboard.battleSection.empty') }}
+        </div>
+
+        <div v-if="battles.length > 0" class="ranking-table">
+          <div class="ranking-header">
             <span class="col-rank">{{ $t('leaderboard.battleSection.rank') }}</span>
             <span class="col-player">{{ $t('leaderboard.battleSection.player') }}</span>
+            <span>{{ $t('leaderboard.battleSection.level') }}</span>
             <span>{{ $t('leaderboard.battleSection.wins') }}</span>
             <span>{{ $t('leaderboard.battleSection.losses') }}</span>
             <span>{{ $t('leaderboard.battleSection.winRate') }}</span>
-            <span>{{ $t('leaderboard.battleSection.streak') }}</span>
           </div>
-          <div v-for="i in 5" :key="i" class="dev-preview-row">
-            <span class="col-rank">{{ i }}</span>
-            <span class="dev-placeholder-bar" :style="{ width: (120 - i * 15) + 'px' }"></span>
-            <span class="dev-placeholder-num"></span>
-            <span class="dev-placeholder-num"></span>
-            <span class="dev-placeholder-num"></span>
-            <span class="dev-placeholder-num"></span>
+          <div
+            v-for="player in battles"
+            :key="player.id"
+            class="battle-row"
+            @click="openProfile(player.username)"
+          >
+            <span class="col-rank">{{ player.rank }}</span>
+            <span class="col-player">{{ player.username }}</span>
+            <span>{{ player.level }}</span>
+            <span>{{ player.wins }}</span>
+            <span>{{ player.losses }}</span>
+            <span>{{ player.winRate }}%</span>
           </div>
         </div>
       </div>
@@ -295,14 +302,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { user } = useAuth()
+
+interface BattlePlayer {
+  rank: number
+  id: string
+  username: string
+  level: number
+  wins: number
+  losses: number
+  winRate: number
+}
+
+const battles = ref<BattlePlayer[]>([])
+const battlesLoading = ref(false)
+const battlesError = ref('')
+let battlesLoaded = false
+
+async function loadBattles() {
+  // Fetched the first time the tab is opened rather than on mount: most
+  // visitors never leave the collection tab, and this is a second ranking to
+  // build.
+  if (battlesLoaded) return
+  battlesLoading.value = true
+  battlesError.value = ''
+  try {
+    const response = await $fetch<{ data: { players: BattlePlayer[] } }>('/api/leaderboard/battles')
+    battles.value = response.data.players
+    battlesLoaded = true
+  } catch (err: any) {
+    battlesError.value = err.data?.statusMessage || 'Failed to load the battle ranking'
+  } finally {
+    battlesLoading.value = false
+  }
+}
+
 const { t } = useI18n()
 const currentUsername = computed(() => user.value?.username || '')
 
 const activeTab = ref<'collection' | 'battles'>('collection')
+
+watch(activeTab, (tab) => {
+  if (tab === 'battles') loadBattles()
+})
 const leaderboard = ref<any[]>([])
 const loading = ref(false)
 const error = ref('')
@@ -387,4 +432,23 @@ onMounted(() => {
 })
 </script>
 
-<style scoped src="~/assets/css/leaderboard.css"></style>
+<style scoped src="~/assets/css/leaderboard.css">
+.battle-row {
+  display: grid;
+  grid-template-columns: 60px 1fr repeat(4, 80px);
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
+  cursor: pointer;
+}
+
+.battle-row:hover {
+  background: var(--bg-glass-light);
+}
+
+.battle-empty {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+</style>

@@ -2,17 +2,19 @@
   "leaderboard": {
     "title": "Classement",
     "subtitle": "Meilleurs joueurs d'Aeroliths",
-    "tabs": { "collection": "Collection", "battles": "Combats", "inDev": "En développement" },
+    "tabs": {
+      "collection": "Collection",
+      "battles": "Combats"
+    },
     "battleSection": {
       "title": "Classement des combats",
-      "badge": "En développement",
-      "desc": "Le classement des combats sera disponible une fois le système de combat implémenté. Suivez vos victoires, vos séries et grimpez dans les rangs !",
       "rank": "#",
       "player": "Joueur",
       "wins": "Victoires",
       "losses": "Défaites",
       "winRate": "Taux de victoire",
-      "streak": "Série"
+      "level": "Niveau",
+      "empty": "Aucune partie n'a encore été jouée."
     },
     "loading": "Chargement du classement...",
     "ptsSuffix": " pts",
@@ -48,6 +50,9 @@
     "reportSubmitted": "Signalement envoyé. Notre équipe va l'examiner.",
     "loadFailed": "Échec du chargement du classement",
     "profileLoadFailed": "Échec du chargement du profil",
-    "meta": { "title": "Classement - Aeroliths", "description": "Découvrez les meilleurs joueurs et collections d'Aeroliths." }
+    "meta": {
+      "title": "Classement - Aeroliths",
+      "description": "Découvrez les meilleurs joueurs et collections d'Aeroliths."
+    }
   }
 }

@@ -114,6 +114,7 @@ global.db = {
     match: {
       create: vi.fn(),
       aggregate: vi.fn(),
+      groupBy: vi.fn(),
       count: vi.fn(),
       findMany: vi.fn(),
     },
