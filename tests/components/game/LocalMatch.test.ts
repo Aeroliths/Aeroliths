@@ -31,7 +31,10 @@ const catalog = [
 
 function stubApi({ withDeck = false } = {}) {
   global.$fetch.mockImplementation((url: string) => {
-    if (url === '/api/lithos') return Promise.resolve({ data: catalog })
+    if (url === '/api/collections') {
+        // Three copies of each keeps every hand in these tests fillable.
+        return Promise.resolve({ data: catalog.map((litho) => ({ quantity: 3, lithos: litho })) })
+      }
     if (url === '/api/elements') return Promise.resolve({ data: [] })
     if (url === '/api/deck') {
       // Rejecting stands for "not logged in, or no deck yet".

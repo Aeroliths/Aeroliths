@@ -65,6 +65,8 @@
       "handRuleChaos": "Chaos",
       "firstPlayer": "Premier joueur",
       "firstPlayerRandom": "Aléatoire",
+      "collectionShort": "Votre collection ne peut pas remplir une main de {needed} pierres pour cette taille de plateau. Gagnez des parties pour en obtenir davantage.",
+      "owned": "x{count}",
       "botPlayer": "Bot",
       "botDifficulty": "Difficulté du bot",
       "botEasy": "Facile",

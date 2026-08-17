@@ -65,6 +65,8 @@
       "handRuleChaos": "Chaos",
       "firstPlayer": "First player",
       "firstPlayerRandom": "Random",
+      "collectionShort": "Your collection cannot fill a hand of {needed} stones for this board size. Win matches to collect more.",
+      "owned": "x{count}",
       "botPlayer": "Bot",
       "botDifficulty": "Bot difficulty",
       "botEasy": "Easy",

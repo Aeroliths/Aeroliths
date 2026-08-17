@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { handSizeFor } from '~/game/engine/match'
 import type { BotDifficulty } from '~/game/bot'
-import { generateBoardElements, randomHand, buildDraftPool } from '~/game/engine/setup'
+import { generateBoardElements, buildDraftPool } from '~/game/engine/setup'
 import { toStone, toElementGraph, type LithosRecord, type ElementRecord } from '~/game/engine/adapters'
 import type { CaptureRules, ElementGraph, HandRule, Player, Stone } from '~/game/engine/types'
 
@@ -28,6 +28,25 @@ export function useMatchSetup() {
   const elements = ref<ElementGraph>({ strongAgainst: {} })
   const hands = ref<Record<Player, Stone[]>>({ A: [], B: [] })
 
+  /** How many copies of each owned lithos the player holds, by lithos id. */
+  const owned = ref<Record<string, number>>({})
+
+  function ownedCount(stone: Stone): number {
+    return owned.value[stone.id] ?? 0
+  }
+
+  /**
+   * The collection expanded to one entry per copy. Drawing without repetition
+   * from this list can never hand out more copies than are owned.
+   */
+  const expandedPool = computed<Stone[]>(() => {
+    const pool: Stone[] = []
+    for (const stone of catalog.value) {
+      for (let copy = 0; copy < ownedCount(stone); copy++) pool.push(stone)
+    }
+    return pool
+  })
+
   const elementSprites = computed<Record<string, string>>(() => {
     const map: Record<string, string> = {}
     for (const stone of catalog.value) {
@@ -51,8 +70,27 @@ export function useMatchSetup() {
 
   const canStart = computed(() => handFull('A') && handFull('B'))
 
+  /**
+   * True when the collection cannot fill a hand of the chosen size. Surfaced
+   * rather than left to disable the start button silently: a dead button with
+   * no explanation reads as a bug, not as a rule.
+   */
+  const collectionTooSmall = computed(
+    () => expandedPool.value.length < Math.max(handSize('A'), handSize('B')),
+  )
+
+  function countInHand(player: Player, stone: Stone): number {
+    return hands.value[player].filter((held) => held.id === stone.id).length
+  }
+
+  /** Ownership caps a hand; it does not drain a pool shared between the two. */
+  function canAdd(player: Player, stone: Stone): boolean {
+    if (handFull(player)) return false
+    return countInHand(player, stone) < ownedCount(stone)
+  }
+
   function addToHand(player: Player, stone: Stone) {
-    if (handFull(player)) return
+    if (!canAdd(player, stone)) return
     hands.value[player].push(stone)
   }
 
@@ -61,9 +99,17 @@ export function useMatchSetup() {
   }
 
   function autoFill(player: Player) {
-    while (!handFull(player) && catalog.value.length > 0) {
-      const pick = catalog.value[hands.value[player].length % catalog.value.length]!
-      hands.value[player].push(pick)
+    // Stops as soon as a whole pass adds nothing, so a collection too small for
+    // the hand ends the loop instead of spinning forever.
+    let added = true
+    while (added && !handFull(player)) {
+      added = false
+      for (const stone of catalog.value) {
+        if (!canAdd(player, stone)) continue
+        hands.value[player].push(stone)
+        added = true
+        if (handFull(player)) break
+      }
     }
   }
 
@@ -80,15 +126,22 @@ export function useMatchSetup() {
 
   /* ---------- Hand modes: Random / Mirror / Draft ---------- */
 
+  // All three modes draw without repetition from the expanded pool, which holds
+  // exactly as many entries as the player owns copies. Ownership is therefore
+  // structural here rather than checked afterwards.
+  function drawFromPool(count: number): Stone[] {
+    return buildDraftPool(expandedPool.value, Math.min(count, expandedPool.value.length))
+  }
+
   function fillRandom() {
-    if (catalog.value.length === 0) return
-    hands.value.A = randomHand(catalog.value, handSize('A'))
-    hands.value.B = randomHand(catalog.value, handSize('B'))
+    if (expandedPool.value.length === 0) return
+    hands.value.A = drawFromPool(handSize('A'))
+    hands.value.B = drawFromPool(handSize('B'))
   }
 
   function fillMirror() {
-    if (catalog.value.length === 0) return
-    const a = randomHand(catalog.value, handSize('A'))
+    if (expandedPool.value.length === 0) return
+    const a = drawFromPool(handSize('A'))
     hands.value.A = a
     hands.value.B = a.slice(0, handSize('B'))
   }
@@ -98,10 +151,10 @@ export function useMatchSetup() {
   const draftTurn = ref<Player>('A')
 
   function startDraft() {
-    if (catalog.value.length === 0) return
+    if (expandedPool.value.length === 0) return
     hands.value.A = []
     hands.value.B = []
-    draftPool.value = buildDraftPool(catalog.value, handSize('A') + handSize('B'))
+    draftPool.value = drawFromPool(handSize('A') + handSize('B'))
     draftTurn.value = 'A'
     draftActive.value = true
   }
@@ -145,11 +198,16 @@ export function useMatchSetup() {
   async function load() {
     loading.value = true
     try {
-      const [lithosRes, elementsRes] = await Promise.all([
-        $fetch<{ data: LithosRecord[] }>('/api/lithos'),
+      const [collectionRes, elementsRes] = await Promise.all([
+        $fetch<{ data: { quantity: number; lithos: LithosRecord }[] }>('/api/collections'),
         $fetch<{ data: ElementRecord[] }>('/api/elements'),
       ])
-      catalog.value = lithosRes.data.map(toStone)
+
+      // One entry per owned kind for display, plus how many are held.
+      catalog.value = collectionRes.data.map((row) => toStone(row.lithos))
+      owned.value = Object.fromEntries(
+        collectionRes.data.map((row) => [row.lithos.id, row.quantity]),
+      )
       elements.value = toElementGraph(elementsRes.data)
 
       // Prefill Player 1 from the saved deck (expanded by quantity).
@@ -183,13 +241,19 @@ export function useMatchSetup() {
     opponentKind,
     botDifficulty,
     catalog,
+    owned,
+    ownedCount,
+    expandedPool,
     elements,
     hands,
     elementSprites,
     handSize,
     handFull,
     canStart,
+    collectionTooSmall,
     addToHand,
+    canAdd,
+    countInHand,
     removeFromHand,
     autoFill,
     fillRandom,

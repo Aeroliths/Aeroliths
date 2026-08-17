@@ -129,12 +129,18 @@
           class="catalog-card"
           :class="{ dragging: drag?.stone.id === stone.id }"
           @pointerdown="onCatalogPointerDown($event, stone)"
+          @click="addToHand('A', stone)"
           @dragstart.prevent
         >
           <GameStone :stone="stone" />
           <span class="catalog-name">{{ stone.name }}</span>
+          <span class="catalog-owned">{{ $t('play.localMatch.owned', { count: ownedCount(stone) }) }}</span>
         </button>
       </div>
+
+      <p v-if="collectionTooSmall" class="collection-short">
+        {{ $t('play.localMatch.collectionShort', { needed: Math.max(handSize('A'), handSize('B')) }) }}
+      </p>
 
       <button class="start-btn" :disabled="!canStart" @click="start">
         {{ $t('play.localMatch.startGame') }}
@@ -287,12 +293,15 @@ const {
   opponentKind,
   botDifficulty,
   catalog,
+  ownedCount,
+  expandedPool,
   elements,
   hands,
   elementSprites,
   handSize,
   handFull,
   canStart,
+  collectionTooSmall,
   addToHand,
   removeFromHand,
   autoFill,
