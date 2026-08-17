@@ -49,12 +49,22 @@
           <span class="mode-title">{{ $t('play.playComponent.botMatchTitle') }}</span>
           <span class="mode-desc">{{ $t('play.playComponent.botMatchDesc') }}</span>
         </button>
+        <button
+          class="mode-card"
+          :class="{ active: mode === 'chests' }"
+          @click="mode = 'chests'"
+        >
+          <span class="mode-icon" aria-hidden="true">🧰</span>
+          <span class="mode-title">{{ $t('play.playComponent.chestsTitle') }}</span>
+          <span class="mode-desc">{{ $t('play.playComponent.chestsDesc') }}</span>
+        </button>
       </div>
 
       <!-- The two match modes share one component, keyed apart so switching
            cards starts a clean setup rather than carrying the previous one. -->
       <Transition name="mode-fade" mode="out-in">
         <DeckBuilder v-if="mode === 'deck'" key="deck" />
+        <ChestInventory v-else-if="mode === 'chests'" key="chests" />
         <LocalMatch
           v-else
           :key="mode"
@@ -71,9 +81,10 @@ import { ref, computed } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import DeckBuilder from '~/components/DeckBuilder.vue'
 import LocalMatch from '~/components/game/LocalMatch.vue'
+import ChestInventory from '~/components/game/ChestInventory.vue'
 
 const { user } = useAuth()
-const mode = ref<'deck' | 'local' | 'bot'>('deck')
+const mode = ref<'deck' | 'local' | 'bot' | 'chests'>('deck')
 const matchActive = ref(false)
 
 /** XP still to earn before the next level, or null at the top of the curve. */

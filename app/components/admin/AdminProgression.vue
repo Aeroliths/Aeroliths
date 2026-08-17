@@ -71,10 +71,25 @@
           </select>
         </div>
         <div class="form-group">
+          <label :for="`reward-kind-${index}`">Reward</label>
+          <select :id="`reward-kind-${index}`" v-model="reward.kind" class="reward-kind">
+            <option value="lithos">Lithos</option>
+            <option value="chest">Chest</option>
+          </select>
+        </div>
+        <div v-if="reward.kind === 'lithos'" class="form-group">
           <label :for="`reward-lithos-${index}`">Lithos</label>
           <select :id="`reward-lithos-${index}`" v-model="reward.lithosId" class="reward-lithos">
             <option v-for="lithos in catalog" :key="lithos.id" :value="lithos.id">
               {{ lithos.name }}
+            </option>
+          </select>
+        </div>
+        <div v-else class="form-group">
+          <label :for="`reward-chest-${index}`">Chest</label>
+          <select :id="`reward-chest-${index}`" v-model="reward.chestTypeId" class="reward-chest">
+            <option v-for="chest in chestTypes" :key="chest.id" :value="chest.id">
+              {{ chest.name }}
             </option>
           </select>
         </div>
@@ -102,6 +117,75 @@
         </button>
       </div>
     </section>
+
+    <section class="progression-block">
+      <div class="progression-head">
+        <h3>Chest types</h3>
+        <p class="progression-hint">
+          Weights are relative: an entry weighted 3 comes out three times as
+          often as one weighted 1.
+        </p>
+      </div>
+
+      <div v-if="chestTypes.length === 0" class="no-data">No chest type yet.</div>
+
+      <div v-for="chest in chestTypes" :key="chest.id" class="chest-row">
+        <div class="chest-head">
+          <strong>{{ chest.name }}</strong>
+          <button class="btn-delete-small remove-chest" @click="removeChest(chest)">Delete</button>
+        </div>
+
+        <div v-if="chest.lootEntries.length === 0" class="no-data">
+          Empty table: this chest cannot be opened until it holds something.
+        </div>
+
+        <div v-for="(entry, index) in chest.lootEntries" :key="index" class="loot-row">
+          <div class="form-group">
+            <label :for="`loot-lithos-${chest.id}-${index}`">Lithos</label>
+            <select
+              :id="`loot-lithos-${chest.id}-${index}`"
+              v-model="entry.lithosId"
+              class="loot-lithos"
+            >
+              <option v-for="lithos in catalog" :key="lithos.id" :value="lithos.id">
+                {{ lithos.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label :for="`loot-weight-${chest.id}-${index}`">Weight</label>
+            <input
+              :id="`loot-weight-${chest.id}-${index}`"
+              v-model.number="entry.weight"
+              type="number"
+              class="loot-weight"
+              min="1"
+            />
+          </div>
+          <button class="btn-delete-small" @click="chest.lootEntries.splice(index, 1)">
+            Remove
+          </button>
+        </div>
+
+        <div class="progression-actions">
+          <button class="btn-add" @click="addLootEntry(chest)">Add entry</button>
+          <button class="btn-create save-loot" :disabled="saving" @click="saveLoot(chest)">
+            Save table
+          </button>
+        </div>
+      </div>
+
+      <div class="progression-actions">
+        <input
+          v-model="newChestName"
+          class="new-chest-name"
+          placeholder="New chest type name"
+        />
+        <button class="btn-create add-chest" :disabled="saving" @click="createChest">
+          Add chest type
+        </button>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -119,10 +203,19 @@ interface RewardRow {
   kind: string
   quantity: number
   lithosId: string
+  chestTypeId: string
+}
+
+interface ChestRow {
+  id: string
+  name: string
+  lootEntries: { lithosId: string; weight: number }[]
 }
 
 const curve = ref<CurveRow[]>([])
 const rewards = ref<RewardRow[]>([])
+const chestTypes = ref<ChestRow[]>([])
+const newChestName = ref('')
 const catalog = ref<{ id: string; name: string }[]>([])
 const loading = ref(false)
 const saving = ref(false)
@@ -138,7 +231,15 @@ async function load() {
       $fetch<any>('/api/lithos'),
     ])
     curve.value = config.data.curve.map((entry: CurveRow) => ({ ...entry }))
-    rewards.value = config.data.rewards.map((reward: RewardRow) => ({ ...reward }))
+    rewards.value = config.data.rewards.map((reward: RewardRow) => ({
+      ...reward,
+      lithosId: reward.lithosId ?? '',
+      chestTypeId: reward.chestTypeId ?? '',
+    }))
+    chestTypes.value = (config.data.chestTypes ?? []).map((chest: ChestRow) => ({
+      ...chest,
+      lootEntries: chest.lootEntries.map((entry) => ({ ...entry })),
+    }))
     catalog.value = lithos.data
   } catch (err: any) {
     error.value = err.data?.statusMessage || 'Failed to load the progression config'
@@ -159,7 +260,62 @@ function addReward() {
     kind: 'lithos',
     quantity: 1,
     lithosId: catalog.value[0]?.id ?? '',
+    chestTypeId: chestTypes.value[0]?.id ?? '',
   })
+}
+
+function addLootEntry(chest: ChestRow) {
+  chest.lootEntries.push({ lithosId: catalog.value[0]?.id ?? '', weight: 1 })
+}
+
+async function createChest() {
+  const name = newChestName.value.trim()
+  if (name.length === 0) {
+    error.value = 'A chest type needs a name'
+    return
+  }
+  saving.value = true
+  error.value = ''
+  try {
+    await $fetch('/api/admin/chests', { method: 'POST', body: { name } })
+    newChestName.value = ''
+    await load()
+    notice.value = 'Chest type created'
+  } catch (err: any) {
+    error.value = err.data?.statusMessage || 'Failed to create the chest type'
+  } finally {
+    saving.value = false
+  }
+}
+
+async function removeChest(chest: ChestRow) {
+  saving.value = true
+  error.value = ''
+  try {
+    await $fetch(`/api/admin/chests/${chest.id}`, { method: 'DELETE' })
+    await load()
+    notice.value = 'Chest type deleted'
+  } catch (err: any) {
+    error.value = err.data?.statusMessage || 'Failed to delete the chest type'
+  } finally {
+    saving.value = false
+  }
+}
+
+async function saveLoot(chest: ChestRow) {
+  saving.value = true
+  error.value = ''
+  try {
+    await $fetch(`/api/admin/chests/${chest.id}/loot`, {
+      method: 'PUT',
+      body: { entries: chest.lootEntries },
+    })
+    notice.value = 'Loot table saved'
+  } catch (err: any) {
+    error.value = err.data?.statusMessage || 'Failed to save the loot table'
+  } finally {
+    saving.value = false
+  }
 }
 
 async function saveCurve() {
@@ -237,7 +393,7 @@ onMounted(load)
 
 .reward-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr) auto;
   gap: var(--spacing-md);
   align-items: end;
   margin-bottom: var(--spacing-sm);
@@ -261,9 +417,41 @@ onMounted(load)
   flex-wrap: wrap;
 }
 
+.chest-row {
+  padding: var(--spacing-md);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.chest-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.loot-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+  gap: var(--spacing-md);
+  align-items: end;
+  margin-bottom: var(--spacing-sm);
+}
+
+.loot-row .form-group {
+  margin-bottom: 0;
+}
+
+.loot-row .btn-delete-small {
+  height: fit-content;
+  margin-bottom: var(--spacing-xs);
+}
+
 @media (max-width: 720px) {
   .curve-row,
-  .reward-row {
+  .reward-row,
+  .loot-row {
     grid-template-columns: 1fr;
   }
 }

@@ -13,7 +13,16 @@
       "level": "Niveau {level}",
       "xpTotal": "{xp} XP",
       "xpToNext": "{xp} XP avant le niveau suivant",
-      "maxLevel": "Niveau maximal atteint"
+      "maxLevel": "Niveau maximal atteint",
+      "chestsTitle": "Coffres",
+      "chestsDesc": "Ouvrez ce que vos niveaux vous ont rapporté"
+    },
+    "chests": {
+      "loading": "Chargement de vos coffres...",
+      "empty": "Aucun coffre pour l'instant. Montez de niveau pour en gagner.",
+      "held": "{count} en réserve",
+      "open": "Ouvrir",
+      "drew": "Vous avez obtenu {name}"
     },
     "board": {
       "hand": "main",

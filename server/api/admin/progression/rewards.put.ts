@@ -24,11 +24,20 @@ export default defineEventHandler(async (event) => {
       if (reward.quantity < 1) {
         throw createError({ statusCode: 400, statusMessage: 'Quantity must be at least 1' })
       }
-      if (reward.kind !== 'lithos') {
+      if (reward.kind !== 'lithos' && reward.kind !== 'chest') {
         throw createError({ statusCode: 400, statusMessage: `Unknown reward kind: ${reward.kind}` })
       }
-      if (typeof reward.lithosId !== 'string' || reward.lithosId.length === 0) {
+      if (
+        reward.kind === 'lithos' &&
+        (typeof reward.lithosId !== 'string' || reward.lithosId.length === 0)
+      ) {
         throw createError({ statusCode: 400, statusMessage: 'A lithos reward needs a lithos' })
+      }
+      if (
+        reward.kind === 'chest' &&
+        (typeof reward.chestTypeId !== 'string' || reward.chestTypeId.length === 0)
+      ) {
+        throw createError({ statusCode: 400, statusMessage: 'A chest reward needs a chest type' })
       }
     }
 
@@ -56,7 +65,8 @@ export default defineEventHandler(async (event) => {
             level: reward.level,
             kind: reward.kind,
             quantity: reward.quantity,
-            lithosId: reward.lithosId,
+            lithosId: reward.kind === 'lithos' ? reward.lithosId : null,
+            chestTypeId: reward.kind === 'chest' ? reward.chestTypeId : null,
           },
         })
       }

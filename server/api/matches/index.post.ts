@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
     const [curve, tiers] = await Promise.all([
       db.postgres.progressionLevel.findMany({ select: { level: true, xpRequired: true } }),
       db.postgres.levelReward.findMany({
-        select: { level: true, kind: true, quantity: true, lithosId: true },
+        select: { level: true, kind: true, quantity: true, lithosId: true, chestTypeId: true },
       }),
     ])
 
@@ -148,6 +148,7 @@ export default defineEventHandler(async (event) => {
           level: current?.level ?? 1,
           levelsGained: [] as number[],
           rewards: [] as { lithosId: string; quantity: number }[],
+          chests: [] as { chestTypeId: string; quantity: number }[],
         }
       }
 
@@ -168,19 +169,35 @@ export default defineEventHandler(async (event) => {
       const newLevel = levelForXp(updated.xp, curve)
       const levelsGained = levelsCrossed(previousLevel, newLevel)
       if (levelsGained.length === 0) {
-        return { totalXp: updated.xp, level: previousLevel, levelsGained, rewards: [] }
+        return { totalXp: updated.xp, level: previousLevel, levelsGained, rewards: [], chests: [] }
       }
 
       await tx.user.update({ where: { id: authUser.userId }, data: { level: newLevel } })
 
       const rewards: { lithosId: string; quantity: number }[] = []
+      const chests: { chestTypeId: string; quantity: number }[] = []
+
       for (const tier of tiers) {
         if (!levelsGained.includes(tier.level)) continue
-        // A tier whose lithos was deleted still counts as a level reached; it
-        // simply hands nothing over, rather than blocking the progression of
-        // everyone who passes through that level.
-        if (tier.kind !== 'lithos' || !tier.lithosId) continue
         const quantity = Math.max(1, tier.quantity)
+
+        // A tier pointing at nothing still counts as a level reached; it simply
+        // hands nothing over, rather than blocking the progression of everyone
+        // who passes through that level.
+        if (tier.kind === 'chest') {
+          if (!tier.chestTypeId) continue
+          await tx.userChest.upsert({
+            where: {
+              userId_chestTypeId: { userId: authUser.userId, chestTypeId: tier.chestTypeId },
+            },
+            create: { userId: authUser.userId, chestTypeId: tier.chestTypeId, quantity },
+            update: { quantity: { increment: quantity } },
+          })
+          chests.push({ chestTypeId: tier.chestTypeId, quantity })
+          continue
+        }
+
+        if (tier.kind !== 'lithos' || !tier.lithosId) continue
         await tx.collections.upsert({
           where: { userId_lithosId: { userId: authUser.userId, lithosId: tier.lithosId } },
           create: { userId: authUser.userId, lithosId: tier.lithosId, quantity },
@@ -189,7 +206,7 @@ export default defineEventHandler(async (event) => {
         rewards.push({ lithosId: tier.lithosId, quantity })
       }
 
-      return { totalXp: updated.xp, level: newLevel, levelsGained, rewards }
+      return { totalXp: updated.xp, level: newLevel, levelsGained, rewards, chests }
     })
 
     return {
@@ -204,6 +221,7 @@ export default defineEventHandler(async (event) => {
         level: grant.level,
         levelsGained: grant.levelsGained,
         rewards: grant.rewards,
+        chests: grant.chests,
       },
     }
   } catch (error: any) {

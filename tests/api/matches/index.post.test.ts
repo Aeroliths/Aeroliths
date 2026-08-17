@@ -55,6 +55,7 @@ describe('POST /api/matches', () => {
     global.db.postgres.user.findUnique.mockResolvedValue({ xp: 0, level: 1 })
     global.db.postgres.progressionLevel.findMany.mockResolvedValue([])
     global.db.postgres.levelReward.findMany.mockResolvedValue([])
+    global.db.postgres.userChest.upsert.mockResolvedValue({})
   })
 
   it('records the match and grants xp', async () => {
@@ -188,6 +189,29 @@ describe('POST /api/matches', () => {
       expect(result.data.xpAwarded).toBe(0)
       expect(result.data.levelsGained).toEqual([])
       expect(global.db.postgres.collections.upsert).not.toHaveBeenCalled()
+    })
+
+    it('fills the inventory rather than the collection for a chest tier', async () => {
+      global.db.postgres.levelReward.findMany.mockResolvedValue([
+        { level: 2, kind: 'chest', quantity: 1, lithosId: null, chestTypeId: 'chest-1' },
+      ])
+
+      const result = await handler(event)
+
+      expect(result.data.levelsGained).toEqual([2, 3])
+      expect(global.db.postgres.userChest.upsert).toHaveBeenCalledTimes(1)
+      expect(global.db.postgres.collections.upsert).not.toHaveBeenCalled()
+    })
+
+    it('skips a chest tier with no chest type', async () => {
+      global.db.postgres.levelReward.findMany.mockResolvedValue([
+        { level: 2, kind: 'chest', quantity: 1, lithosId: null, chestTypeId: null },
+      ])
+
+      const result = await handler(event)
+
+      expect(result.data.levelsGained).toEqual([2, 3])
+      expect(global.db.postgres.userChest.upsert).not.toHaveBeenCalled()
     })
 
     it('counts a tier whose lithos was deleted as reached, and hands nothing over', async () => {

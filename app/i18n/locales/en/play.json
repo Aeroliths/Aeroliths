@@ -13,7 +13,16 @@
       "level": "Level {level}",
       "xpTotal": "{xp} XP",
       "xpToNext": "{xp} XP to the next level",
-      "maxLevel": "Highest level reached"
+      "maxLevel": "Highest level reached",
+      "chestsTitle": "Chests",
+      "chestsDesc": "Open what your levels earned you"
+    },
+    "chests": {
+      "loading": "Loading your chests...",
+      "empty": "No chest yet. Level up to earn some.",
+      "held": "{count} held",
+      "open": "Open",
+      "drew": "You got {name}"
     },
     "board": {
       "hand": "hand",

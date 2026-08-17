@@ -41,6 +41,7 @@ model User {
   roleId         String
   collections    Collections[]
   matches        Match[]
+  chests         UserChest[]
   deck           Deck?
   loginHistory   LoginHistory[]
   oauthAccounts  OAuthAccount[]
@@ -139,6 +140,7 @@ model Lithos {
   collections  Collections[]
   deckEntries  DeckEntry[]
   levelRewards LevelReward[]
+  lootEntries  LootEntry[]
   element     Elements?   @relation(fields: [elementId], references: [id])
   elementId   String?
 
@@ -214,7 +216,51 @@ model LevelReward {
   lithosId String?
   lithos   Lithos? @relation(fields: [lithosId], references: [id], onDelete: SetNull)
 
+  chestTypeId String?
+  chestType   ChestType? @relation(fields: [chestTypeId], references: [id], onDelete: Restrict)
+
   @@map("level_rewards")
+}
+
+model ChestType {
+  id   String @id @default(cuid())
+  name String @unique
+
+  lootEntries  LootEntry[]
+  userChests   UserChest[]
+  levelRewards LevelReward[]
+
+  @@map("chest_types")
+}
+
+model LootEntry {
+  id String @id @default(cuid())
+  // Relative weight, not a percentage: adding a line must not force a rebalance
+  // of every other one.
+  weight Int @default(1)
+
+  chestTypeId String
+  chestType   ChestType @relation(fields: [chestTypeId], references: [id], onDelete: Cascade)
+  lithosId    String
+  lithos      Lithos    @relation(fields: [lithosId], references: [id], onDelete: Cascade)
+
+  @@unique([chestTypeId, lithosId])
+  @@map("loot_entries")
+}
+
+model UserChest {
+  id       String @id @default(cuid())
+  quantity Int    @default(0)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Restrict, not Cascade: deleting a type must never quietly take chests out
+  // of players' hands.
+  chestTypeId String
+  chestType   ChestType @relation(fields: [chestTypeId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, chestTypeId])
+  @@map("user_chests")
 }
 
 model Elements {

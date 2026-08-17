@@ -65,14 +65,15 @@ describe('PlayComponent', () => {
     expect(wrapper.find('.progress-fill').attributes('style')).toContain('100%')
   })
 
-  it('offers three modes, including the bot', async () => {
+  it('offers four modes, including the bot and the chests', async () => {
     wrapper = mount(PlayComponent, mountOptions)
     await flushPromises()
 
     const cards = wrapper.findAll('.mode-card')
 
-    expect(cards).toHaveLength(3)
+    expect(cards).toHaveLength(4)
     expect(cards[2]!.text()).toContain('play.playComponent.botMatchTitle')
+    expect(cards[3]!.text()).toContain('play.playComponent.chestsTitle')
   })
 
   // The bot used to be reachable only through a dropdown buried among the rule
@@ -85,6 +86,16 @@ describe('PlayComponent', () => {
     await flushPromises()
 
     expect(wrapper.find('.bot-difficulty').exists()).toBe(true)
+  })
+
+  it('opens the chest inventory from the fourth card', async () => {
+    wrapper = mount(PlayComponent, mountOptions)
+    await flushPromises()
+
+    await wrapper.findAll('.mode-card')[3]!.trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.chest-inventory').exists()).toBe(true)
   })
 
   it('keeps the hotseat card free of any bot control', async () => {

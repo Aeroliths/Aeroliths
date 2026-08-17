@@ -67,7 +67,28 @@ describe('PUT /api/admin/progression/rewards', () => {
   })
 
   it('refuses an unknown reward kind', async () => {
-    global.readBody.mockResolvedValue({ rewards: [{ ...validReward, kind: 'chest' }] })
+    global.readBody.mockResolvedValue({ rewards: [{ ...validReward, kind: 'mystery' }] })
+
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+  })
+
+  it('accepts a chest reward', async () => {
+    global.readBody.mockResolvedValue({
+      rewards: [{ level: 2, kind: 'chest', quantity: 1, chestTypeId: 'chest-1' }],
+    })
+
+    const result = await handler(event)
+
+    expect(result.success).toBe(true)
+    const { data } = global.db.postgres.levelReward.create.mock.calls[0]![0]
+    expect(data.chestTypeId).toBe('chest-1')
+    expect(data.lithosId).toBeNull()
+  })
+
+  it('refuses a chest reward with no chest type', async () => {
+    global.readBody.mockResolvedValue({
+      rewards: [{ level: 2, kind: 'chest', quantity: 1, chestTypeId: '' }],
+    })
 
     await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
   })

@@ -19,7 +19,14 @@ describe('AdminProgression', () => {
               { level: 1, xpRequired: 0 },
               { level: 2, xpRequired: 100 },
             ],
-            rewards: [{ level: 2, kind: 'lithos', quantity: 1, lithosId: 'l-1' }],
+            rewards: [{ level: 2, kind: 'lithos', quantity: 1, lithosId: 'l-1', chestTypeId: null }],
+            chestTypes: [
+              {
+                id: 'chest-1',
+                name: 'Wooden chest',
+                lootEntries: [{ lithosId: 'l-1', weight: 3 }],
+              },
+            ],
           },
         })
       }
@@ -98,6 +105,50 @@ describe('AdminProgression', () => {
 
     // The row it added must not be the one that breaks the save.
     expect(wrapper.find('.error-message').exists()).toBe(false)
+  })
+
+  it('lists the chest types with their table', async () => {
+    wrapper = mount(AdminProgression)
+    await flushPromises()
+
+    expect(wrapper.findAll('.chest-row')).toHaveLength(1)
+    expect(wrapper.findAll('.loot-row')).toHaveLength(1)
+  })
+
+  it('swaps the lithos picker for a chest picker on a chest reward', async () => {
+    wrapper = mount(AdminProgression)
+    await flushPromises()
+
+    expect(wrapper.find('.reward-row .reward-lithos').exists()).toBe(true)
+    expect(wrapper.find('.reward-row .reward-chest').exists()).toBe(false)
+
+    await wrapper.find('.reward-row .reward-kind').setValue('chest')
+
+    expect(wrapper.find('.reward-row .reward-chest').exists()).toBe(true)
+    expect(wrapper.find('.reward-row .reward-lithos').exists()).toBe(false)
+  })
+
+  it('saves one loot table at a time', async () => {
+    wrapper = mount(AdminProgression)
+    await flushPromises()
+    vi.mocked(global.$fetch).mockClear()
+
+    await wrapper.find('.save-loot').trigger('click')
+    await flushPromises()
+
+    expect(savedCalls('loot')).toHaveLength(1)
+  })
+
+  it('refuses to create a chest type with no name', async () => {
+    wrapper = mount(AdminProgression)
+    await flushPromises()
+    vi.mocked(global.$fetch).mockClear()
+
+    await wrapper.find('.add-chest').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.error-message').exists()).toBe(true)
+    expect(savedCalls('/api/admin/chests')).toHaveLength(0)
   })
 
   it('surfaces a rejection from the server', async () => {

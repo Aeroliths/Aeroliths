@@ -128,6 +128,24 @@ global.db = {
       deleteMany: vi.fn(),
       createMany: vi.fn(),
     },
+    chestType: {
+      create: vi.fn(),
+      delete: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+    },
+    lootEntry: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      deleteMany: vi.fn(),
+    },
+    userChest: {
+      upsert: vi.fn(),
+      update: vi.fn(),
+      updateMany: vi.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+    },
     levelReward: {
       create: vi.fn(),
       findMany: vi.fn(),
