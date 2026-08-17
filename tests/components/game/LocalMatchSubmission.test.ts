@@ -48,7 +48,11 @@ describe('match submission', () => {
     global.$fetch.mockImplementation((url: string) => {
       if (url === '/api/lithos') return Promise.resolve({ data: catalog })
       if (url === '/api/elements') return Promise.resolve({ data: [] })
-      if (url === '/api/matches') return Promise.resolve({ data: { xpAwarded: 100 } })
+      if (url === '/api/matches') {
+        return Promise.resolve({
+          data: { xpAwarded: 100, cappedToday: false, level: 3, levelsGained: [2, 3] },
+        })
+      }
       return Promise.reject(new Error('no deck'))
     })
   })
@@ -101,6 +105,8 @@ describe('match submission', () => {
 
     // The reward the server granted is shown, rather than earned in silence.
     expect(wrapper.find('.end-xp').exists()).toBe(true)
+    expect(wrapper.find('.end-level').exists()).toBe(true)
+    expect(wrapper.find('.end-level-up').exists()).toBe(true)
 
     const payload = (calls[0]![1] as any).body
     expect(payload.hands.A).toHaveLength(5)

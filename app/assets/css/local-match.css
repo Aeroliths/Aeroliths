@@ -407,3 +407,14 @@
   font-size: var(--font-sm);
   color: var(--color-text-muted);
 }
+
+.end-level {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.end-level-up {
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-primary, #6366f1);
+}

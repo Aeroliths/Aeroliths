@@ -52,6 +52,9 @@ describe('POST /api/matches', () => {
     global.db.postgres.match.aggregate.mockResolvedValue({ _sum: { xpAwarded: 0 } })
     global.db.postgres.match.create.mockResolvedValue({ id: 'm-1' })
     global.db.postgres.user.update.mockResolvedValue({ xp: 100 })
+    global.db.postgres.user.findUnique.mockResolvedValue({ xp: 0, level: 1 })
+    global.db.postgres.progressionLevel.findMany.mockResolvedValue([])
+    global.db.postgres.levelReward.findMany.mockResolvedValue([])
   })
 
   it('records the match and grants xp', async () => {
@@ -135,5 +138,67 @@ describe('POST /api/matches', () => {
     expect(result.data.cappedToday).toBe(true)
     expect(global.db.postgres.match.create).toHaveBeenCalledTimes(1)
     expect(global.db.postgres.user.update).not.toHaveBeenCalled()
+  })
+
+  describe('levelling', () => {
+    const curve = [
+      { level: 1, xpRequired: 0 },
+      { level: 2, xpRequired: 50 },
+      { level: 3, xpRequired: 90 },
+      { level: 4, xpRequired: 10_000 },
+    ]
+
+    beforeEach(() => {
+      global.db.postgres.progressionLevel.findMany.mockResolvedValue(curve)
+      global.db.postgres.levelReward.findMany.mockResolvedValue([
+        { level: 2, kind: 'lithos', quantity: 2, lithosId: 'l-strong' },
+        { level: 3, kind: 'lithos', quantity: 1, lithosId: 'l-weak' },
+      ])
+      global.db.postgres.collections.upsert.mockResolvedValue({})
+    })
+
+    it('raises the level and grants every tier crossed', async () => {
+      // A win on easy pays 100, which clears both the level 2 and level 3
+      // thresholds in a single match.
+      const result = await handler(event)
+
+      expect(result.data.level).toBe(3)
+      expect(result.data.levelsGained).toEqual([2, 3])
+      expect(global.db.postgres.collections.upsert).toHaveBeenCalledTimes(2)
+    })
+
+    it('grants nothing when no threshold is crossed', async () => {
+      global.db.postgres.progressionLevel.findMany.mockResolvedValue([
+        { level: 1, xpRequired: 0 },
+        { level: 2, xpRequired: 10_000 },
+      ])
+
+      const result = await handler(event)
+
+      expect(result.data.level).toBe(1)
+      expect(result.data.levelsGained).toEqual([])
+      expect(global.db.postgres.collections.upsert).not.toHaveBeenCalled()
+    })
+
+    it('cannot level up on xp the daily cap refused', async () => {
+      global.db.postgres.match.aggregate.mockResolvedValue({ _sum: { xpAwarded: 10_000 } })
+
+      const result = await handler(event)
+
+      expect(result.data.xpAwarded).toBe(0)
+      expect(result.data.levelsGained).toEqual([])
+      expect(global.db.postgres.collections.upsert).not.toHaveBeenCalled()
+    })
+
+    it('counts a tier whose lithos was deleted as reached, and hands nothing over', async () => {
+      global.db.postgres.levelReward.findMany.mockResolvedValue([
+        { level: 2, kind: 'lithos', quantity: 1, lithosId: null },
+      ])
+
+      const result = await handler(event)
+
+      expect(result.data.levelsGained).toEqual([2, 3])
+      expect(global.db.postgres.collections.upsert).not.toHaveBeenCalled()
+    })
   })
 })

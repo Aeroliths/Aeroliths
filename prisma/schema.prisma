@@ -25,6 +25,8 @@ model User {
   starterPoolGrantedAt       DateTime?
   // Running total. Every increment is backed by a Match row.
   xp                         Int       @default(0)
+  // Stored, never derived: a curve edit must not restate a player's history.
+  level                      Int       @default(1)
   deletionReminderSent       Boolean   @default(false)
   warning6MonthsSent         Boolean   @default(false)
   warning2MonthsSent         Boolean   @default(false)
@@ -134,8 +136,9 @@ model Lithos {
   updatedAt  DateTime @updatedAt
 
   // Relations
-  collections Collections[]
-  deckEntries DeckEntry[]
+  collections  Collections[]
+  deckEntries  DeckEntry[]
+  levelRewards LevelReward[]
   element     Elements?   @relation(fields: [elementId], references: [id])
   elementId   String?
 
@@ -188,6 +191,30 @@ model Match {
 
   @@index([userId, playedAt])
   @@map("matches")
+}
+
+model ProgressionLevel {
+  id String @id @default(cuid())
+  // Level 1 exists with a threshold of 0, so a fresh account is level 1.
+  level      Int @unique
+  xpRequired Int
+
+  @@map("progression_levels")
+}
+
+model LevelReward {
+  id String @id @default(cuid())
+  // Level this tier pays out at. Not a relation: the curve can be replaced
+  // wholesale without cascading away the rewards attached to it.
+  level Int @unique
+  // "lithos" today; the chest sub-lot adds its own kind.
+  kind     String @default("lithos")
+  quantity Int    @default(1)
+
+  lithosId String?
+  lithos   Lithos? @relation(fields: [lithosId], references: [id], onDelete: SetNull)
+
+  @@map("level_rewards")
 }
 
 model Elements {

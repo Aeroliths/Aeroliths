@@ -21,25 +21,35 @@ export interface MatchSubmission {
 export function useMatchSubmission() {
   const lastAward = ref<number | null>(null)
   const cappedToday = ref(false)
+  const level = ref<number | null>(null)
+  const levelsGained = ref<number[]>([])
   const failed = ref(false)
 
   async function submit(payload: MatchSubmission) {
     failed.value = false
     try {
-      const response = await $fetch<{ data: { xpAwarded: number; cappedToday: boolean } }>(
-        '/api/matches',
-        { method: 'POST', body: payload },
-      )
+      const response = await $fetch<{
+        data: {
+          xpAwarded: number
+          cappedToday: boolean
+          level?: number
+          levelsGained?: number[]
+        }
+      }>('/api/matches', { method: 'POST', body: payload })
       lastAward.value = response.data.xpAwarded
       cappedToday.value = response.data.cappedToday
+      level.value = response.data.level ?? null
+      levelsGained.value = response.data.levelsGained ?? []
     } catch {
       // A rejected or unreachable submission must never break the end screen:
       // the match was played, only the reward is lost.
       failed.value = true
       lastAward.value = null
       cappedToday.value = false
+      level.value = null
+      levelsGained.value = []
     }
   }
 
-  return { submit, lastAward, cappedToday, failed }
+  return { submit, lastAward, cappedToday, level, levelsGained, failed }
 }

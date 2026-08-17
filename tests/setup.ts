@@ -122,6 +122,18 @@ global.db = {
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    progressionLevel: {
+      findMany: vi.fn(),
+      deleteMany: vi.fn(),
+      createMany: vi.fn(),
+    },
+    levelReward: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      upsert: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
+    },
     role: {
       create: vi.fn(),
       findUnique: vi.fn(),

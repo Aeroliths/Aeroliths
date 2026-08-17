@@ -60,6 +60,8 @@
       "botThinking": "Le bot réfléchit",
       "xpAwarded": "+{xp} XP",
       "xpCapped": "Limite d'XP quotidienne atteinte",
+      "level": "Niveau {level}",
+      "levelUp": "Niveau {level} atteint",
       "turnTimer": "Minuteur de tour",
       "turnTimerOff": "Désactivé",
       "handModeRandom": "Aléatoire",

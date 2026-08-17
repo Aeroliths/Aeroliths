@@ -60,6 +60,8 @@
       "botThinking": "The bot is thinking",
       "xpAwarded": "+{xp} XP",
       "xpCapped": "Daily XP limit reached",
+      "level": "Level {level}",
+      "levelUp": "Level {level} reached",
       "turnTimer": "Turn timer",
       "turnTimerOff": "Off",
       "handModeRandom": "Random",

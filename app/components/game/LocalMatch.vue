@@ -213,6 +213,10 @@
           </div>
           <div v-if="lastAward !== null" class="end-xp">
             <span class="end-xp-amount">{{ $t('play.localMatch.xpAwarded', { xp: lastAward }) }}</span>
+            <span v-if="level !== null" class="end-level">{{ $t('play.localMatch.level', { level }) }}</span>
+            <span v-if="levelsGained.length > 0" class="end-level-up">
+              {{ $t('play.localMatch.levelUp', { level: levelsGained[levelsGained.length - 1] }) }}
+            </span>
             <span v-if="cappedToday" class="end-xp-capped">{{ $t('play.localMatch.xpCapped') }}</span>
           </div>
           <div class="end-recap">
@@ -378,7 +382,7 @@ const { thinking: botThinking } = useBotOpponent({
 
 /* ---------- Submitting a finished bot match ---------- */
 
-const { submit, lastAward, cappedToday } = useMatchSubmission()
+const { submit, lastAward, cappedToday, level, levelsGained } = useMatchSubmission()
 
 watch(
   () => match.value?.status,
