@@ -1,416 +1,127 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import handler from '~~/server/api/auth/login.post'
 
-// Mock bcrypt
 vi.mock('bcrypt', () => ({
-  default: {
-    compare: vi.fn(),
-  },
+  default: { compare: vi.fn() },
 }))
 
-// Mock jsonwebtoken
-vi.mock('jsonwebtoken', () => ({
-  default: {
-    sign: vi.fn(),
-  },
-}))
+import bcrypt from 'bcrypt'
 
-// Mock the database
-vi.mock('~~/server/utils/db', () => ({
-  default: {
-    postgres: {
-      user: {
-        findUnique: vi.fn(),
-      },
-    },
-  },
-}))
+const event = {} as any
+const compare = bcrypt.compare as unknown as ReturnType<typeof vi.fn>
 
-// Mock the captcha verifier so handler-style tests can opt-in to a passing/failing captcha
-vi.mock('~~/server/utils/captcha', () => ({
-  verifyCaptcha: vi.fn().mockResolvedValue(undefined),
-}))
+function storedUser(overrides: Record<string, any> = {}) {
+  return {
+    id: 'user-1',
+    email: 'player@example.com',
+    username: 'player',
+    profilePicture: null,
+    emailVerified: true,
+    lastActiveAt: new Date('2026-08-01'),
+    deletionRequestedAt: null,
+    createdAt: new Date('2026-01-01'),
+    // Fields that must never reach the client.
+    verificationToken: 'secret-verification-token',
+    resetToken: 'secret-reset-token',
+    authentication: { password: 'hashed', tokenVersion: 3 },
+    role: { id: 'role-1', name: 'user' },
+    ...overrides,
+  }
+}
 
 describe('POST /api/auth/login', () => {
-  let mockUserFindUnique: any
-  let mockBcryptCompare: any
-  let mockJwtSign: any
-
-  beforeEach(async () => {
-    // Reset mocks before each test
+  beforeEach(() => {
     vi.clearAllMocks()
-
-    // Set JWT_SECRET environment variable
-    process.env.JWT_SECRET = 'test-jwt-secret-key'
-
-    // Import mocked modules
-    const dbModule = await import('~~/server/utils/db')
-    const bcryptModule = await import('bcrypt')
-    const jwtModule = await import('jsonwebtoken')
-
-    mockUserFindUnique = dbModule.default.postgres.user.findUnique as any
-    mockBcryptCompare = bcryptModule.default.compare as any
-    mockJwtSign = jwtModule.default.sign as any
+    global.rateLimit.mockReturnValue(undefined)
+    global.verifyCaptcha.mockResolvedValue(undefined)
+    global.issueAuthSession.mockResolvedValue(undefined)
+    global.readBody.mockResolvedValue({
+      email: 'player@example.com',
+      password: 'correct horse',
+      captchaToken: 'token',
+    })
+    global.db.postgres.user.findUnique.mockResolvedValue(storedUser())
+    compare.mockResolvedValue(true)
   })
 
-  describe('Validation', () => {
-    it('should reject request without email', () => {
-      const body = {
-        password: 'password123',
-        // Missing email
-      }
+  it('signs the user in and opens a session', async () => {
+    const result = await handler(event)
 
-      expect((body as any).email).toBeUndefined()
-      expect(body.password).toBeDefined()
-    })
-
-    it('should reject request without password', () => {
-      const body = {
-        email: 'user@test.com',
-        // Missing password
-      }
-
-      expect(body.email).toBeDefined()
-      expect((body as any).password).toBeUndefined()
-    })
-
-    it('should accept request with email and password', () => {
-      const body = {
-        email: 'user@test.com',
-        password: 'password123',
-      }
-
-      expect(body.email).toBeDefined()
-      expect(body.password).toBeDefined()
-    })
-
-    it('should reject invalid JSON format', () => {
-      const invalidJson = '{ invalid json }'
-
-      expect(() => JSON.parse(invalidJson)).toThrow()
-    })
-
-    it('should parse valid JSON string', () => {
-      const validJson = '{"email":"user@test.com","password":"password123"}'
-
-      const parsed = JSON.parse(validJson)
-      expect(parsed.email).toBe('user@test.com')
-      expect(parsed.password).toBe('password123')
-    })
+    expect(result.success).toBe(true)
+    expect(result.data.user.id).toBe('user-1')
+    expect(global.issueAuthSession).toHaveBeenCalledTimes(1)
   })
 
-  describe('User Authentication', () => {
-    it('should reject non-existent email', async () => {
-      mockUserFindUnique.mockResolvedValue(null)
+  it('passes the stored token version to the session', async () => {
+    await handler(event)
 
-      const result = await mockUserFindUnique({
-        where: { email: 'nonexistent@test.com' },
-        include: {
-          authentication: true,
-          role: true,
-        },
-      })
-
-      expect(result).toBeNull()
-    })
-
-    it('should reject user without authentication', async () => {
-      const userWithoutAuth = {
-        id: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: null,
-        role: { id: 'role-user', name: 'user' },
-      }
-
-      mockUserFindUnique.mockResolvedValue(userWithoutAuth)
-
-      const result = await mockUserFindUnique({
-        where: { email: 'user@test.com' },
-        include: {
-          authentication: true,
-          role: true,
-        },
-      })
-
-      expect(result.authentication).toBeNull()
-    })
-
-    it('should find user with authentication', async () => {
-      const userWithAuth = {
-        id: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      }
-
-      mockUserFindUnique.mockResolvedValue(userWithAuth)
-
-      const result = await mockUserFindUnique({
-        where: { email: 'user@test.com' },
-        include: {
-          authentication: true,
-          role: true,
-        },
-      })
-
-      expect(result.authentication).toBeDefined()
-      expect(result.authentication.password).toBe('hashed_password')
-    })
+    expect(global.issueAuthSession).toHaveBeenCalledWith(
+      event,
+      expect.objectContaining({ tokenVersion: 3 }),
+    )
   })
 
-  describe('Password Verification', () => {
-    it('should reject incorrect password', async () => {
-      mockBcryptCompare.mockResolvedValue(false)
+  it('never returns the password or the internal tokens', async () => {
+    const result = await handler(event)
 
-      const result = await mockBcryptCompare('wrongpassword', 'hashed_password')
-
-      expect(result).toBe(false)
-    })
-
-    it('should accept correct password', async () => {
-      mockBcryptCompare.mockResolvedValue(true)
-
-      const result = await mockBcryptCompare('correctpassword', 'hashed_password')
-
-      expect(result).toBe(true)
-    })
+    const serialized = JSON.stringify(result)
+    expect(serialized).not.toContain('hashed')
+    expect(serialized).not.toContain('secret-verification-token')
+    expect(serialized).not.toContain('secret-reset-token')
+    expect(result.data.user).not.toHaveProperty('authentication')
   })
 
-  describe('JWT Token Generation', () => {
-    beforeEach(() => {
-      const mockUser = {
-        id: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      }
-
-      mockUserFindUnique.mockResolvedValue(mockUser)
-      mockBcryptCompare.mockResolvedValue(true)
+  it('applies the rate limit before touching the database', async () => {
+    global.rateLimit.mockImplementation(() => {
+      throw { statusCode: 429, statusMessage: 'Too many requests' }
     })
 
-    it('should generate JWT token with correct payload', async () => {
-      const mockToken = 'jwt_token_here'
-      mockJwtSign.mockReturnValue(mockToken)
-
-      const payload = {
-        userId: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        role: 'user',
-      }
-
-      const token = mockJwtSign(payload, 'test-jwt-secret-key', { expiresIn: '7d' })
-
-      expect(token).toBe(mockToken)
-      expect(mockJwtSign).toHaveBeenCalledWith(
-        payload,
-        'test-jwt-secret-key',
-        { expiresIn: '7d' }
-      )
-    })
-
-    it('should handle missing JWT_SECRET', () => {
-      delete process.env.JWT_SECRET
-
-      expect(process.env.JWT_SECRET).toBeUndefined()
-    })
-
-    it('should use custom expiration time from environment', () => {
-      process.env.JWT_EXPIRES_IN = '30d'
-      const mockToken = 'jwt_token_here'
-      mockJwtSign.mockReturnValue(mockToken)
-
-      const payload = {
-        userId: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        role: 'user',
-      }
-
-      const token = mockJwtSign(payload, 'test-jwt-secret-key', { expiresIn: '30d' })
-
-      expect(token).toBe(mockToken)
-      expect(mockJwtSign).toHaveBeenCalledWith(
-        payload,
-        'test-jwt-secret-key',
-        { expiresIn: '30d' }
-      )
-    })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 429 })
+    expect(global.db.postgres.user.findUnique).not.toHaveBeenCalled()
   })
 
-  describe('Response Format', () => {
-    it('should return success response with token and user data', async () => {
-      const mockUser = {
-        id: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        name: 'Test',
-        surname: 'User',
-        roleId: 'role-user',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        authentication: {
-          id: 'auth-1',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      }
+  it('verifies the captcha before touching the database', async () => {
+    global.verifyCaptcha.mockRejectedValue({ statusCode: 400, statusMessage: 'Captcha failed' })
 
-      const mockToken = 'jwt_token_here'
-
-      mockUserFindUnique.mockResolvedValue(mockUser)
-      mockBcryptCompare.mockResolvedValue(true)
-      mockJwtSign.mockReturnValue(mockToken)
-
-      // Simulate removing authentication data
-      const { authentication, ...userWithoutAuth } = mockUser
-
-      const expectedResponse = {
-        success: true,
-        message: 'Login successful',
-        data: {
-          user: userWithoutAuth,
-          token: mockToken,
-          expiresIn: '7d',
-        },
-      }
-
-      expect(expectedResponse.success).toBe(true)
-      expect(expectedResponse.message).toBe('Login successful')
-      expect(expectedResponse.data.token).toBe(mockToken)
-      expect((expectedResponse.data.user as any).authentication).toBeUndefined()
-      expect(expectedResponse.data.user.email).toBe('user@test.com')
-      expect(expectedResponse.data.expiresIn).toBeDefined()
-    })
-
-    it('should not expose password hash in response', async () => {
-      const mockUser = {
-        id: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-1',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      }
-
-      mockUserFindUnique.mockResolvedValue(mockUser)
-      mockBcryptCompare.mockResolvedValue(true)
-      mockJwtSign.mockReturnValue('token')
-
-      // Verify authentication is removed
-      const { authentication, ...userWithoutAuth } = mockUser
-
-      expect((userWithoutAuth as any).authentication).toBeUndefined()
-      expect((userWithoutAuth as any).password).toBeUndefined()
-    })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
+    expect(global.db.postgres.user.findUnique).not.toHaveBeenCalled()
   })
 
-  describe('Database Operations', () => {
-    it('should handle database errors', async () => {
-      mockUserFindUnique.mockRejectedValue(new Error('Database connection failed'))
+  it('rejects a request with no credentials', async () => {
+    global.readBody.mockResolvedValue({ captchaToken: 'token' })
 
-      await expect(
-        mockUserFindUnique({
-          where: { email: 'user@test.com' },
-          include: {
-            authentication: true,
-            role: true,
-          },
-        })
-      ).rejects.toThrow('Database connection failed')
-    })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 400 })
   })
 
-  describe('Captcha Verification', () => {
-    it('should call verifyCaptcha with the token from the request body', async () => {
-      const { verifyCaptcha } = await import('~~/server/utils/captcha')
-      const mockVerify = verifyCaptcha as any
-      mockVerify.mockResolvedValue(undefined)
+  it('answers the same way for an unknown account and a wrong password', async () => {
+    global.db.postgres.user.findUnique.mockResolvedValue(null)
+    const unknownAccount = await handler(event).catch((error) => error)
 
-      await mockVerify('valid-token', {} as any)
+    global.db.postgres.user.findUnique.mockResolvedValue(storedUser())
+    compare.mockResolvedValue(false)
+    const wrongPassword = await handler(event).catch((error) => error)
 
-      expect(mockVerify).toHaveBeenCalledWith('valid-token', expect.anything())
-    })
-
-    it('should propagate a 400 when verifyCaptcha rejects (no DB call)', async () => {
-      const { verifyCaptcha } = await import('~~/server/utils/captcha')
-      const mockVerify = verifyCaptcha as any
-      mockVerify.mockRejectedValue({ statusCode: 400, message: 'Captcha verification failed' })
-
-      await expect(mockVerify('bad-token', {} as any)).rejects.toMatchObject({
-        statusCode: 400,
-        message: 'Captcha verification failed',
-      })
-      expect(mockUserFindUnique).not.toHaveBeenCalled()
-    })
+    // Distinguishable answers would let an attacker enumerate accounts.
+    expect(unknownAccount.statusCode).toBe(401)
+    expect(wrongPassword.statusCode).toBe(401)
+    expect(unknownAccount.message).toBe(wrongPassword.message)
+    expect(global.issueAuthSession).not.toHaveBeenCalled()
   })
 
-  describe('Different User Roles', () => {
-    it('should login admin user', async () => {
-      const mockAdmin = {
-        id: 'admin-1',
-        email: 'admin@test.com',
-        username: 'admin',
-        authentication: {
-          id: 'auth-admin',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-admin', name: 'admin' },
-      }
+  it('refuses an account whose email is not verified', async () => {
+    global.db.postgres.user.findUnique.mockResolvedValue(storedUser({ emailVerified: false }))
 
-      mockUserFindUnique.mockResolvedValue(mockAdmin)
-      mockBcryptCompare.mockResolvedValue(true)
-      mockJwtSign.mockReturnValue('admin_token')
-
-      const result = await mockUserFindUnique({
-        where: { email: 'admin@test.com' },
-        include: {
-          authentication: true,
-          role: true,
-        },
-      })
-
-      expect(result.role.name).toBe('admin')
+    await expect(handler(event)).rejects.toMatchObject({
+      statusCode: 403,
+      statusMessage: 'EMAIL_NOT_VERIFIED',
     })
+    expect(global.issueAuthSession).not.toHaveBeenCalled()
+  })
 
-    it('should login regular user', async () => {
-      const mockUser = {
-        id: 'user-1',
-        email: 'user@test.com',
-        username: 'user',
-        authentication: {
-          id: 'auth-user',
-          password: 'hashed_password',
-        },
-        role: { id: 'role-user', name: 'user' },
-      }
+  it('refuses an account with no authentication row', async () => {
+    global.db.postgres.user.findUnique.mockResolvedValue(storedUser({ authentication: null }))
 
-      mockUserFindUnique.mockResolvedValue(mockUser)
-      mockBcryptCompare.mockResolvedValue(true)
-      mockJwtSign.mockReturnValue('user_token')
-
-      const result = await mockUserFindUnique({
-        where: { email: 'user@test.com' },
-        include: {
-          authentication: true,
-          role: true,
-        },
-      })
-
-      expect(result.role.name).toBe('user')
-    })
+    await expect(handler(event)).rejects.toMatchObject({ statusCode: 401 })
+    expect(global.issueAuthSession).not.toHaveBeenCalled()
   })
 })

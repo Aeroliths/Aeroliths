@@ -26,6 +26,34 @@ declare global {
   // eslint-disable-next-line no-var
   var rateLimit: Mock
   // eslint-disable-next-line no-var
+  var verifyCaptcha: Mock
+  // eslint-disable-next-line no-var
+  var issueAuthSession: Mock
+  // eslint-disable-next-line no-var
+  var validateEmailTrust: Mock
+  // eslint-disable-next-line no-var
+  var deleteCookie: Mock
+  // eslint-disable-next-line no-var
+  var getCookie: Mock
+  // eslint-disable-next-line no-var
+  var setCookie: Mock
+  // eslint-disable-next-line no-var
+  var readOAuthPending: Mock
+  // eslint-disable-next-line no-var
+  var clearOAuthPending: Mock
+  // eslint-disable-next-line no-var
+  var sendVerificationEmail: Mock
+  // eslint-disable-next-line no-var
+  var sendPasswordResetEmail: Mock
+  // eslint-disable-next-line no-var
+  var sendDeletionRequestEmail: Mock
+  // eslint-disable-next-line no-var
+  var generateVerificationToken: typeof import('../server/utils/email').generateVerificationToken
+  // eslint-disable-next-line no-var
+  var hashToken: typeof import('../server/utils/email').hashToken
+  // eslint-disable-next-line no-var
+  var validatePassword: typeof import('../server/utils/password-validation').validatePassword
+  // eslint-disable-next-line no-var
   var db: any
   // eslint-disable-next-line no-var
   var isMediaCategory: typeof import('../server/utils/media').isMediaCategory

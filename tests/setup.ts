@@ -5,6 +5,8 @@ import {
   registerMediaAsset,
 } from '~~/server/utils/media'
 import { grantStarterPool, grantStarterPoolSafely } from '~~/server/utils/starter-pool'
+import { generateVerificationToken, hashToken } from '~~/server/utils/email'
+import { validatePassword } from '~~/server/utils/password-validation'
 
 // Mock environment variables
 process.env.JWT_SECRET = 'test-jwt-secret-key'
@@ -24,6 +26,28 @@ global.requireRole = vi.fn()
 // Rate limiting is auto-imported by Nuxt. The default lets the handler through;
 // tests that care about it override this to throw.
 global.rateLimit = vi.fn()
+
+// Session, captcha, cookies and outbound email are auto-imported by Nuxt too.
+// The defaults are permissive so a handler runs end to end; tests that assert
+// on them override the relevant one.
+global.verifyCaptcha = vi.fn()
+global.issueAuthSession = vi.fn()
+global.validateEmailTrust = vi.fn()
+global.deleteCookie = vi.fn()
+global.getCookie = vi.fn()
+global.setCookie = vi.fn()
+global.readOAuthPending = vi.fn()
+global.clearOAuthPending = vi.fn()
+global.sendVerificationEmail = vi.fn()
+global.sendPasswordResetEmail = vi.fn()
+global.sendDeletionRequestEmail = vi.fn()
+
+// Real implementations, like the media and starter pool helpers above. Token
+// hashing and password strength are exactly what the auth tests need to assert
+// on, so mocking them would hollow out the tests that matter most.
+global.generateVerificationToken = generateVerificationToken
+global.hashToken = hashToken
+global.validatePassword = validatePassword
 
 // Mock the upload helpers (auto-imported by Nuxt)
 global.upload_image = vi.fn()
@@ -86,6 +110,21 @@ global.db = {
       aggregate: vi.fn(),
       count: vi.fn(),
       findMany: vi.fn(),
+    },
+    authentication: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+    role: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      upsert: vi.fn(),
+    },
+    oAuthAccount: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
     },
     $transaction: vi.fn(),
   },
