@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import createHandler from '~/server/api/admin/elements/index.post'
-import patchHandler from '~/server/api/admin/elements/[id].patch'
-import deleteHandler from '~/server/api/admin/elements/[id].delete'
+import createHandler from '~~/server/api/admin/elements/index.post'
+import patchHandler from '~~/server/api/admin/elements/[id].patch'
+import deleteHandler from '~~/server/api/admin/elements/[id].delete'
 import { createTestAdmin } from '../../../utils/auth'
 
 const PNG_DATA_URL =

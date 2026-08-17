@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       news: {
@@ -19,7 +19,7 @@ describe('GET /api/news locale filtering', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    const dbModule = await import('~/server/utils/db')
+    const dbModule = await import('~~/server/utils/db')
     mockFindMany = dbModule.default.postgres.news.findMany as any
   })
 

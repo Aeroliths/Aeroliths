@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createTestAdmin, createTestUser } from '../../../../utils/auth'
 
 // Mock the auth utilities
-vi.mock('~/server/utils/auth', () => ({
+vi.mock('~~/server/utils/auth', () => ({
   getAuthUser: vi.fn(),
   requireRole: vi.fn(),
 }))
 
 // Mock the database
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       user: {
@@ -34,8 +34,8 @@ describe('PATCH /api/admin/users/[id]/role', () => {
     vi.clearAllMocks()
 
     // Import mocked modules
-    const authModule = await import('~/server/utils/auth')
-    const dbModule = await import('~/server/utils/db')
+    const authModule = await import('~~/server/utils/auth')
+    const dbModule = await import('~~/server/utils/db')
 
     mockGetAuthUser = authModule.getAuthUser as any
     mockRequireRole = authModule.requireRole as any

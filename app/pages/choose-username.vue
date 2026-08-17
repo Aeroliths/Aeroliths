@@ -57,11 +57,15 @@ if (!data.value?.pending) {
   await navigateTo(localePath('/login'))
 }
 
-const pendingEmail = computed(() => data.value?.email ?? '')
-const pendingProvider = computed(() => data.value?.provider ?? '')
+// The endpoint answers with either a bare { pending: false } or the full
+// session, so read the details through the discriminant rather than assuming
+// the fields are there.
+const session = computed(() => (data.value?.pending ? data.value : null))
+const pendingEmail = computed(() => session.value?.email ?? '')
+const pendingProvider = computed(() => session.value?.provider ?? '')
 const providerLabel = computed(() => (pendingProvider.value === 'discord' ? 'Discord' : ''))
 
-const username = ref(data.value?.suggestedUsername ?? '')
+const username = ref(data.value?.pending ? data.value.suggestedUsername : '')
 const errorMessage = ref('')
 const isSubmitting = ref(false)
 

@@ -23,7 +23,6 @@ export default defineNuxtConfig({
     strategy: 'prefix_except_default',
     restructureDir: 'app/i18n',
     langDir: 'locales/',
-    lazy: true,
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'aeroliths_locale',
@@ -47,8 +46,8 @@ export default defineNuxtConfig({
     buildAssetsDir: '/_nuxt/',
     head: {
       htmlAttrs: { lang: 'en' },
-      titleTemplate: (title?: string) =>
-        title ? `${title} | Aeroliths` : 'Aeroliths - Strategy Board Game Inspired by Skystones',
+      // titleTemplate lives in the default layout: this block is serialised
+      // into the build, so a function here is not a valid value.
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },

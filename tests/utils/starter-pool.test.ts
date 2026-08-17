@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { grantStarterPool, grantStarterPoolSafely } from '~/server/utils/starter-pool'
+import { grantStarterPool, grantStarterPoolSafely } from '~~/server/utils/starter-pool'
 
 const STARTER_LITHOS = [
   { id: 'lithos-1', starterQuantity: 2 },

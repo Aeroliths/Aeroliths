@@ -7,8 +7,8 @@ import {
   handSizeFor,
   decideWinner,
   randomMove,
-} from '~/app/game/engine/match'
-import type { CaptureRules, MatchState, Player, Stone } from '~/app/game/engine/types'
+} from '~/game/engine/match'
+import type { CaptureRules, MatchState, Player, Stone } from '~/game/engine/types'
 
 const RULES: CaptureRules = { same: false, plus: false, combo: false, wall: false }
 

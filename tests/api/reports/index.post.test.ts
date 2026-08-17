@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createTestUser } from '../../utils/auth'
 
-vi.mock('~/server/utils/auth', () => ({
+vi.mock('~~/server/utils/auth', () => ({
   getAuthUser: vi.fn(),
 }))
 
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       user: {
@@ -27,8 +27,8 @@ describe('POST /api/reports', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    const authModule = await import('~/server/utils/auth')
-    const dbModule = await import('~/server/utils/db')
+    const authModule = await import('~~/server/utils/auth')
+    const dbModule = await import('~~/server/utils/db')
     mockGetAuthUser = authModule.getAuthUser as any
     mockUserFindUnique = dbModule.default.postgres.user.findUnique as any
     mockReportFindFirst = dbModule.default.postgres.userReport.findFirst as any

@@ -51,8 +51,8 @@ export default defineEventHandler(async (event) => {
     const lithosPerElement: Record<string, Set<string>> = {}
     for (const l of lithosByElement) {
       if (!l.elementId) continue
-      if (!lithosPerElement[l.elementId]) lithosPerElement[l.elementId] = new Set()
-      lithosPerElement[l.elementId].add(l.id)
+      const owned = (lithosPerElement[l.elementId] ??= new Set())
+      owned.add(l.id)
     }
 
     const lithosByRarity = await db.postgres.lithos.groupBy({
@@ -79,8 +79,8 @@ export default defineEventHandler(async (event) => {
     for (const c of user.collections) {
       userRarityCounts[c.lithos.rarity] = (userRarityCounts[c.lithos.rarity] || 0) + 1
       if (c.lithos.elementId) {
-        if (!userLithosByElement[c.lithos.elementId]) userLithosByElement[c.lithos.elementId] = new Set()
-        userLithosByElement[c.lithos.elementId].add(c.lithos.id)
+        const owned = (userLithosByElement[c.lithos.elementId] ??= new Set())
+        owned.add(c.lithos.id)
       }
     }
 

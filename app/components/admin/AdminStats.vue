@@ -153,7 +153,7 @@
                   :key="activityChartData.labels[i]"
                   class="activity-chart-label"
                   :title="`${activityChartData.labels[i]}: ${count} ${activityMetric === 'logins' ? 'login' : 'visit'}${count === 1 ? '' : 's'}`"
-                >{{ formatChartLabel(activityChartData.labels[i], i) }}</span>
+                >{{ formatChartLabel(activityChartData.labels[i] ?? '', i) }}</span>
               </div>
             </div>
           </div>

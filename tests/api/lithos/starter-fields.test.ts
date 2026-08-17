@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import createHandler from '~/server/api/lithos/index.post'
-import patchHandler from '~/server/api/lithos/[id].patch'
+import createHandler from '~~/server/api/lithos/index.post'
+import patchHandler from '~~/server/api/lithos/[id].patch'
 import { createTestAdmin } from '../../utils/auth'
 
 const event = {} as any

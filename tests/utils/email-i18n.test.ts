@@ -5,7 +5,7 @@ import {
   buildDeletionRequestEmail,
   buildDeletionReminderEmail,
   buildInactivityWarningEmail,
-} from '~/server/utils/email-i18n'
+} from '~~/server/utils/email-i18n'
 
 describe('email-i18n templates', () => {
   it('buildVerificationEmail: en subject and content', () => {

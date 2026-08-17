@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
       data: { userId: user.userId },
       include: {
         entries: {
-          include: { lithos: true },
+          include: { lithos: { include: { element: true } } },
         },
       },
     })

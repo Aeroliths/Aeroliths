@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createTestAdmin, createTestUser } from '../../../utils/auth'
 
-vi.mock('~/server/utils/auth', () => ({
+vi.mock('~~/server/utils/auth', () => ({
   getAuthUser: vi.fn(),
   requireRole: vi.fn(),
 }))
 
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       userReport: {
@@ -23,8 +23,8 @@ describe('GET /api/admin/reports', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    const authModule = await import('~/server/utils/auth')
-    const dbModule = await import('~/server/utils/db')
+    const authModule = await import('~~/server/utils/auth')
+    const dbModule = await import('~~/server/utils/db')
     mockGetAuthUser = authModule.getAuthUser as any
     mockRequireRole = authModule.requireRole as any
     mockReportFindMany = dbModule.default.postgres.userReport.findMany as any

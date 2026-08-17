@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import handler from '~/server/api/admin/media/[id].patch'
+import handler from '~~/server/api/admin/media/[id].patch'
 import { createTestAdmin, createTestUser } from '../../../utils/auth'
 
 const event = {} as any

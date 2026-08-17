@@ -35,6 +35,11 @@ declare global {
   var grantStarterPool: typeof import('../server/utils/starter-pool').grantStarterPool
   // eslint-disable-next-line no-var
   var grantStarterPoolSafely: typeof import('../server/utils/starter-pool').grantStarterPoolSafely
+  // Assigned by tests/setup-component.ts for the tests that mount components.
+  // eslint-disable-next-line no-var
+  var useI18n: () => { t: (key: string) => string; locale: { value: string } }
+  // eslint-disable-next-line no-var
+  var $fetch: Mock
 }
 
 export {}

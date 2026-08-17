@@ -19,6 +19,9 @@
 const route = useRoute()
 const canonical = computed(() => `https://aeroliths.fr${route.path}`)
 useHead({
+  // Pages that set no title of their own fall back to the full site title.
+  titleTemplate: (title?: string) =>
+    title ? `${title} | Aeroliths` : 'Aeroliths - Strategy Board Game Inspired by Skystones',
   link: [{ rel: 'canonical', href: canonical }],
   meta: [{ property: 'og:url', content: canonical }],
 })

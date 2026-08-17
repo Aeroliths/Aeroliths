@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-vi.mock('~/server/utils/auth', () => ({
+vi.mock('~~/server/utils/auth', () => ({
   getAuthUser: vi.fn(),
   requireRole: vi.fn(),
 }))
 
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       news: {
@@ -16,8 +16,8 @@ vi.mock('~/server/utils/db', () => ({
   },
 }))
 
-vi.mock('~/server/utils/news-helpers', async () => {
-  const actual = await vi.importActual<typeof import('~/server/utils/news-helpers')>('~/server/utils/news-helpers')
+vi.mock('~~/server/utils/news-helpers', async () => {
+  const actual = await vi.importActual<typeof import('~~/server/utils/news-helpers')>('~~/server/utils/news-helpers')
   return {
     ...actual,
     ensureUniqueSlug: vi.fn(),
@@ -29,7 +29,7 @@ vi.mock('~/server/utils/news-helpers', async () => {
 // charges the module's cold transform against the test timeout, and news-helpers
 // pulls in isomorphic-dompurify through importActual, which does not fit in the
 // default budget when the whole suite runs in a single fork.
-import { ensureUniqueSlug } from '~/server/utils/news-helpers'
+import { ensureUniqueSlug } from '~~/server/utils/news-helpers'
 
 describe('locale validation for news creation', () => {
   beforeEach(() => vi.clearAllMocks())

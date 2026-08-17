@@ -1,8 +1,8 @@
 {
   // Dedicated TS config for the test suite. The editor picks this up for files
   // under tests/ so module resolution matches the vitest runtime aliases
-  // (vitest.config.*), where `~`/`@` point at the project root - not at app/
-  // like Nuxt's generated tsconfig does.
+  // (vitest.config.*), which follow Nuxt: `~`/`@` are app/, `~~`/`@@` are the
+  // project root.
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
@@ -14,8 +14,8 @@
     "strict": false,
     "noImplicitAny": false,
     "paths": {
-      "~/*": ["../*"],
-      "@/*": ["../*"],
+      "~/*": ["../app/*"],
+      "@/*": ["../app/*"],
       "~~/*": ["../*"],
       "@@/*": ["../*"]
     },

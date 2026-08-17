@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       news: {
@@ -14,8 +14,8 @@ vi.mock('~/server/utils/db', () => ({
 // the module's cold transform against the hook timeout, and news-helpers pulls
 // in isomorphic-dompurify, which does not fit in 10s when the whole suite runs
 // in a single fork.
-import { ensureUniqueSlug } from '~/server/utils/news-helpers'
-import db from '~/server/utils/db'
+import { ensureUniqueSlug } from '~~/server/utils/news-helpers'
+import db from '~~/server/utils/db'
 
 describe('ensureUniqueSlug', () => {
   const mockFindUnique = db.postgres.news.findUnique as any

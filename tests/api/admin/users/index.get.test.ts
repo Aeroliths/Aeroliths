@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { generateTestToken, createTestAdmin, createTestUser } from '../../../utils/auth'
 
 // Mock the auth utilities
-vi.mock('~/server/utils/auth', () => ({
+vi.mock('~~/server/utils/auth', () => ({
   getAuthUser: vi.fn(),
   requireRole: vi.fn(),
 }))
 
 // Mock the database
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       user: {
@@ -28,8 +28,8 @@ describe('GET /api/admin/users', () => {
     vi.clearAllMocks()
 
     // Import mocked modules
-    const authModule = await import('~/server/utils/auth')
-    const dbModule = await import('~/server/utils/db')
+    const authModule = await import('~~/server/utils/auth')
+    const dbModule = await import('~~/server/utils/db')
 
     mockGetAuthUser = authModule.getAuthUser as any
     mockRequireRole = authModule.requireRole as any
@@ -520,7 +520,7 @@ describe('GET /api/admin/users', () => {
       ;(globalThis as any).getAuthUser = vi.fn().mockReturnValue(createTestAdmin())
       ;(globalThis as any).requireRole = vi.fn()
 
-      handler = (await import('~/server/api/admin/users/index.get')).default
+      handler = (await import('~~/server/api/admin/users/index.get')).default
     })
 
     // The whole suite runs in a single fork (see vitest.config.ts), so these

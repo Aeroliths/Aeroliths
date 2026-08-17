@@ -7,7 +7,7 @@ vi.mock('node:dns/promises', () => ({
   default: { resolveMx: mockResolveMx },
 }))
 
-const { validateEmailTrust } = await import('~/server/utils/email-validation')
+const { validateEmailTrust } = await import('~~/server/utils/email-validation')
 
 const VALID_MX = [{ exchange: 'mx.example.com', priority: 10 }]
 

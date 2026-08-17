@@ -158,6 +158,12 @@ export default defineEventHandler(async (event) => {
     const visitsByDayMonth = new Array(30).fill(0) as number[]
     const visitsByMonthYear = new Array(12).fill(0) as number[]
 
+    // Every call site bound-checks its index first, but an indexed read is
+    // still typed as possibly undefined, so the increment goes through here.
+    const bump = (bucket: number[], index: number) => {
+      bucket[index] = (bucket[index] ?? 0) + 1
+    }
+
     const dayMs = 24 * 60 * 60 * 1000
     const monthsFromYearStart = (d: Date) =>
       (d.getFullYear() - yearStart.getFullYear()) * 12 + (d.getMonth() - yearStart.getMonth())
@@ -166,24 +172,24 @@ export default defineEventHandler(async (event) => {
       const d = row.loggedAt
       const monthIndex = monthsFromYearStart(d)
       if (monthIndex >= 0 && monthIndex < 12) {
-        loginsByMonthYear[monthIndex]++
+        bump(loginsByMonthYear, monthIndex)
       }
       const daysFromMonthStart = Math.floor(
         (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginMonthStart.getTime()) / dayMs
       )
       if (daysFromMonthStart >= 0 && daysFromMonthStart < 30) {
-        loginsByDayMonth[daysFromMonthStart]++
+        bump(loginsByDayMonth, daysFromMonthStart)
       }
       if (d.getTime() >= loginWeekStart.getTime()) {
         const daysFromWeekStart = Math.floor(
           (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginWeekStart.getTime()) / dayMs
         )
         if (daysFromWeekStart >= 0 && daysFromWeekStart < 7) {
-          loginsByDayWeek[daysFromWeekStart]++
+          bump(loginsByDayWeek, daysFromWeekStart)
         }
       }
       if (d.getTime() >= todayStart.getTime()) {
-        loginsByHour[d.getHours()]++
+        bump(loginsByHour, d.getHours())
       }
     }
 
@@ -195,14 +201,14 @@ export default defineEventHandler(async (event) => {
       const d = row.visitedAt
       const monthIndex = monthsFromYearStart(d)
       if (monthIndex >= 0 && monthIndex < 12) {
-        visitsByMonthYear[monthIndex]++
+        bump(visitsByMonthYear, monthIndex)
         uniqueVisitorsYear.add(row.visitorId)
       }
       const daysFromMonthStart = Math.floor(
         (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginMonthStart.getTime()) / dayMs
       )
       if (daysFromMonthStart >= 0 && daysFromMonthStart < 30) {
-        visitsByDayMonth[daysFromMonthStart]++
+        bump(visitsByDayMonth, daysFromMonthStart)
         uniqueVisitorsMonth.add(row.visitorId)
       }
       if (d.getTime() >= loginWeekStart.getTime()) {
@@ -210,12 +216,12 @@ export default defineEventHandler(async (event) => {
           (new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - loginWeekStart.getTime()) / dayMs
         )
         if (daysFromWeekStart >= 0 && daysFromWeekStart < 7) {
-          visitsByDayWeek[daysFromWeekStart]++
+          bump(visitsByDayWeek, daysFromWeekStart)
           uniqueVisitorsWeek.add(row.visitorId)
         }
       }
       if (d.getTime() >= todayStart.getTime()) {
-        visitsByHour[d.getHours()]++
+        bump(visitsByHour, d.getHours())
         uniqueVisitorsToday.add(row.visitorId)
       }
     }

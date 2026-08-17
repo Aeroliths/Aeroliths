@@ -1,4 +1,4 @@
-import { JWTPayload } from '~~/server/utils/auth';
+import type { JWTPayload } from '~~/server/utils/auth';
 
 // API route to create a new lithos (admin only)
 export default defineEventHandler(async (event) => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { createMatch, suddenDeathHands } from '~/app/game/engine/match'
-import type { MatchState, Player, Stone } from '~/app/game/engine/types'
+import { createMatch, suddenDeathHands } from '~/game/engine/match'
+import type { MatchState, Player, Stone } from '~/game/engine/types'
 
 function stone(id: string): Stone {
   return { id, elementId: null, spikeUp: 0, spikeDown: 0, spikeLeft: 0, spikeRight: 0 }

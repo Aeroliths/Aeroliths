@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { toStone, toElementGraph } from '~/app/game/engine/adapters'
+import { toStone, toElementGraph } from '~/game/engine/adapters'
 
 describe('toStone', () => {
   it('maps a lithos API record to an engine stone, including the element name', () => {

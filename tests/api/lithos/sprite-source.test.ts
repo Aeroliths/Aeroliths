@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import createHandler from '~/server/api/lithos/index.post'
-import patchHandler from '~/server/api/lithos/[id].patch'
-import deleteHandler from '~/server/api/admin/lithos/[id].delete'
+import createHandler from '~~/server/api/lithos/index.post'
+import patchHandler from '~~/server/api/lithos/[id].patch'
+import deleteHandler from '~~/server/api/admin/lithos/[id].delete'
 import { createTestAdmin } from '../../utils/auth'
 
 const PNG_DATA_URL =

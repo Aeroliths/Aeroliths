@@ -5,7 +5,7 @@
       <div class="profile-card-avatar">
         <div class="profile-card-avatar-inner">
           <img v-if="formData.profilePicture" :src="formData.profilePicture" :alt="formData.username" />
-          <span v-else class="profile-card-initials">{{ formData.username ? formData.username[0].toUpperCase() : '?' }}</span>
+          <span v-else class="profile-card-initials">{{ formData.username ? formData.username.charAt(0).toUpperCase() : '?' }}</span>
         </div>
         <label class="profile-card-avatar-edit" for="profile-picture-input" :class="{ disabled: loading }">
           <span class="avatar-edit-icon">&#x270E;</span>

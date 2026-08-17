@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-const { validateUsernameContent } = await import('~/server/utils/username-moderation')
+const { validateUsernameContent } = await import('~~/server/utils/username-moderation')
 
 describe('validateUsernameContent', () => {
   it('allows clean usernames', () => {

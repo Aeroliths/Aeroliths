@@ -149,7 +149,7 @@
     <!-- ========== PLAY ========== -->
     <div v-else-if="match" class="play">
       <GameBoard
-        v-if="replaying"
+        v-if="replaying && replayState"
         :state="replayState"
         :selected-hand-index="null"
         :last-events="replayEvents"

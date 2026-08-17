@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { createMatch, placeStone } from '~/app/game/engine/match'
-import type { ElementGraph, MatchState, Stone } from '~/app/game/engine/types'
+import { createMatch, placeStone } from '~/game/engine/match'
+import type { ElementGraph, MatchState, Stone } from '~/game/engine/types'
 
 function stone(id: string, spikes: Partial<Stone> = {}): Stone {
   return {

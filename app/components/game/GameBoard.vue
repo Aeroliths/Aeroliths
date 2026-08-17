@@ -65,9 +65,7 @@
           ]"
           :data-cx="x"
           :data-cy="y"
-          :title="captureInfo && captureInfo[`${x}-${y}`]
-            ? `${t('play.board.capturedBy')}${captureInfo[`${x}-${y}`].by === 'A' ? t('play.board.player1') : t('play.board.player2')} (${captureInfo[`${x}-${y}`].type})`
-            : undefined"
+          :title="capturedTitle(x, y)"
           :disabled="!!cell || !canPlace || state.status === 'finished'"
           @mouseenter="showPreview(x, y)"
           @mouseleave="clearPreview"
@@ -88,10 +86,10 @@
           </span>
           <GameStone v-if="cell" :stone="cell.stone" :owner="cell.owner" />
           <span
-            v-if="edgeBadges[`${x}-${y}`] && edgeBadges[`${x}-${y}`].delta !== 0"
+            v-if="badgeAt(x, y)?.delta"
             class="elem-badge"
-            :class="[`edge-${edgeBadges[`${x}-${y}`].edge}`, edgeBadges[`${x}-${y}`].delta > 0 ? 'pos' : 'neg']"
-          >{{ edgeBadges[`${x}-${y}`].delta > 0 ? '+1' : '-1' }}</span>
+            :class="[`edge-${badgeAt(x, y)?.edge}`, (badgeAt(x, y)?.delta ?? 0) > 0 ? 'pos' : 'neg']"
+          >{{ (badgeAt(x, y)?.delta ?? 0) > 0 ? '+1' : '-1' }}</span>
         </button>
       </template>
     </div>
@@ -174,6 +172,14 @@ function isPlayable(i: number): boolean {
   if (props.state.handRule === 'order') return i === 0
   if (props.state.handRule === 'chaos') return props.forcedHandIndex == null || i === props.forcedHandIndex
   return true
+}
+
+/** Tooltip describing who captured a cell, or undefined when it was not. */
+function capturedTitle(x: number, y: number): string | undefined {
+  const info = props.captureInfo?.[`${x}-${y}`]
+  if (!info) return undefined
+  const by = info.by === 'A' ? t('play.board.player1') : t('play.board.player2')
+  return `${t('play.board.capturedBy')}${by} (${info.type})`
 }
 
 /* ---------- Open hands: show the opponent's hand face-up ---------- */
@@ -319,6 +325,11 @@ watch(
 
 const captureLabel = ref('')
 const edgeBadges = ref<Record<string, { edge: string; delta: number }>>({})
+
+/** The transient element badge on a cell, or undefined when it has none. */
+function badgeAt(x: number, y: number) {
+  return edgeBadges.value[`${x}-${y}`]
+}
 
 const emptyCells = computed(() =>
   props.state.board.reduce((n, row) => n + row.filter((c) => c === null).length, 0)

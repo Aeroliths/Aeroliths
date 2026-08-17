@@ -22,7 +22,9 @@ const availableLocaleCodes = computed(() => locales.value.map((l) => (typeof l =
 
 async function selectLocale(code: string) {
   if (code === locale.value) return
-  await navigateTo(switchLocalePath(code))
+  // The codes come from the runtime locale list, which is typed as plain
+  // strings, while switchLocalePath expects the configured locale union.
+  await navigateTo(switchLocalePath(code as typeof locale.value))
   if (isAuthenticated.value && user.value) {
     try {
       await $fetch(`/api/users/${user.value.id}`, { method: 'PATCH', body: { locale: code } })

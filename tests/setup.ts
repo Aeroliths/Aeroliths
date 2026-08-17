@@ -3,8 +3,8 @@ import {
   isMediaCategory,
   countMediaUsage,
   registerMediaAsset,
-} from '~/server/utils/media'
-import { grantStarterPool, grantStarterPoolSafely } from '~/server/utils/starter-pool'
+} from '~~/server/utils/media'
+import { grantStarterPool, grantStarterPoolSafely } from '~~/server/utils/starter-pool'
 
 // Mock environment variables
 process.env.JWT_SECRET = 'test-jwt-secret-key'

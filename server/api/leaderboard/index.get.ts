@@ -43,8 +43,8 @@ export default defineEventHandler(async (event) => {
     const lithosPerElement: Record<string, Set<string>> = {}
     for (const l of lithosByElement) {
       if (!l.elementId) continue
-      if (!lithosPerElement[l.elementId]) lithosPerElement[l.elementId] = new Set()
-      lithosPerElement[l.elementId].add(l.id)
+      const owned = (lithosPerElement[l.elementId] ??= new Set())
+      owned.add(l.id)
     }
 
     // Get all lithos grouped by rarity for rarity completion
@@ -82,8 +82,8 @@ export default defineEventHandler(async (event) => {
       const userLithosByElement: Record<string, Set<string>> = {}
       for (const c of user.collections) {
         if (!c.lithos.elementId) continue
-        if (!userLithosByElement[c.lithos.elementId]) userLithosByElement[c.lithos.elementId] = new Set()
-        userLithosByElement[c.lithos.elementId].add(c.lithos.id)
+        const owned = (userLithosByElement[c.lithos.elementId] ??= new Set())
+        owned.add(c.lithos.id)
       }
 
       const completedElements: string[] = []

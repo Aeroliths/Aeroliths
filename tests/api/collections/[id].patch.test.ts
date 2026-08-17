@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { generateTestToken, createTestUser } from '../../utils/auth'
 
 // Mock the auth utilities
-vi.mock('~/server/utils/auth', () => ({
+vi.mock('~~/server/utils/auth', () => ({
   getAuthUser: vi.fn(),
 }))
 
 // Mock the database
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       collections: {
@@ -28,8 +28,8 @@ describe('PATCH /api/collections/[id]', () => {
     vi.clearAllMocks()
 
     // Import mocked modules
-    const authModule = await import('~/server/utils/auth')
-    const dbModule = await import('~/server/utils/db')
+    const authModule = await import('~~/server/utils/auth')
+    const dbModule = await import('~~/server/utils/db')
 
     mockGetAuthUser = authModule.getAuthUser as any
     mockCollectionsFindUnique = dbModule.default.postgres.collections.findUnique as any

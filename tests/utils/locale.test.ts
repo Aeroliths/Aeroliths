@@ -15,7 +15,7 @@ import {
   SUPPORTED_LOCALES,
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
-} from '~/server/utils/locale'
+} from '~~/server/utils/locale'
 
 describe('resolveRequestLocale', () => {
   it('returns "fr" when the routing cookie is set to fr', () => {

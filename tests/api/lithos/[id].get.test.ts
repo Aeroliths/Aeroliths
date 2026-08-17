@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock the database
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       lithos: {
@@ -19,7 +19,7 @@ describe('GET /api/lithos/[id]', () => {
     vi.clearAllMocks()
 
     // Import mocked modules
-    const dbModule = await import('~/server/utils/db')
+    const dbModule = await import('~~/server/utils/db')
     mockLithosFindUnique = dbModule.default.postgres.lithos.findUnique as any
   })
 

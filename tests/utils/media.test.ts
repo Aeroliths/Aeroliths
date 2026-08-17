@@ -6,7 +6,7 @@ import {
   hashImage,
   countMediaUsage,
   registerMediaAsset,
-} from '~/server/utils/media'
+} from '~~/server/utils/media'
 import { createTestAdmin } from '../utils/auth'
 
 // One transparent 1x1 PNG, reused so the same bytes hash to the same value.

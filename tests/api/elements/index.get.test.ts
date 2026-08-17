@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock the database
-vi.mock('~/server/utils/db', () => ({
+vi.mock('~~/server/utils/db', () => ({
   default: {
     postgres: {
       elements: {
@@ -19,7 +19,7 @@ describe('GET /api/elements', () => {
     vi.clearAllMocks()
 
     // Import mocked modules
-    const dbModule = await import('~/server/utils/db')
+    const dbModule = await import('~~/server/utils/db')
     mockElementsFindMany = dbModule.default.postgres.elements.findMany as any
   })
 

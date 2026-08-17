@@ -3,7 +3,9 @@
 export default defineEventHandler((event) => {
   const pending = readOAuthPending(event)
   if (!pending) {
-    return { pending: false }
+    // Literal types on both branches, so the client can narrow the response
+    // on `pending` instead of guessing which fields are present.
+    return { pending: false as const }
   }
 
   let suggestedUsername = (pending.displayName || pending.email.split('@')[0] || '')
@@ -15,7 +17,7 @@ export default defineEventHandler((event) => {
   }
 
   return {
-    pending: true,
+    pending: true as const,
     provider: pending.provider,
     email: pending.email,
     suggestedUsername,
