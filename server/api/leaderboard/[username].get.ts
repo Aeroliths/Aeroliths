@@ -1,3 +1,5 @@
+import { winRate } from '~~/server/utils/leaderboard'
+
 // API route to get a user's public profile with collection stats
 export default defineEventHandler(async (event) => {
   try {
@@ -15,6 +17,8 @@ export default defineEventHandler(async (event) => {
         username: true,
         profilePicture: true,
         createdAt: true,
+        xp: true,
+        level: true,
         collections: {
           select: {
             quantity: true,
@@ -147,6 +151,36 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // Progression and record, read for this one player rather than for everyone.
+    const [counts, recent] = await Promise.all([
+      db.postgres.match.groupBy({
+        by: ['result'],
+        where: { userId: user.id },
+        _count: { _all: true },
+      }),
+      db.postgres.match.findMany({
+        where: { userId: user.id },
+        select: {
+          result: true,
+          difficulty: true,
+          boardSize: true,
+          scoreSelf: true,
+          scoreOpponent: true,
+          playedAt: true,
+        },
+        orderBy: { playedAt: 'desc' },
+        take: 10,
+      }),
+    ])
+
+    const record = { userId: user.id, wins: 0, losses: 0, draws: 0 }
+    for (const row of counts) {
+      const amount = row._count._all
+      if (row.result === 'win') record.wins += amount
+      else if (row.result === 'loss') record.losses += amount
+      else if (row.result === 'draw') record.draws += amount
+    }
+
     return {
       success: true,
       data: {
@@ -154,6 +188,10 @@ export default defineEventHandler(async (event) => {
         username: user.username,
         profilePicture: user.profilePicture,
         memberSince: user.createdAt,
+        xp: user.xp,
+        level: user.level,
+        record: { ...record, winRate: winRate(record) },
+        recentMatches: recent,
         score,
         totalOwned,
         uniqueOwned,

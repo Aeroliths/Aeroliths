@@ -81,6 +81,7 @@ global.db = {
       delete: vi.fn(),
       count: vi.fn(),
       findMany: vi.fn(),
+      groupBy: vi.fn(),
     },
     elements: {
       create: vi.fn(),

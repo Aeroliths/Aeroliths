@@ -45,7 +45,17 @@
       "uniqueLithos": "Lithos uniques",
       "completion": "Complétion",
       "elementProgress": "Progression par élément",
-      "rarityProgress": "Progression par rareté"
+      "rarityProgress": "Progression par rareté",
+      "progressionTitle": "Progression",
+      "level": "Niveau",
+      "xp": "XP",
+      "wins": "Victoires",
+      "losses": "Défaites",
+      "winRate": "Ratio",
+      "noMatches": "Aucune partie jouée pour l’instant.",
+      "result_win": "Victoire",
+      "result_loss": "Défaite",
+      "result_draw": "Nul"
     },
     "reportSubmitted": "Signalement envoyé. Notre équipe va l'examiner.",
     "loadFailed": "Échec du chargement du classement",

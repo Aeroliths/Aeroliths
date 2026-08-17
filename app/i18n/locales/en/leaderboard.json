@@ -45,7 +45,17 @@
       "uniqueLithos": "Unique Lithos",
       "completion": "Completion",
       "elementProgress": "Element Progress",
-      "rarityProgress": "Rarity Progress"
+      "rarityProgress": "Rarity Progress",
+      "progressionTitle": "Progression",
+      "level": "Level",
+      "xp": "XP",
+      "wins": "Wins",
+      "losses": "Losses",
+      "winRate": "Win rate",
+      "noMatches": "No match played yet.",
+      "result_win": "Win",
+      "result_loss": "Loss",
+      "result_draw": "Draw"
     },
     "reportSubmitted": "Report submitted. Our team will review it.",
     "loadFailed": "Failed to load leaderboard",

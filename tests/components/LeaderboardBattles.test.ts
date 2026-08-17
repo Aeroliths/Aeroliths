@@ -136,4 +136,93 @@ describe('LeaderboardComponent battles tab', () => {
     expect(wrapper.find('.battle-empty').exists()).toBe(false)
     expect(wrapper.find('.error-message').exists()).toBe(true)
   })
+
+  it('shows the progression and the recent matches on a profile', async () => {
+    global.$fetch.mockImplementation((url: string) => {
+      if (String(url).includes('battles')) return Promise.resolve(battles)
+      if (String(url).includes('/api/leaderboard/')) {
+        return Promise.resolve({
+          data: {
+            id: 'u1',
+            username: 'ada',
+            profilePicture: null,
+            memberSince: '2026-01-01T00:00:00.000Z',
+            xp: 900,
+            level: 5,
+            record: { wins: 3, losses: 1, draws: 0, winRate: 75 },
+            recentMatches: [
+              {
+                result: 'win',
+                difficulty: 'hard',
+                boardSize: 3,
+                scoreSelf: 6,
+                scoreOpponent: 3,
+                playedAt: '2026-08-17T00:00:00.000Z',
+              },
+            ],
+            score: 0,
+            totalOwned: 0,
+            uniqueOwned: 0,
+            completionPercent: 0,
+            badges: [],
+            elementCompletion: [],
+            rarityCompletion: [],
+            collectionByElement: {},
+          },
+        })
+      }
+      return Promise.resolve(emptyCollection)
+    })
+
+    wrapper = mount(LeaderboardComponent, mountOptions)
+    await flushPromises()
+    await openBattles(wrapper)
+    await flushPromises()
+
+    await wrapper.find('.battle-row').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.profile-progression').text()).toContain('900')
+    expect(wrapper.findAll('.recent-match')).toHaveLength(1)
+    expect(wrapper.find('.recent-match').classes()).toContain('result-win')
+  })
+
+  it('says so on a profile with no match', async () => {
+    global.$fetch.mockImplementation((url: string) => {
+      if (String(url).includes('battles')) return Promise.resolve(battles)
+      if (String(url).includes('/api/leaderboard/')) {
+        return Promise.resolve({
+          data: {
+            id: 'u1',
+            username: 'ada',
+            profilePicture: null,
+            memberSince: '2026-01-01T00:00:00.000Z',
+            xp: 0,
+            level: 1,
+            record: { wins: 0, losses: 0, draws: 0, winRate: 0 },
+            recentMatches: [],
+            score: 0,
+            totalOwned: 0,
+            uniqueOwned: 0,
+            completionPercent: 0,
+            badges: [],
+            elementCompletion: [],
+            rarityCompletion: [],
+            collectionByElement: {},
+          },
+        })
+      }
+      return Promise.resolve(emptyCollection)
+    })
+
+    wrapper = mount(LeaderboardComponent, mountOptions)
+    await flushPromises()
+    await openBattles(wrapper)
+    await flushPromises()
+    await wrapper.find('.battle-row').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.no-matches').exists()).toBe(true)
+    expect(wrapper.findAll('.recent-match')).toHaveLength(0)
+  })
 })

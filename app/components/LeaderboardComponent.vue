@@ -210,6 +210,51 @@
             </button>
           </div>
 
+          <!-- Progression and record -->
+          <div class="profile-section profile-progression">
+            <h3>{{ $t('leaderboard.profile.progressionTitle') }}</h3>
+            <div class="progression-stats">
+              <span class="progression-stat">
+                <strong>{{ profile.level }}</strong>
+                {{ $t('leaderboard.profile.level') }}
+              </span>
+              <span class="progression-stat">
+                <strong>{{ profile.xp }}</strong>
+                {{ $t('leaderboard.profile.xp') }}
+              </span>
+              <span class="progression-stat">
+                <strong>{{ profile.record.wins }}</strong>
+                {{ $t('leaderboard.profile.wins') }}
+              </span>
+              <span class="progression-stat">
+                <strong>{{ profile.record.losses }}</strong>
+                {{ $t('leaderboard.profile.losses') }}
+              </span>
+              <span class="progression-stat">
+                <strong>{{ profile.record.winRate }}%</strong>
+                {{ $t('leaderboard.profile.winRate') }}
+              </span>
+            </div>
+
+            <div v-if="profile.recentMatches.length === 0" class="no-matches">
+              {{ $t('leaderboard.profile.noMatches') }}
+            </div>
+            <ul v-else class="recent-matches">
+              <li
+                v-for="(match, i) in profile.recentMatches"
+                :key="i"
+                class="recent-match"
+                :class="`result-${match.result}`"
+              >
+                <span class="match-result">{{ $t(`leaderboard.profile.result_${match.result}`) }}</span>
+                <span class="match-score">{{ match.scoreSelf }} - {{ match.scoreOpponent }}</span>
+                <span class="match-detail">{{ match.boardSize }}x{{ match.boardSize }}</span>
+                <span class="match-detail">{{ match.difficulty }}</span>
+                <span class="match-date">{{ formatDate(match.playedAt) }}</span>
+              </li>
+            </ul>
+          </div>
+
           <!-- Badges -->
           <div v-if="profile.badges.length > 0" class="profile-section">
             <h3>{{ $t('leaderboard.profile.badgesTitle') }}</h3>
@@ -450,5 +495,54 @@ onMounted(() => {
   padding: var(--spacing-lg);
   text-align: center;
   color: var(--color-text-muted);
+}
+
+.progression-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.progression-stat {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.progression-stat strong {
+  font-size: var(--font-lg);
+  color: var(--color-text-primary);
+}
+
+.recent-matches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recent-match {
+  display: grid;
+  grid-template-columns: 80px 70px 60px 1fr auto;
+  gap: var(--spacing-sm);
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-left: 3px solid transparent;
+  font-size: var(--font-sm);
+}
+
+.recent-match.result-win { border-left-color: var(--color-success, #22c55e); }
+.recent-match.result-loss { border-left-color: var(--color-error-light, #ef4444); }
+.recent-match.result-draw { border-left-color: var(--color-border-light); }
+
+.match-detail,
+.match-date,
+.no-matches {
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 560px) {
+  .recent-match { grid-template-columns: 1fr 1fr; }
 }
 </style>
