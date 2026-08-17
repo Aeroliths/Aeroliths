@@ -123,6 +123,7 @@ global.db = {
       update: vi.fn(),
     },
     progressionLevel: {
+      findFirst: vi.fn(),
       findMany: vi.fn(),
       deleteMany: vi.fn(),
       createMany: vi.fn(),

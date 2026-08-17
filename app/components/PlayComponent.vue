@@ -4,6 +4,21 @@
       <div class="play-header">
         <h1>{{ $t('play.playComponent.title') }}</h1>
         <p>{{ $t('play.playComponent.welcome') }}<strong>{{ user?.username }}</strong>{{ $t('play.playComponent.welcomeSuffix') }}</p>
+
+        <div v-if="user?.level" class="progress-card">
+          <div class="progress-head">
+            <span class="progress-level">{{ $t('play.playComponent.level', { level: user.level }) }}</span>
+            <span class="progress-xp">{{ $t('play.playComponent.xpTotal', { xp: user.xp ?? 0 }) }}</span>
+          </div>
+          <div class="progress-track" role="presentation">
+            <div class="progress-fill" :style="{ width: `${progressPercent}%` }" />
+          </div>
+          <span class="progress-remaining">
+            {{ remainingXp === null
+              ? $t('play.playComponent.maxLevel')
+              : $t('play.playComponent.xpToNext', { xp: remainingXp }) }}
+          </span>
+        </div>
       </div>
 
       <div v-if="!matchActive" class="mode-cards">
@@ -52,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import DeckBuilder from '~/components/DeckBuilder.vue'
 import LocalMatch from '~/components/game/LocalMatch.vue'
@@ -60,11 +75,74 @@ import LocalMatch from '~/components/game/LocalMatch.vue'
 const { user } = useAuth()
 const mode = ref<'deck' | 'local' | 'bot'>('deck')
 const matchActive = ref(false)
+
+/** XP still to earn before the next level, or null at the top of the curve. */
+const remainingXp = computed(() => {
+  const next = user.value?.nextLevelXp
+  if (next === null || next === undefined) return null
+  return Math.max(0, next - (user.value?.xp ?? 0))
+})
+
+/**
+ * How full the bar is within the current level. The bar measures the current
+ * level, not the whole curve, so early levels do not look permanently empty.
+ */
+const progressPercent = computed(() => {
+  const next = user.value?.nextLevelXp
+  if (next === null || next === undefined || next <= 0) return 100
+  const xp = user.value?.xp ?? 0
+  return Math.min(100, Math.max(0, Math.round((xp / next) * 100)))
+})
 </script>
 
 <style scoped src="~/assets/css/play.css"></style>
 
 <style scoped>
+.progress-card {
+  margin: 1rem 0 0.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-xl, 1rem);
+  border: 1px solid var(--color-border-light);
+  background: var(--bg-glass-light);
+}
+
+.progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.progress-level {
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+
+.progress-xp,
+.progress-remaining {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-glass-medium);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary, #6366f1);
+  transition: width 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill { transition: none; }
+}
+
 .mode-cards {
   display: grid;
   /* Three cards fit side by side when there is room and wrap when there is not,

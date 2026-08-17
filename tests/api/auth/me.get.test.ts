@@ -14,6 +14,8 @@ function storedUser(overrides: Record<string, any> = {}) {
     lastActiveAt: new Date('2026-08-01'),
     deletionRequestedAt: null,
     createdAt: new Date('2026-01-01'),
+    xp: 120,
+    level: 2,
     role: { id: 'role-1', name: 'user' },
     authentication: { tokenVersion: 0 },
     ...overrides,
@@ -26,6 +28,7 @@ describe('GET /api/auth/me', () => {
     global.getAuthUser.mockReturnValue({ ...createTestUser(), tokenVersion: 0 })
     global.db.postgres.user.findUnique.mockResolvedValue(storedUser())
     global.db.postgres.user.update.mockResolvedValue({})
+    global.db.postgres.progressionLevel.findFirst.mockResolvedValue({ xpRequired: 250 })
   })
 
   it('returns the current user', async () => {
@@ -34,6 +37,24 @@ describe('GET /api/auth/me', () => {
     expect(result.success).toBe(true)
     expect(result.data.id).toBe('test-user-id')
     expect(result.data.role.name).toBe('user')
+  })
+
+  it('returns the progression, with the next threshold resolved server side', async () => {
+    const result = await handler(event)
+
+    expect(result.data.xp).toBe(120)
+    expect(result.data.level).toBe(2)
+    // The curve table is admin-only, so the client is handed the number it
+    // needs rather than the table it would have to read.
+    expect(result.data.nextLevelXp).toBe(250)
+  })
+
+  it('reports no next threshold at the top of the curve', async () => {
+    global.db.postgres.progressionLevel.findFirst.mockResolvedValue(null)
+
+    const result = await handler(event)
+
+    expect(result.data.nextLevelXp).toBeNull()
   })
 
   it('never returns the authentication row', async () => {

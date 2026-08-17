@@ -7,6 +7,10 @@ interface User {
   profilePicture?: string | null
   lastActiveAt: string
   deletionRequestedAt?: string | null
+  xp?: number
+  level?: number
+  /** Threshold of the next level, or null at the top of the curve. */
+  nextLevelXp?: number | null
   role: {
     id: string
     name: string

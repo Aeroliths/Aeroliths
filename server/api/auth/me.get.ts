@@ -16,6 +16,8 @@ export default defineEventHandler(async (event) => {
         lastActiveAt: true,
         deletionRequestedAt: true,
         createdAt: true,
+        xp: true,
+        level: true,
         role: { select: { id: true, name: true } },
         authentication: { select: { tokenVersion: true } },
       },
@@ -43,6 +45,14 @@ export default defineEventHandler(async (event) => {
     // Remove authentication from response
     const { authentication, ...userWithoutAuth } = userDetails
 
+    // The threshold of the next level, resolved here so the client never needs
+    // to read the curve table, which is admin-only. Null once the top of the
+    // curve is reached, or while no curve is configured.
+    const nextEntry = await db.postgres.progressionLevel.findFirst({
+      where: { level: userDetails.level + 1 },
+      select: { xpRequired: true },
+    })
+
     // Update last active date
     await db.postgres.user.update({
       where: { id: user.userId },
@@ -51,7 +61,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      data: userWithoutAuth,
+      data: { ...userWithoutAuth, nextLevelXp: nextEntry?.xpRequired ?? null },
     }
   } catch (error) {
     if (error && typeof error === 'object' && 'statusCode' in error) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="admin-section">
+  <div class="tab-content">
     <h2>Progression</h2>
 
     <div v-if="loading" class="loading">Loading progression...</div>
@@ -7,26 +7,46 @@
     <div v-if="notice" class="success-message">{{ notice }}</div>
 
     <section class="progression-block">
-      <h3>Level curve</h3>
-      <p class="hint">
-        Level 1 must require zero XP, levels must be consecutive, and each
-        threshold must exceed the previous one.
-      </p>
+      <div class="progression-head">
+        <h3>Level curve</h3>
+        <p class="progression-hint">
+          Level 1 must require zero XP, levels must be consecutive, and each
+          threshold must exceed the previous one.
+        </p>
+      </div>
+
+      <div v-if="curve.length === 0" class="no-data">
+        No curve yet. Add a level to start: nothing levels up until the curve exists.
+      </div>
 
       <div v-for="(entry, index) in curve" :key="index" class="curve-row">
-        <label>
-          Level
-          <input v-model.number="entry.level" type="number" class="level-number" min="1" />
-        </label>
-        <label>
-          XP required
-          <input v-model.number="entry.xpRequired" type="number" class="xp-required" min="0" />
-        </label>
-        <button class="ghost-btn remove-level" @click="curve.splice(index, 1)">Remove</button>
+        <div class="form-group">
+          <label :for="`level-${index}`">Level</label>
+          <input
+            :id="`level-${index}`"
+            v-model.number="entry.level"
+            type="number"
+            class="level-number"
+            min="1"
+          />
+        </div>
+        <div class="form-group">
+          <label :for="`xp-${index}`">XP required</label>
+          <input
+            :id="`xp-${index}`"
+            v-model.number="entry.xpRequired"
+            type="number"
+            class="xp-required"
+            min="0"
+          />
+        </div>
+        <button class="btn-delete-small remove-level" @click="curve.splice(index, 1)">
+          Remove
+        </button>
       </div>
 
       <div class="progression-actions">
-        <button class="ghost-btn add-level" @click="addLevel">Add level</button>
+        <button class="btn-add add-level" @click="addLevel">Add level</button>
         <button class="btn-create save-curve" :disabled="saving" @click="saveCurve">
           Save curve
         </button>
@@ -34,35 +54,49 @@
     </section>
 
     <section class="progression-block">
-      <h3>Reward tiers</h3>
-      <p class="hint">One tier per level, on a level the curve defines.</p>
+      <div class="progression-head">
+        <h3>Reward tiers</h3>
+        <p class="progression-hint">One tier per level, on a level the curve defines.</p>
+      </div>
+
+      <div v-if="rewards.length === 0" class="no-data">No reward tier configured.</div>
 
       <div v-for="(reward, index) in rewards" :key="index" class="reward-row">
-        <label>
-          Level
-          <select v-model.number="reward.level" class="reward-level">
+        <div class="form-group">
+          <label :for="`reward-level-${index}`">Level</label>
+          <select :id="`reward-level-${index}`" v-model.number="reward.level" class="reward-level">
             <option v-for="entry in curve" :key="entry.level" :value="entry.level">
               {{ entry.level }}
             </option>
           </select>
-        </label>
-        <label>
-          Lithos
-          <select v-model="reward.lithosId" class="reward-lithos">
+        </div>
+        <div class="form-group">
+          <label :for="`reward-lithos-${index}`">Lithos</label>
+          <select :id="`reward-lithos-${index}`" v-model="reward.lithosId" class="reward-lithos">
             <option v-for="lithos in catalog" :key="lithos.id" :value="lithos.id">
               {{ lithos.name }}
             </option>
           </select>
-        </label>
-        <label>
-          Quantity
-          <input v-model.number="reward.quantity" type="number" class="reward-quantity" min="1" />
-        </label>
-        <button class="ghost-btn remove-reward" @click="rewards.splice(index, 1)">Remove</button>
+        </div>
+        <div class="form-group">
+          <label :for="`reward-qty-${index}`">Quantity</label>
+          <input
+            :id="`reward-qty-${index}`"
+            v-model.number="reward.quantity"
+            type="number"
+            class="reward-quantity"
+            min="1"
+          />
+        </div>
+        <button class="btn-delete-small remove-reward" @click="rewards.splice(index, 1)">
+          Remove
+        </button>
       </div>
 
       <div class="progression-actions">
-        <button class="ghost-btn add-reward" @click="addReward">Add tier</button>
+        <button class="btn-add add-reward" :disabled="curve.length === 0" @click="addReward">
+          Add tier
+        </button>
         <button class="btn-create save-rewards" :disabled="saving" @click="saveRewards">
           Save tiers
         </button>
@@ -170,22 +204,67 @@ onMounted(load)
 </script>
 
 <style scoped>
+/* Layout only: every control reuses the shared admin styles, so the fields and
+   buttons here look like the ones in the other tabs rather than like browser
+   defaults. */
 .progression-block {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl, 2rem);
 }
 
-.curve-row,
+.progression-head {
+  margin-bottom: var(--spacing-md);
+}
+
+.progression-head h3 {
+  margin: 0 0 var(--spacing-xxs) 0;
+}
+
+.progression-hint {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+/* The remove button sits on its own track so the fields keep a steady width
+   however many rows there are. */
+.curve-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+  gap: var(--spacing-md);
+  align-items: end;
+  margin-bottom: var(--spacing-sm);
+}
+
 .reward-row {
-  display: flex;
-  gap: var(--spacing-sm);
-  align-items: flex-end;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr) auto;
+  gap: var(--spacing-md);
+  align-items: end;
+  margin-bottom: var(--spacing-sm);
+}
+
+.curve-row .form-group,
+.reward-row .form-group {
+  margin-bottom: 0;
+}
+
+.curve-row .btn-delete-small,
+.reward-row .btn-delete-small {
+  height: fit-content;
   margin-bottom: var(--spacing-xs);
-  flex-wrap: wrap;
 }
 
 .progression-actions {
   display: flex;
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 720px) {
+  .curve-row,
+  .reward-row {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

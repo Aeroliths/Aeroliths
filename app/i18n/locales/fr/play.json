@@ -9,7 +9,11 @@
       "localMatchTitle": "Partie locale",
       "localMatchDesc": "Affrontez un ami en 1 contre 1 en local",
       "botMatchTitle": "Contre le bot",
-      "botMatchDesc": "Jouez en solo contre trois niveaux de difficulté"
+      "botMatchDesc": "Jouez en solo contre trois niveaux de difficulté",
+      "level": "Niveau {level}",
+      "xpTotal": "{xp} XP",
+      "xpToNext": "{xp} XP avant le niveau suivant",
+      "maxLevel": "Niveau maximal atteint"
     },
     "board": {
       "hand": "main",
