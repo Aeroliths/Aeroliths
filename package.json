@@ -43,7 +43,7 @@
     "dotenv-expand": "^12.0.3",
     "isomorphic-dompurify": "^3.14.0",
     "jsonwebtoken": "^9.0.3",
-    "nuxt": "^4.5.2",
+    "nuxt": "^4.6.4",
     "nuxt-auth-utils": "^0.5.29",
     "pg": "^8.20.0",
     "prisma": "^7.10.1",
@@ -60,7 +60,7 @@
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/ui": "^4.1.11",
     "baseline-browser-mapping": "^2.10.12",
-    "happy-dom": "^20.8.9",
+    "happy-dom": "^21.0.4",
     "tsx": "^4.21.0",
     "vitest": "^4.1.11"
   },
