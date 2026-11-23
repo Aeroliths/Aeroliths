@@ -3,7 +3,7 @@
     <!-- Open hands: the opponent's hand, face-up and read-only -->
     <div v-if="state.openHands && !readonly && state.status === 'playing'" class="open-hand">
       <span class="open-hand-label">{{ opponentLabel }} {{ $t('play.board.hand') }}</span>
-      <div class="open-hand-cards">
+      <div class="open-hand-cards" :class="`size-${state.size}`">
         <div
           v-for="(stone, i) in state.hands[opponent]"
           :key="stone.id + '-' + i"
@@ -51,7 +51,10 @@
     <!-- Board grid -->
     <div
       class="grid"
-      :style="{ gridTemplateColumns: `repeat(${state.size}, 1fr)` }"
+      :style="{
+        gridTemplateColumns: `repeat(${state.size}, minmax(0, 1fr))`,
+        gridTemplateRows: `repeat(${state.size}, minmax(0, 1fr))`,
+      }"
     >
       <template v-for="(row, y) in state.board" :key="y">
         <button
@@ -106,7 +109,7 @@
     <!-- Current player's hand -->
     <div v-if="state.status === 'playing' && !readonly" class="hand">
       <div class="hand-label">{{ state.current === 'A' ? $t('play.board.player1') : $t('play.board.player2') }} {{ $t('play.board.hand') }}</div>
-      <div class="hand-cards">
+      <div class="hand-cards" :class="`size-${state.size}`">
         <button
           v-for="(stone, i) in state.hands[state.current]"
           :key="stone.id + '-' + i"
@@ -396,6 +399,9 @@ watch(
   flex-direction: column;
   gap: 1.25rem;
   align-items: center;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
 }
 
 /* ---- Status bar ---- */
@@ -404,13 +410,14 @@ watch(
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 520px;
-  gap: 1rem;
+  min-height: 46px;
+  gap: 0.75rem;
 }
 
 .score {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 0.5rem;
   padding: 0.5rem 0.9rem;
   border-radius: 999px;
@@ -448,6 +455,12 @@ watch(
 
 .status-center {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem 0.45rem;
   text-align: center;
 }
 
@@ -455,6 +468,7 @@ watch(
   font-size: var(--font-base);
   color: var(--color-text-primary);
   font-weight: var(--font-semibold);
+  white-space: nowrap;
 }
 
 .result {
@@ -475,18 +489,20 @@ watch(
 
 .cell {
   position: relative;
-  aspect-ratio: 1;
+  width: 100%;
+  height: 100%;
   min-width: 0;
   min-height: 0;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
-  background: var(--bg-glass-light);
+  border: 1.5px solid var(--color-border-light);
+  background: var(--color-bg-darker);
   padding: 0;
   cursor: default;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 /* The Lithos fills the cell but is taken out of flow, so its image size can
@@ -500,12 +516,13 @@ watch(
 
 .cell.placeable {
   cursor: pointer;
-  border-style: dashed;
-  border-color: var(--color-brand-primary);
+  border-color: var(--color-border-brand);
+  background: rgba(107, 150, 173, 0.07);
 }
 
 .cell.placeable:hover {
-  background: rgba(107, 150, 173, 0.12);
+  border-color: var(--color-brand-primary-light);
+  background: rgba(107, 150, 173, 0.15);
 }
 
 .cell.preview-capture {
@@ -592,7 +609,18 @@ watch(
 /* ---- Open hands: opponent's hand, face-up and read-only ---- */
 .open-hand { width: 100%; max-width: 520px; }
 .open-hand-label { font-size: var(--font-sm); color: var(--color-text-muted); margin-bottom: 0.4rem; display: block; }
-.open-hand-cards { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.open-hand-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 56px;
+  align-content: flex-start;
+  align-items: flex-start;
+}
+.open-hand-cards.size-4,
+.open-hand-cards.size-5 {
+  min-height: calc(56px * 2 + 0.5rem);
+}
 .open-card {
   width: 56px;
   height: 56px;
@@ -632,6 +660,15 @@ watch(
   display: flex;
   flex-wrap: wrap;
   gap: 0.6rem;
+  min-height: 76px;
+  align-content: flex-start;
+  align-items: flex-start;
+}
+.hand-cards.size-4 {
+  min-height: calc(76px * 2 + 0.6rem);
+}
+.hand-cards.size-5 {
+  min-height: calc(76px * 3 + 1.2rem);
 }
 
 .hand-card {

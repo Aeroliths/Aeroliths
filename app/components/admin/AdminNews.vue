@@ -412,7 +412,7 @@ onMounted(async () => {
   justify-content: center;
   color: var(--color-text-subtle);
   font-size: var(--font-sm);
-  border: 1px dashed var(--color-border-lighter);
+  border: 1px solid var(--color-border-lighter);
   background: var(--bg-glass-lighter);
 }
 
@@ -563,7 +563,7 @@ onMounted(async () => {
   width: 100%;
   padding: var(--spacing-sm);
   background: var(--bg-glass-light);
-  border: 1px dashed var(--color-border-brand-light);
+  border: 1px solid var(--color-border-brand-light);
   border-radius: var(--radius-lg);
   color: var(--color-text-secondary);
   font-size: var(--font-sm);

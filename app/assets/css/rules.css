@@ -156,8 +156,12 @@
 }
 
 .mini-litho.opponent.captured {
-  border-style: dashed;
-  opacity: 0.8;
+  border-color: var(--color-brand-primary);
+  background: rgba(107, 150, 173, 0.14);
+}
+
+.mini-litho.opponent.captured .mini-value {
+  color: var(--color-brand-primary-light);
 }
 
 .mini-label {

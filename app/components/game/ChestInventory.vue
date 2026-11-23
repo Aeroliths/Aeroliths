@@ -136,7 +136,7 @@ onMounted(load)
   gap: 0.65rem;
   padding: 2.75rem 1.5rem;
   border-radius: var(--radius-xl);
-  border: 1px dashed var(--color-border-light);
+  border: 1px solid var(--color-border-light);
   background: var(--bg-glass-lighter);
   color: var(--color-text-muted);
   font-size: var(--font-sm);

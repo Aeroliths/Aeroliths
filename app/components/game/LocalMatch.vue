@@ -194,7 +194,9 @@
         @place-at="play"
       />
 
-      <p v-if="botThinking" class="bot-thinking">{{ $t('play.localMatch.botThinking') }}</p>
+      <div v-if="botEnabled && match.status === 'playing'" class="bot-status" aria-live="polite">
+        <p v-if="botThinking" class="bot-thinking">{{ $t('play.localMatch.botThinking') }}</p>
+      </div>
 
       <div v-if="replaying" class="replay-bar">
         <button class="ghost-btn sm" :disabled="replayIndex === 0" @click="replayStep(-1)" aria-label="Previous step">

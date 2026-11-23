@@ -393,6 +393,7 @@
   flex-direction: column;
   gap: 1.25rem;
   align-items: center;
+  width: 100%;
 }
 
 .play-actions {
@@ -548,6 +549,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   .end-overlay, .end-modal { animation: none; }
+}
+
+.bot-status {
+  height: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bot-thinking {
