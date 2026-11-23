@@ -574,7 +574,26 @@ const activityChartMax = computed(() =>
 // the same aspect ratio as the rendered box — otherwise `preserveAspectRatio
 //="none"` stretches text and circles non-uniformly (they render squashed).
 const chartSvgRef = ref<SVGSVGElement | null>(null)
-const { width: chartSvgWidth } = useElementSize(chartSvgRef)
+const chartSvgWidth = ref(0)
+let chartResizeObserver: ResizeObserver | null = null
+
+watch(
+  chartSvgRef,
+  (el) => {
+    chartResizeObserver?.disconnect()
+    chartResizeObserver = null
+    if (!el) return
+    chartSvgWidth.value = el.getBoundingClientRect().width
+    if (typeof ResizeObserver !== 'undefined') {
+      chartResizeObserver = new ResizeObserver((entries) => {
+        const entry = entries[0]
+        if (entry) chartSvgWidth.value = entry.contentRect.width
+      })
+      chartResizeObserver.observe(el)
+    }
+  },
+  { immediate: true },
+)
 
 const CHART_VB_H = 180
 const CHART_PAD_TOP = 14
@@ -736,5 +755,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (autoRefreshInterval) clearInterval(autoRefreshInterval)
+  chartResizeObserver?.disconnect()
 })
 </script>

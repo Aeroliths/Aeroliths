@@ -56,7 +56,6 @@ import Papicon from '~/components/Papicon.vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
-import Link from '@tiptap/extension-link'
 
 const props = defineProps<{
   modelValue: string
@@ -73,9 +72,14 @@ const uploadError = ref('')
 const editor = useEditor({
   content: props.modelValue || '',
   extensions: [
-    StarterKit,
+    StarterKit.configure({
+      link: {
+        openOnClick: false,
+        autolink: true,
+        HTMLAttributes: { rel: 'noopener noreferrer nofollow', target: '_blank' },
+      },
+    }),
     Image.configure({ inline: false }),
-    Link.configure({ openOnClick: false, autolink: true, HTMLAttributes: { rel: 'noopener noreferrer nofollow', target: '_blank' } }),
   ],
   onUpdate: ({ editor: e }) => {
     emit('update:modelValue', e.getHTML())

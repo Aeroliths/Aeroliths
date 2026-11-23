@@ -2,10 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
-  modules: ['@nuxt/ui', '@vueuse/nuxt', 'nuxt-auth-utils', '@nuxtjs/i18n'],
-  ui: {
-    fonts: false,
-  },
+  modules: ['nuxt-auth-utils', '@nuxtjs/i18n'],
   css: [
     '@fontsource-variable/plus-jakarta-sans',
     '@fontsource-variable/space-grotesk',
@@ -78,10 +75,6 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#14161a' },
       ],
     },
-  },
-  icon: {
-    provider: 'iconify',
-    serverBundle: false
   },
   // Work around a Nuxt 4.6.4 / untyped regression where an omitted devServer.host
   // resolves to `{}` and crashes @nuxt/cli's `#syncAllowedHosts` (`hostname.toLowerCase`).
