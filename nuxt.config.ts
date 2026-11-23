@@ -3,7 +3,14 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
   modules: ['@nuxt/ui', '@vueuse/nuxt', 'nuxt-auth-utils', '@nuxtjs/i18n'],
-  css: ['~/assets/css/global.css'],
+  ui: {
+    fonts: false,
+  },
+  css: [
+    '@fontsource-variable/plus-jakarta-sans',
+    '@fontsource-variable/space-grotesk',
+    '~/assets/css/global.css',
+  ],
   i18n: {
     locales: [
       {
@@ -68,13 +75,18 @@ export default defineNuxtConfig({
         { name: 'twitter:description', content: 'Free online strategy game inspired by Skylanders Skystones. Build your deck, master the elements, dominate the board.' },
         { name: 'twitter:image', content: 'https://aeroliths.fr/placeholder-background.jpg' },
         // Theme
-        { name: 'theme-color', content: '#1e2028' },
+        { name: 'theme-color', content: '#14161a' },
       ],
     },
   },
   icon: {
     provider: 'iconify',
     serverBundle: false
+  },
+  // Work around a Nuxt 4.6.4 / untyped regression where an omitted devServer.host
+  // resolves to `{}` and crashes @nuxt/cli's `#syncAllowedHosts` (`hostname.toLowerCase`).
+  devServer: {
+    host: process.env.NUXT_HOST || process.env.NITRO_HOST || process.env.HOST || 'localhost',
   },
   vite: {
     server: {

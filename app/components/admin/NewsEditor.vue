@@ -2,7 +2,7 @@
   <div class="news-editor">
     <div v-if="editor" class="news-editor-toolbar">
       <button type="button" :class="{ active: editor.isActive('bold') }" @click="editor.chain().focus().toggleBold().run()" title="Bold">
-        <strong>B</strong>
+        <Papicon name="bold" :size="14" />
       </button>
       <button type="button" :class="{ active: editor.isActive('italic') }" @click="editor.chain().focus().toggleItalic().run()" title="Italic">
         <em>I</em>
@@ -19,25 +19,29 @@
       </button>
       <span class="sep" />
       <button type="button" :class="{ active: editor.isActive('bulletList') }" @click="editor.chain().focus().toggleBulletList().run()" title="Bullet list">
-        • List
+        <Papicon name="list" :size="14" />
       </button>
       <button type="button" :class="{ active: editor.isActive('orderedList') }" @click="editor.chain().focus().toggleOrderedList().run()" title="Numbered list">
         1. List
       </button>
       <button type="button" :class="{ active: editor.isActive('blockquote') }" @click="editor.chain().focus().toggleBlockquote().run()" title="Quote">
-        ❝
+        <Papicon name="text-bubble" :size="14" />
       </button>
       <span class="sep" />
       <button type="button" :class="{ active: editor.isActive('link') }" @click="promptLink" title="Link">
-        🔗
+        <Papicon name="link" :size="14" />
       </button>
       <button type="button" @click="triggerImageUpload" title="Image" :disabled="uploadingImage">
-        {{ uploadingImage ? '…' : '🖼️' }}
+        <Papicon :name="uploadingImage ? 'clock' : 'gallery'" :size="14" />
       </button>
       <input ref="imageInput" type="file" accept="image/*" hidden @change="handleImageUpload" />
       <span class="sep" />
-      <button type="button" @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()" title="Undo">↶</button>
-      <button type="button" @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()" title="Redo">↷</button>
+      <button type="button" @click="editor.chain().focus().undo().run()" :disabled="!editor.can().undo()" title="Undo">
+        <Papicon name="arrow-left" :size="14" />
+      </button>
+      <button type="button" @click="editor.chain().focus().redo().run()" :disabled="!editor.can().redo()" title="Redo">
+        <Papicon name="arrow-right" :size="14" />
+      </button>
     </div>
 
     <EditorContent :editor="editor" class="news-editor-content" />
@@ -48,6 +52,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'

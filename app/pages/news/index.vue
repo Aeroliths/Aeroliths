@@ -28,7 +28,10 @@
             <p class="news-card__date">{{ formatDate(item.publishedAt) }}</p>
             <h2 class="news-card__title">{{ item.title }}</h2>
             <p v-if="item.excerpt" class="news-card__excerpt">{{ item.excerpt }}</p>
-            <span class="news-card__cta">{{ $t('news.readMore') }}</span>
+            <span class="news-card__cta">
+              <span>{{ $t('news.readMore') }}</span>
+              <Papicon name="arrow-right" :size="14" />
+            </span>
           </div>
         </NuxtLinkLocale>
       </div>
@@ -37,6 +40,8 @@
 </template>
 
 <script setup lang="ts">
+import Papicon from '~/components/Papicon.vue'
+
 type NewsListItem = {
   id: string
   title: string
@@ -106,10 +111,7 @@ const formatDate = (iso: string | null) => {
 }
 
 .news-hero__gradient {
-  background: linear-gradient(135deg, var(--color-brand-primary), #5898b8, #d4a76a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-text-primary);
 }
 
 .news-hero__desc {
@@ -234,7 +236,11 @@ const formatDate = (iso: string | null) => {
 }
 
 .news-card__cta {
-  margin-top: var(--spacing-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: var(--spacing-md);
   font-size: var(--font-sm);
   color: var(--color-brand-primary);
   font-weight: var(--font-semibold);

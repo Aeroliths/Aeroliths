@@ -8,22 +8,22 @@
 }
 
 .legal-container {
-  max-width: 900px;
+  max-width: 920px;
   margin: 0 auto;
   background: var(--bg-glass-card);
-  border: 2px solid var(--color-border-brand);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-3xl);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl) var(--spacing-3xl);
+  box-shadow: var(--shadow-xl), var(--shadow-inset-highlight);
 }
 
 .legal-title {
-  font-size: var(--font-6xl);
-  font-weight: var(--font-bold);
-  color: var(--color-brand-primary);
+  font-size: clamp(2rem, 4.5vw, 2.75rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
   text-align: center;
-  margin-bottom: var(--spacing-3xl);
-  text-shadow: var(--shadow-text-lg);
+  margin-bottom: var(--spacing-2xl);
 }
 
 /* =========================================
@@ -131,16 +131,15 @@
 }
 
 .back-button {
-  background: var(--gradient-primary);
-  color: var(--color-text-primary);
-  font-size: var(--font-xl);
+  background: var(--color-brand-primary);
+  color: var(--color-bg-base);
+  font-size: var(--font-base);
   font-weight: var(--font-semibold);
-  padding: var(--spacing-md) var(--spacing-2xl);
-  border: 2px solid var(--color-brand-primary);
+  padding: 0.85rem var(--spacing-2xl);
+  border: 1px solid transparent;
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: var(--transition-all);
-  box-shadow: 0 4px 12px rgba(122, 184, 212, 0.3);
   display: inline-block;
   text-decoration: none;
 }

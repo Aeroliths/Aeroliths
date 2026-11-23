@@ -1,144 +1,158 @@
 /* =========================================
    DESIGN SYSTEM - CSS VARIABLES
-   Thème Aeroliths - Pierre & Ciel
+   Thème Aeroliths - Pierre & Ardoise (Mat, sobre)
    ========================================= */
 
 :root {
-  /* Tell the browser this page is dark-themed, so native form controls
-     (select dropdown popups, checkboxes, scrollbars) render with the dark
-     UI instead of defaulting to a light system popup with light inherited
-     text — which is what caused dropdown options to render unreadable. */
   color-scheme: dark;
 
   /* =========================================
-     BRAND COLORS
-     Bleu céruléen - ciel clair, azur atmosphérique
+     FONT FAMILIES
+     Self-hosted variable fonts (CSP-safe)
      ========================================= */
-  --color-brand-primary: #7ab8d4;
-  --color-brand-primary-light: #9dd0e8;
-  --color-brand-primary-dark: #5898b8;
+  --font-display: 'Space Grotesk Variable', 'Plus Jakarta Sans Variable', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
 
   /* =========================================
-     GRADIENTS
+     BRAND COLORS
+     Bleu ardoise minéral & ocre doux (sans néon)
      ========================================= */
-  --gradient-brand: linear-gradient(135deg, #4a7fa5 0%, #2d5a80 100%);
-  --gradient-primary: linear-gradient(135deg, #7ab8d4 0%, #5898b8 100%);
-  --gradient-primary-hover: linear-gradient(135deg, #9dd0e8 0%, #7ab8d4 100%);
+  --color-brand-primary: #6b96ad;
+  --color-brand-primary-light: #88afc4;
+  --color-brand-primary-dark: #51768b;
+  --color-accent-gold: #c29b5b;
+  --color-accent-gold-dark: #9c7a42;
+
+  /* Shared primary alias */
+  --color-primary: var(--color-brand-primary);
+
+  /* Match player colors (natural, muted, readable) */
+  --owner-a: #5889ba;
+  --owner-b: #c75d5d;
+
+  /* =========================================
+     ACCENT SURFACES (matte, no neon gradients)
+     ========================================= */
+  --gradient-brand: #51768b;
+  --gradient-heading: #f0eee8;
+  --gradient-primary: #6b96ad;
+  --gradient-primary-hover: #7ca4ba;
+  --gradient-surface: #1b1e24;
 
   /* =========================================
      BACKGROUND COLORS
-     Pierres sombres - obsidienne, ardoise, granit
+     Basalte & ardoise mate
      ========================================= */
-  --color-bg-base: #1e2028;
-  --color-bg-primary: #252830;
-  --color-bg-secondary: #181a21;
-  --color-bg-dark: #13151c;
-  --color-bg-darker: #1c1e26;
+  --color-bg-base: #14161a;
+  --color-bg-primary: #1b1e24;
+  --color-bg-secondary: #22262e;
+  --color-bg-dark: #0f1115;
+  --color-bg-darker: #16191f;
 
-  /* Glass morphism backgrounds */
-  --bg-glass-light: rgba(100, 130, 160, 0.06);
-  --bg-glass-lighter: rgba(100, 130, 160, 0.03);
-  --bg-glass-medium: rgba(100, 130, 160, 0.10);
-  --bg-glass-card: rgba(25, 28, 38, 0.90);
-  --bg-glass-dark: rgba(25, 28, 38, 0.95);
+  /* Subtle stone surface layers */
+  --bg-glass-light: rgba(255, 255, 255, 0.03);
+  --bg-glass-lighter: rgba(255, 255, 255, 0.018);
+  --bg-glass-medium: rgba(255, 255, 255, 0.06);
+  --bg-glass-card: #1b1e24;
+  --bg-glass-dark: #14161a;
 
-  /* Overlay gradients */
-  --overlay-base: rgba(30, 32, 40, 0.95);
-  --overlay-radial: radial-gradient(circle at 50% 50%, rgba(70, 130, 180, 0.08) 0%, transparent 50%);
+  /* Overlay */
+  --overlay-base: rgba(15, 17, 21, 0.92);
+  --overlay-radial: none;
 
   /* =========================================
      TEXT COLORS
-     Calcaire pâle - blanc cassé, brume de pierre
+     Calcaire naturel & gris ardoise
      ========================================= */
-  --color-text-primary: #ece8e0;
-  --color-text-secondary: rgba(236, 232, 224, 0.9);
-  --color-text-muted: rgba(236, 232, 224, 0.7);
-  --color-text-subtle: rgba(236, 232, 224, 0.6);
-  --color-text-placeholder: rgba(236, 232, 224, 0.4);
-  --color-text-inverted: #333;
-  --color-text-inverted-secondary: #555;
-  --color-text-highlight: #d8d4cc;
-  --color-text-highlight-alt: #c8c4bc;
-  --color-text-highlight-subtle: #b8b4ac;
-  --color-text-muted-alt: #a8a4a0;
+  --color-text-primary: #eeece6;
+  --color-text-secondary: #d5d3cd;
+  --color-text-muted: #989ba3;
+  --color-text-subtle: #737780;
+  --color-text-placeholder: #5a5e68;
+  --color-text-inverted: #14161a;
+  --color-text-inverted-secondary: #2c303a;
+  --color-text-highlight: #d8d6d0;
+  --color-text-highlight-alt: #c5c3bd;
+  --color-text-highlight-subtle: #b0aea8;
+  --color-text-muted-alt: #8a8d96;
 
   /* =========================================
      BORDER COLORS
-     Ciel teinté - bordures subtiles bleues
      ========================================= */
-  --color-border-light: rgba(122, 184, 212, 0.12);
-  --color-border-lighter: rgba(122, 184, 212, 0.06);
-  --color-border-subtle: rgba(122, 184, 212, 0.25);
-  --color-border-brand: rgba(122, 184, 212, 0.30);
-  --color-border-brand-light: rgba(122, 184, 212, 0.20);
-  --color-border-brand-medium: rgba(122, 184, 212, 0.40);
-  --color-border-brand-dark: rgba(122, 184, 212, 0.50);
-  --color-border-brand-darker: rgba(122, 184, 212, 0.80);
-  --color-border-dashed: rgba(122, 184, 212, 0.40);
+  --color-border-lighter: rgba(255, 255, 255, 0.07);
+  --color-border-light: rgba(255, 255, 255, 0.12);
+  --color-border-subtle: rgba(255, 255, 255, 0.2);
+  --color-border-brand-light: rgba(107, 150, 173, 0.26);
+  --color-border-brand: rgba(107, 150, 173, 0.44);
+  --color-border-brand-medium: rgba(107, 150, 173, 0.56);
+  --color-border-brand-dark: rgba(107, 150, 173, 0.68);
+  --color-border-brand-darker: rgba(107, 150, 173, 0.85);
+  --color-border-dashed: rgba(107, 150, 173, 0.45);
   --color-border-inverted: #ddd;
   --color-border-inverted-light: #eee;
 
   /* =========================================
-     STATUS COLORS
+     STATUS COLORS (muted, non-neon)
      ========================================= */
   /* Error / Danger */
-  --color-error: #ef4444;
-  --color-error-light: #fca5a5;
-  --color-error-bg: rgba(239, 68, 68, 0.1);
-  --color-error-bg-hover: rgba(239, 68, 68, 0.2);
-  --color-error-border: rgba(239, 68, 68, 0.3);
-  --color-error-border-hover: rgba(239, 68, 68, 0.5);
+  --color-error: #c75757;
+  --color-error-light: #e28d8d;
+  --color-error-bg: rgba(199, 87, 87, 0.11);
+  --color-error-bg-hover: rgba(199, 87, 87, 0.2);
+  --color-error-border: rgba(199, 87, 87, 0.28);
+  --color-error-border-hover: rgba(199, 87, 87, 0.48);
 
   /* Success */
-  --color-success: #4CAF50;
-  --color-success-dark: #45a049;
-  --color-success-light: #3c3;
-  --color-success-bg: #efe;
-  --color-success-bg-alt: rgba(122, 184, 212, 0.10);
+  --color-success: #4f9d73;
+  --color-success-dark: #3f845f;
+  --color-success-light: #7cc09a;
+  --color-success-bg: rgba(79, 157, 115, 0.12);
+  --color-success-bg-alt: rgba(79, 157, 115, 0.1);
 
   /* Warning / Admin */
-  --color-warning: #f1c40f;
-  --color-warning-bg: rgba(241, 196, 15, 0.1);
-  --color-warning-bg-hover: rgba(241, 196, 15, 0.2);
-  --color-warning-border: rgba(241, 196, 15, 0.3);
-  --color-warning-border-hover: rgba(241, 196, 15, 0.5);
+  --color-warning: #c89f4e;
+  --color-warning-bg: rgba(200, 159, 78, 0.1);
+  --color-warning-bg-hover: rgba(200, 159, 78, 0.18);
+  --color-warning-border: rgba(200, 159, 78, 0.28);
+  --color-warning-border-hover: rgba(200, 159, 78, 0.45);
 
-  /* Info - bleu acier, reflet de ciel */
-  --color-info: #6ba5c8;
-  --color-info-dark: #4a7fa5;
-  --color-info-bg: rgba(107, 165, 200, 0.10);
-  --color-info-border: rgba(107, 165, 200, 0.20);
+  /* Info */
+  --color-info: #6b96ad;
+  --color-info-dark: #51768b;
+  --color-info-bg: rgba(107, 150, 173, 0.1);
+  --color-info-border: rgba(107, 150, 173, 0.24);
 
   /* Inverted status colors */
   --color-error-inverted: #fee;
   --color-error-text-inverted: #c33;
   --color-success-inverted: #efe;
   --color-success-text-inverted: #3c3;
-  --color-disabled-bg: #f5f5f5;
-  --color-disabled-bg-alt: #ccc;
+  --color-disabled-bg: #262a33;
+  --color-disabled-bg-alt: #3a3f4c;
 
   /* =========================================
      ADMIN PANEL COLORS
      ========================================= */
-  --color-admin-bg: #f0f2f5;
-  --color-admin-text: #2c3e50;
-  --color-admin-text-secondary: #495057;
-  --color-admin-text-muted: #7f8c8d;
+  --color-admin-bg: #14161a;
+  --color-admin-text: #eeece6;
+  --color-admin-text-secondary: #c5c3bd;
+  --color-admin-text-muted: #989ba3;
   --color-admin-white: #ffffff;
-  --color-admin-border: #dee2e6;
-  --color-admin-border-light: #ced4da;
-  --color-admin-card-bg: #f8f9fa;
+  --color-admin-border: rgba(255, 255, 255, 0.12);
+  --color-admin-border-light: rgba(255, 255, 255, 0.07);
+  --color-admin-card-bg: #1b1e24;
 
-  --color-admin-primary: #5898b8;
-  --color-admin-primary-dark: #4a7fa5;
-  --color-admin-success: #27ae60;
-  --color-admin-success-dark: #229954;
-  --color-admin-warning: #f39c12;
-  --color-admin-warning-dark: #e67e22;
-  --color-admin-danger: #e74c3c;
-  --color-admin-danger-dark: #c0392b;
-  --color-admin-info: #d1ecf1;
-  --color-admin-info-dark: #0c5460;
+  --color-admin-primary: #6b96ad;
+  --color-admin-primary-dark: #51768b;
+  --color-admin-success: #4f9d73;
+  --color-admin-success-dark: #3f845f;
+  --color-admin-warning: #c89f4e;
+  --color-admin-warning-dark: #a6823b;
+  --color-admin-danger: #c75757;
+  --color-admin-danger-dark: #a84444;
+  --color-admin-info: rgba(107, 150, 173, 0.14);
+  --color-admin-info-dark: #88afc4;
 
   /* =========================================
      SPACING SCALE
@@ -163,48 +177,47 @@
   --radius-xl: 1rem;        /* 16px */
   --radius-2xl: 1.25rem;    /* 20px */
   --radius-3xl: 1.5rem;     /* 24px */
-  --radius-full: 9999px;    /* Full round */
+  --radius-full: 9999px;
 
   /* =========================================
-     SHADOWS
-     Lueur céleste sur fond de pierre
+     SHADOWS (neutral dark only, zero colored neon glow)
      ========================================= */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 24px rgba(122, 184, 212, 0.15);
-  --shadow-xl: 0 12px 30px rgba(122, 184, 212, 0.30);
-  --shadow-2xl: 0 20px 60px rgba(0, 0, 0, 0.40);
-  --shadow-focus: 0 0 0 3px rgba(107, 165, 200, 0.15);
-  --shadow-focus-brand: 0 0 0 3px rgba(88, 152, 184, 0.15);
-  --shadow-text: 0 2px 8px rgba(0, 0, 0, 0.6);
-  --shadow-text-lg: 0 2px 8px rgba(122, 184, 212, 0.25);
-  --shadow-hover: 0 10px 30px rgba(70, 130, 180, 0.35);
-  --shadow-hover-brand: 0 6px 20px rgba(122, 184, 212, 0.40);
-  --shadow-active: 0 2px 8px rgba(122, 184, 212, 0.35);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.34);
+  --shadow-xl: 0 14px 36px rgba(0, 0, 0, 0.4);
+  --shadow-2xl: 0 20px 52px rgba(0, 0, 0, 0.48);
+  --shadow-focus: 0 0 0 2px rgba(107, 150, 173, 0.32);
+  --shadow-focus-brand: 0 0 0 2px rgba(107, 150, 173, 0.38);
+  --shadow-text: 0 1px 4px rgba(0, 0, 0, 0.45);
+  --shadow-text-lg: none;
+  --shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.32);
+  --shadow-hover-brand: 0 6px 18px rgba(0, 0, 0, 0.32);
+  --shadow-active: 0 1px 3px rgba(0, 0, 0, 0.28);
+  --shadow-inset-highlight: none;
 
   /* =========================================
      TRANSITIONS
      ========================================= */
-  --transition-fast: 0.2s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
-  --transition-all: all 0.3s ease;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.22s ease;
+  --transition-slow: 0.4s ease;
+  --transition-all: all 0.2s ease;
 
   /* =========================================
-     TYPOGRAPHY
+     TYPOGRAPHY SCALE
      ========================================= */
-  /* Font sizes */
   --font-xs: 0.75rem;       /* 12px */
   --font-sm: 0.875rem;      /* 14px */
-  --font-base: 0.95rem;     /* 15.2px */
+  --font-base: 0.9375rem;   /* 15px */
   --font-md: 1rem;          /* 16px */
-  --font-lg: 1.05rem;       /* 16.8px */
-  --font-xl: 1.1rem;        /* 17.6px */
+  --font-lg: 1.0625rem;     /* 17px */
+  --font-xl: 1.125rem;      /* 18px */
   --font-2xl: 1.25rem;      /* 20px */
   --font-3xl: 1.5rem;       /* 24px */
   --font-4xl: 1.75rem;      /* 28px */
-  --font-5xl: 2rem;         /* 32px */
-  --font-6xl: 2.5rem;       /* 40px */
+  --font-5xl: 2.125rem;     /* 34px */
+  --font-6xl: 2.625rem;     /* 42px */
   --font-7xl: 3.5rem;       /* 56px */
 
   /* Font weights */
@@ -231,7 +244,7 @@
   --z-tooltip: 2000;
 
   /* =========================================
-     BREAKPOINTS (for reference in JS)
+     BREAKPOINTS (reference)
      ========================================= */
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;

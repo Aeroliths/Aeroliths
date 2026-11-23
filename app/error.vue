@@ -1,9 +1,5 @@
 <template>
   <div class="error-page">
-    <!-- Ambient glows -->
-    <div class="ambient-glow ambient-glow--sky"></div>
-    <div class="ambient-glow ambient-glow--stone"></div>
-
     <div class="error-container">
       <div class="error-content">
         <!-- Error Code -->
@@ -11,7 +7,7 @@
 
         <!-- Error Icon -->
         <div class="error-icon">
-          <UIcon :name="errorIcon" class="icon" />
+          <Papicon :name="errorIcon" :size="44" class="icon" />
         </div>
 
         <!-- Error Message -->
@@ -56,24 +52,15 @@
 
         <!-- Action Buttons -->
         <div class="error-actions">
-          <UButton
-            to="/"
-            color="primary"
-            size="lg"
-            icon="i-heroicons-home"
-          >
-            Back to Home
-          </UButton>
+          <NuxtLink to="/" class="error-btn error-btn--primary">
+            <Papicon name="home" :size="17" />
+            <span>Back to Home</span>
+          </NuxtLink>
 
-          <UButton
-            @click="handleError"
-            color="neutral"
-            variant="outline"
-            size="lg"
-            icon="i-heroicons-arrow-path"
-          >
-            Try Again
-          </UButton>
+          <button type="button" @click="handleError" class="error-btn error-btn--ghost">
+            <Papicon name="arrow-right" :size="17" />
+            <span>Try Again</span>
+          </button>
         </div>
 
         <!-- Additional Info for Dev -->
@@ -95,6 +82,9 @@
 </template>
 
 <script setup lang="ts">
+import Papicon from '~/components/Papicon.vue'
+import type { PapiconName } from '~/utils/papicons'
+
 const props = defineProps({
   error: {
     type: Object,
@@ -104,18 +94,18 @@ const props = defineProps({
 
 const isDev = import.meta.dev
 
-const errorIcon = computed(() => {
+const errorIcon = computed<PapiconName>(() => {
   switch (props.error.statusCode) {
     case 404:
-      return 'i-heroicons-magnifying-glass-circle'
+      return 'search'
     case 403:
-      return 'i-heroicons-lock-closed'
+      return 'lock'
     case 418:
-      return 'i-heroicons-beaker'
+      return 'sparkles'
     case 500:
-      return 'i-heroicons-exclamation-triangle'
+      return 'alert-triangle'
     default:
-      return 'i-heroicons-x-circle'
+      return 'alert-circle'
   }
 })
 
@@ -191,12 +181,10 @@ useSeoMeta({
 
 /* Error code */
 .error-code {
-  font-size: 7rem;
-  font-weight: 900;
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font-display);
+  font-size: 6.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
   margin: 0;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -204,14 +192,21 @@ useSeoMeta({
 
 /* Icon */
 .error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-2xl);
+  background: rgba(114, 188, 224, 0.12);
+  border: 1px solid var(--color-border-brand-light);
+  color: var(--color-brand-primary-light);
   margin: var(--spacing-md) 0 var(--spacing-lg);
 }
 
 .error-icon .icon {
-  width: 56px;
-  height: 56px;
-  color: var(--color-brand-primary);
-  opacity: 0.7;
+  width: 36px;
+  height: 36px;
 }
 
 /* Title & description */
@@ -235,6 +230,43 @@ useSeoMeta({
   gap: var(--spacing-sm);
   justify-content: center;
   flex-wrap: wrap;
+}
+
+.error-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.72rem 1.35rem;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.error-btn--primary {
+  background: var(--gradient-primary);
+  color: var(--color-bg-base);
+}
+
+.error-btn--primary:hover {
+  background: var(--gradient-primary-hover);
+  box-shadow: var(--shadow-hover-brand);
+  transform: translateY(-1px);
+}
+
+.error-btn--ghost {
+  background: var(--bg-glass-medium);
+  border-color: var(--color-border-light);
+  color: var(--color-text-primary);
+}
+
+.error-btn--ghost:hover {
+  border-color: var(--color-border-brand);
+  color: var(--color-brand-primary-light);
 }
 
 /* Debug */

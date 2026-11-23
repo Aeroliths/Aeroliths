@@ -8,31 +8,29 @@
 }
 
 .leaderboard-container {
-  max-width: 1000px;
+  max-width: 1040px;
   margin: 0 auto;
   padding: var(--spacing-xl);
-  background: var(--bg-glass-light);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-2xl);
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-xl), var(--shadow-inset-highlight);
 }
 
 .leaderboard-container h1 {
   color: var(--color-text-primary);
-  font-size: var(--font-6xl);
+  font-size: clamp(2rem, 4.5vw, 2.75rem);
+  font-weight: 700;
   margin-bottom: var(--spacing-xs);
   text-align: center;
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .leaderboard-container .subtitle {
   color: var(--color-text-muted);
   text-align: center;
   margin-bottom: var(--spacing-xl);
-  font-size: var(--font-xl);
+  font-size: var(--font-md);
 }
 
 /* =========================================
@@ -242,8 +240,10 @@
 }
 
 .podium-crown {
-  font-size: 28px;
-  animation: float 2s ease-in-out infinite;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-gold);
 }
 
 @keyframes float {
@@ -266,8 +266,7 @@
 .podium-avatar--gold {
   width: 80px;
   height: 80px;
-  border: 3px solid rgba(255, 215, 0, 0.5);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+  border: 2px solid rgba(194, 155, 91, 0.65);
 }
 
 .podium-avatar img {
@@ -400,7 +399,30 @@
 }
 
 .rank-medal {
-  font-size: var(--font-xl);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+}
+
+.rank-medal--gold {
+  background: rgba(245, 197, 66, 0.16);
+  color: #f5c542;
+  border: 1px solid rgba(245, 197, 66, 0.35);
+}
+
+.rank-medal--silver {
+  background: rgba(203, 213, 225, 0.15);
+  color: #cbd5e1;
+  border: 1px solid rgba(203, 213, 225, 0.3);
+}
+
+.rank-medal--bronze {
+  background: rgba(217, 138, 78, 0.16);
+  color: #e09f67;
+  border: 1px solid rgba(217, 138, 78, 0.32);
 }
 
 .col-player {
@@ -507,7 +529,15 @@
 
 /* Badges */
 .badge-mini {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: rgba(114, 188, 224, 0.12);
+  color: var(--color-brand-primary-light);
+  border: 1px solid var(--color-border-lighter);
   cursor: default;
 }
 
@@ -557,14 +587,17 @@
   position: absolute;
   top: var(--spacing-md);
   right: var(--spacing-md);
-  background: none;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-lighter);
   color: var(--color-text-muted);
-  font-size: var(--font-xl);
   cursor: pointer;
-  padding: var(--spacing-xs);
   border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  transition: var(--transition-all);
 }
 
 .profile-close:hover {
@@ -713,7 +746,16 @@
 }
 
 .badge-icon {
-  font-size: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background: rgba(114, 188, 224, 0.12);
+  border: 1px solid var(--color-border-brand-light);
+  color: var(--color-brand-primary-light);
+  margin-bottom: 4px;
 }
 
 .badge-name {
@@ -812,10 +854,10 @@
 }
 
 /* Rarity bars */
-.bar-rarity-common { background: #94a3b8; }
-.bar-rarity-rare { background: #60a5fa; }
-.bar-rarity-epic { background: #a78bfa; }
-.bar-rarity-legendary { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.bar-rarity-common { background: #7d8694; }
+.bar-rarity-rare { background: #5889ba; }
+.bar-rarity-epic { background: #8f74b8; }
+.bar-rarity-legendary { background: #c29b5b; }
 
 /* Rarity tags */
 .rarity-tag {

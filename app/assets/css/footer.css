@@ -5,16 +5,16 @@
 .footer {
   margin-top: auto;
   background-color: var(--color-bg-dark);
+  border-top: 1px solid var(--color-border-lighter);
   position: relative;
 }
 
 .footer-glow {
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, var(--color-brand-primary) 50%, transparent 100%);
+  display: none;
 }
 
 .footer-container {
-  max-width: 960px;
+  max-width: 1040px;
   margin: 0 auto;
   padding: var(--spacing-3xl) var(--spacing-xl) var(--spacing-lg);
 }
@@ -22,17 +22,12 @@
 /* =========================================
    CONTENT
    ========================================= */
-
 .footer-content {
   display: flex;
   justify-content: space-between;
   gap: var(--spacing-3xl);
   padding-bottom: var(--spacing-2xl);
 }
-
-/* =========================================
-   INFO (LEFT)
-   ========================================= */
 
 .footer-info {
   display: flex;
@@ -41,95 +36,106 @@
 }
 
 .footer-brand {
+  font-family: var(--font-display);
   font-size: var(--font-2xl);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-brand-primary);
   text-decoration: none;
-  letter-spacing: -0.02em;
-  transition: opacity var(--transition-fast);
+  letter-spacing: -0.03em;
+  width: fit-content;
+  transition: color var(--transition-fast);
 }
 
 .footer-brand:hover {
-  opacity: 0.8;
+  color: var(--color-brand-primary-light);
 }
 
 .footer-desc {
-  color: var(--color-text-subtle);
+  color: var(--color-text-muted);
   font-size: var(--font-sm);
   line-height: var(--line-height-relaxed);
-  max-width: 320px;
+  max-width: 340px;
 }
 
 /* =========================================
    COUNTERS
    ========================================= */
-
 .footer-counters {
   display: flex;
-  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
   margin-top: var(--spacing-xs);
 }
 
 .footer-counter {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   position: relative;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-glass-lighter);
+  border: 1px solid var(--color-border-lighter);
+  min-width: 92px;
 }
 
 .footer-counter-value {
-  font-size: var(--font-3xl);
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
-  line-height: 1;
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
 .footer-counter-label {
-  font-size: var(--font-xs);
+  font-size: 0.68rem;
   color: var(--color-text-subtle);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-top: var(--spacing-xxs);
+  margin-top: 2px;
 }
 
 .footer-counter--dev {
-  opacity: 0.4;
+  opacity: 0.55;
 }
 
 .footer-counter-badge {
   position: absolute;
-  top: -6px;
-  right: -20px;
+  top: -8px;
+  right: 8px;
   font-size: 9px;
   font-weight: var(--font-bold);
-  color: var(--color-brand-primary);
-  background: rgba(122, 184, 212, 0.12);
-  border: 1px solid rgba(122, 184, 212, 0.25);
-  padding: 1px 5px;
+  color: var(--color-brand-primary-light);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-brand-light);
+  padding: 1px 6px;
   border-radius: var(--radius-full);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 
 /* =========================================
-   LINK GROUPS (RIGHT)
+   LINK GROUPS
    ========================================= */
-
 .footer-groups {
   display: flex;
-  gap: 5rem;
+  gap: 4.5rem;
 }
 
 .footer-group {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 0.55rem;
 }
 
 .footer-group-label {
-  font-size: var(--font-sm);
-  font-weight: var(--font-semibold);
+  font-family: var(--font-display);
+  font-size: var(--font-xs);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--color-text-primary);
   margin-bottom: var(--spacing-xxs);
 }
@@ -142,41 +148,41 @@
 }
 
 .footer-group a:hover {
-  color: var(--color-brand-primary);
+  color: var(--color-brand-primary-light);
 }
 
 /* =========================================
    BOTTOM
    ========================================= */
-
 .footer-bottom {
-  border-top: 1px solid var(--color-border-light);
+  border-top: 1px solid var(--color-border-lighter);
   padding-top: var(--spacing-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
 }
 
 .footer-bottom p {
   margin: 0;
   font-size: var(--font-xs);
-  color: var(--color-text-placeholder);
+  color: var(--color-text-subtle);
 }
 
 .footer-bottom a {
-  color: var(--color-text-subtle);
+  color: var(--color-text-muted);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 .footer-bottom a:hover {
-  color: var(--color-brand-primary);
+  color: var(--color-brand-primary-light);
 }
 
 /* =========================================
    RESPONSIVE
    ========================================= */
-
 @media (max-width: 768px) {
   .footer-container {
     padding: var(--spacing-2xl) var(--spacing-md) var(--spacing-md);
@@ -202,6 +208,10 @@
     justify-content: center;
   }
 
+  .footer-counter {
+    align-items: center;
+  }
+
   .footer-groups {
     gap: var(--spacing-3xl);
     justify-content: center;
@@ -214,7 +224,7 @@
 
   .footer-bottom {
     flex-direction: column;
-    gap: var(--spacing-xxs);
+    gap: var(--spacing-xs);
     text-align: center;
   }
 }
@@ -223,7 +233,7 @@
   .footer-counters {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-lg);
-    justify-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
   }
 }

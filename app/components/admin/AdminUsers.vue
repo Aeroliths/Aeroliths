@@ -10,7 +10,7 @@
         placeholder="Search users by username, email, or name..."
         class="search-input"
       />
-      <span class="search-icon">🔍</span>
+      <span class="search-icon" aria-hidden="true"><Papicon name="search" :size="16" /></span>
     </div>
 
     <div v-if="usersLoading" class="loading">Loading users...</div>
@@ -37,12 +37,14 @@
             <td>{{ userItem.email }}</td>
             <td>
               <span :class="['verified-badge', userItem.emailVerified ? 'verified' : 'unverified']">
-                {{ userItem.emailVerified ? '✓ Verified' : '✗ Unverified' }}
+                <Papicon :name="userItem.emailVerified ? 'check' : 'cross'" :size="12" />
+                {{ userItem.emailVerified ? 'Verified' : 'Unverified' }}
               </span>
             </td>
             <td>
               <span :class="['oauth-badge', hasDiscord(userItem) ? 'linked' : 'unlinked']">
-                {{ hasDiscord(userItem) ? '✓ Linked' : '— Not linked' }}
+                <Papicon :name="hasDiscord(userItem) ? 'check' : 'minus'" :size="12" />
+                {{ hasDiscord(userItem) ? 'Linked' : 'Not linked' }}
               </span>
             </td>
             <td>
@@ -164,6 +166,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { user, initAuth } = useAuth()

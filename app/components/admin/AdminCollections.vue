@@ -13,7 +13,7 @@
           placeholder="Search a user by username or email..."
           class="search-input"
         />
-        <span class="search-icon">🔍</span>
+        <span class="search-icon" aria-hidden="true"><Papicon name="search" :size="16" /></span>
       </div>
     </div>
 
@@ -58,7 +58,7 @@
       <div class="col-modal">
         <div class="col-modal-header">
           <h3>Collection - {{ selectedUser?.username }}</h3>
-          <button class="col-close-btn" @click="closeCollectionModal">✕</button>
+          <button class="col-close-btn" @click="closeCollectionModal" aria-label="Close"><Papicon name="cross" :size="16" /></button>
         </div>
 
         <div v-if="collectionError" class="error-message">{{ collectionError }}</div>
@@ -101,7 +101,7 @@
             >
               {{ collectionLoading ? 'Adding...' : 'Add' }}
             </button>
-            <button @click="addForm.lithosId = ''" class="btn-clear">✕</button>
+            <button @click="addForm.lithosId = ''" class="btn-clear" aria-label="Clear"><Papicon name="cross" :size="14" /></button>
           </div>
         </div>
 
@@ -154,7 +154,7 @@
       <div class="col-modal">
         <div class="col-modal-header">
           <h3>Give a Lithos to all users</h3>
-          <button class="col-close-btn" @click="closeGiveAllModal">✕</button>
+          <button class="col-close-btn" @click="closeGiveAllModal" aria-label="Close"><Papicon name="cross" :size="16" /></button>
         </div>
 
         <div v-if="giveAllModalError" class="error-message">{{ giveAllModalError }}</div>
@@ -195,7 +195,7 @@
             >
               {{ giveAllLoading ? 'Giving...' : `Give to all (${users.length})` }}
             </button>
-            <button @click="giveAllForm.lithosId = ''" class="btn-clear">✕</button>
+            <button @click="giveAllForm.lithosId = ''" class="btn-clear" aria-label="Clear"><Papicon name="cross" :size="14" /></button>
           </div>
         </div>
 
@@ -225,6 +225,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { initAuth } = useAuth()

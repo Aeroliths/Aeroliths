@@ -8,7 +8,9 @@
           <span v-else class="profile-card-initials">{{ formData.username ? formData.username.charAt(0).toUpperCase() : '?' }}</span>
         </div>
         <label class="profile-card-avatar-edit" for="profile-picture-input" :class="{ disabled: loading }">
-          <span class="avatar-edit-icon">&#x270E;</span>
+          <span class="avatar-edit-icon" aria-hidden="true">
+            <Papicon name="pen" :size="14" />
+          </span>
         </label>
       </div>
       <h2 class="profile-card-username">{{ formData.username || $t('settings.profile.usernameFallback') }}</h2>
@@ -79,6 +81,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { user, initAuth } = useAuth()

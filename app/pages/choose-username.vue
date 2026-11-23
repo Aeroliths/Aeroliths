@@ -116,12 +116,12 @@ useSeoMeta({
 }
 
 .username-card {
-  background: var(--bg-glass-light);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-2xl);
-  padding: var(--spacing-3xl) var(--spacing-2xl);
-  box-shadow: var(--shadow-2xl);
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-2xl), var(--shadow-inset-highlight);
 }
 
 .username-header {
@@ -131,13 +131,9 @@ useSeoMeta({
 
 .username-header h1 {
   font-size: var(--font-4xl);
-  font-weight: var(--font-bold);
+  font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 var(--spacing-xs) 0;
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .username-header p {
@@ -197,20 +193,21 @@ useSeoMeta({
 }
 
 .username-button {
-  padding: var(--spacing-md);
-  background: var(--gradient-brand);
+  padding: 0.85rem var(--spacing-md);
+  background: var(--gradient-primary);
   border: none;
   border-radius: var(--radius-lg);
-  color: var(--color-text-primary);
-  font-size: var(--font-lg);
+  color: var(--color-bg-base);
+  font-size: var(--font-base);
   font-weight: var(--font-semibold);
   cursor: pointer;
   transition: var(--transition-all);
 }
 
 .username-button:hover:not(:disabled) {
+  background: var(--gradient-primary-hover);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+  box-shadow: var(--shadow-hover-brand);
 }
 
 .username-button:disabled {

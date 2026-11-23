@@ -25,7 +25,7 @@
           </div>
           <div class="litho-info">
             <span class="litho-name">{{ item.lithos.name }}</span>
-            <span class="litho-rarity">{{ item.lithos.rarity }}</span>
+            <span class="litho-rarity" :class="`rarity-text-${item.lithos.rarity}`">{{ item.lithos.rarity }}</span>
           </div>
           <div class="deck-controls">
             <span class="owned-qty">{{ $t('play.deckBuilder.ownedPrefix') }}{{ item.quantity }}</span>
@@ -34,13 +34,19 @@
                 class="qty-btn"
                 :disabled="getDeckQty(item.lithos.id) === 0 || saving === item.lithos.id"
                 @click="updateDeck(item.lithos.id, getDeckQty(item.lithos.id) - 1)"
-              >−</button>
+                aria-label="Decrease quantity"
+              >
+                <Papicon name="minus" :size="13" />
+              </button>
               <span class="deck-qty">{{ getDeckQty(item.lithos.id) }}/{{ maxInDeck(item) }}</span>
               <button
                 class="qty-btn"
                 :disabled="getDeckQty(item.lithos.id) >= maxInDeck(item) || saving === item.lithos.id"
                 @click="updateDeck(item.lithos.id, getDeckQty(item.lithos.id) + 1)"
-              >+</button>
+                aria-label="Increase quantity"
+              >
+                <Papicon name="plus" :size="13" />
+              </button>
             </div>
           </div>
         </div>
@@ -70,15 +76,17 @@
           </div>
           <div class="deck-entry-info">
             <span class="litho-name">{{ entry.lithos.name }}</span>
-            <span class="litho-rarity">{{ entry.lithos.rarity }}</span>
+            <span class="litho-rarity" :class="`rarity-text-${entry.lithos.rarity}`">{{ entry.lithos.rarity }}</span>
           </div>
-          <div class="deck-entry-qty">× {{ entry.quantity }}</div>
+          <div class="deck-entry-qty">×{{ entry.quantity }}</div>
           <button
             class="remove-btn"
             :disabled="saving === entry.lithos.id"
             @click="updateDeck(entry.lithos.id, 0)"
             :title="$t('play.deckBuilder.removeTitle')"
-          >✕</button>
+          >
+            <Papicon name="cross" :size="14" />
+          </button>
         </div>
       </div>
     </div>
@@ -87,6 +95,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import GameStone from '~/components/game/GameStone.vue'
 import type { Stone } from '~/game/engine/types'
 
@@ -169,7 +178,6 @@ async function updateDeck(lithosId: string, quantity: number) {
       method: 'PUT',
       body: { lithosId, quantity },
     })
-    // Update local state
     if (quantity === 0) {
       deckEntries.value = deckEntries.value.filter(e => e.lithosId !== lithosId)
     } else {
@@ -177,7 +185,6 @@ async function updateDeck(lithosId: string, quantity: number) {
       if (existing) {
         existing.quantity = quantity
       } else {
-        // Refetch to get full entry with lithos details
         const res = await $fetch<{ data: { entries: DeckEntry[] } }>('/api/deck')
         deckEntries.value = res.data.entries
       }
@@ -195,110 +202,130 @@ onMounted(fetchAll)
 <style scoped>
 .deck-builder {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 1.5rem;
+  grid-template-columns: 1fr 330px;
+  gap: 1.25rem;
   align-items: start;
 }
 
 /* ---- Panels ---- */
 .panel {
-  background: var(--bg-glass-light);
-  border: 1px solid var(--color-border-light);
+  background: var(--bg-glass-lighter);
+  border: 1px solid var(--color-border-lighter);
   border-radius: var(--radius-2xl);
-  padding: 1.5rem;
+  padding: 1.35rem;
+  box-shadow: var(--shadow-inset-highlight);
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.15rem;
 }
 
 .panel-header h2 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: var(--font-2xl);
+  font-weight: var(--font-semibold);
   color: var(--color-text-primary);
 }
 
 .count {
-  font-size: var(--font-sm);
-  color: var(--color-text-muted);
-  background: var(--bg-glass-medium);
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-semibold);
+  color: var(--color-brand-primary-light);
+  background: rgba(114, 188, 224, 0.12);
+  border: 1px solid var(--color-border-brand-light);
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-full);
+  font-variant-numeric: tabular-nums;
 }
 
 .loading,
 .empty {
   color: var(--color-text-muted);
   text-align: center;
-  padding: 2rem 0;
-  font-size: var(--font-base);
+  padding: 2.25rem 0;
+  font-size: var(--font-sm);
 }
 
 /* ---- Collection grid ---- */
 .lithos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 0.9rem;
   max-height: 70vh;
   overflow-y: auto;
   padding-right: 0.25rem;
 }
 
 .litho-card {
-  background: var(--bg-glass-medium);
-  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-lighter);
   border-radius: var(--radius-xl);
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  transition: transform 0.15s;
+  gap: 0.55rem;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .litho-card:hover {
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .litho-visual {
   width: 100%;
   aspect-ratio: 1;
   border-radius: var(--radius-lg);
-  background: var(--bg-glass-light);
-  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-darker);
+  border: 1px solid var(--color-border-lighter);
 }
 
 .litho-info {
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
 }
 
 .litho-name {
   font-size: var(--font-sm);
   font-weight: var(--font-semibold);
   color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .litho-rarity {
   font-size: 0.7rem;
+  font-weight: var(--font-semibold);
   text-transform: capitalize;
   color: var(--color-text-muted);
+  flex-shrink: 0;
 }
+
+.rarity-text-common { color: #94a3b8; }
+.rarity-text-rare { color: #60a5fa; }
+.rarity-text-epic { color: #c084fc; }
+.rarity-text-legendary { color: var(--color-accent-gold); }
 
 /* ---- Deck controls ---- */
 .deck-controls {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   margin-top: auto;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--color-border-lighter);
 }
 
 .owned-qty {
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  color: var(--color-text-subtle);
   text-align: center;
 }
 
@@ -312,32 +339,34 @@ onMounted(fetchAll)
 .qty-btn {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-border-light);
   background: var(--bg-glass-light);
   color: var(--color-text-primary);
-  font-size: 1rem;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .qty-btn:hover:not(:disabled) {
-  background: var(--bg-glass-medium);
+  background: rgba(114, 188, 224, 0.14);
+  border-color: var(--color-border-brand);
+  color: var(--color-brand-primary-light);
 }
 
 .qty-btn:disabled {
-  opacity: 0.35;
+  opacity: 0.32;
   cursor: not-allowed;
 }
 
 .deck-qty {
   font-size: var(--font-sm);
   font-weight: var(--font-semibold);
+  font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
-  min-width: 32px;
+  min-width: 34px;
   text-align: center;
 }
 
@@ -345,7 +374,7 @@ onMounted(fetchAll)
 .deck-list {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.55rem;
   max-height: 70vh;
   overflow-y: auto;
 }
@@ -354,10 +383,11 @@ onMounted(fetchAll)
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background: var(--bg-glass-medium);
-  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-lighter);
   border-radius: var(--radius-lg);
   padding: 0.5rem 0.75rem;
+  transition: border-color var(--transition-fast);
 }
 
 .deck-visual {
@@ -365,8 +395,8 @@ onMounted(fetchAll)
   height: 44px;
   flex-shrink: 0;
   border-radius: var(--radius-md);
-  background: var(--bg-glass-light);
-  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-darker);
+  border: 1px solid var(--color-border-lighter);
 }
 
 .deck-entry-info {
@@ -377,40 +407,40 @@ onMounted(fetchAll)
   min-width: 0;
 }
 
-.deck-entry-info .litho-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .deck-entry-qty {
   font-size: var(--font-sm);
   font-weight: var(--font-bold);
-  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-brand-primary-light);
   white-space: nowrap;
 }
 
 .remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   background: none;
-  border: none;
+  border: 1px solid transparent;
   color: var(--color-text-muted);
   cursor: pointer;
-  font-size: 0.85rem;
-  padding: 0.25rem;
   border-radius: var(--radius-sm);
-  transition: color 0.15s;
+  transition: color var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
   flex-shrink: 0;
 }
 
 .remove-btn:hover:not(:disabled) {
   color: var(--color-error-light);
+  background: var(--color-error-bg);
+  border-color: var(--color-error-border);
 }
 
 /* ---- Rarity borders ---- */
-.rarity-common    { border-color: rgba(150, 150, 150, 0.3); }
-.rarity-rare      { border-color: rgba(59, 130, 246, 0.4); }
-.rarity-epic      { border-color: rgba(139, 92, 246, 0.4); }
-.rarity-legendary { border-color: rgba(245, 158, 11, 0.4); }
+.rarity-common    { border-color: rgba(148, 163, 184, 0.24); }
+.rarity-rare      { border-color: rgba(96, 165, 250, 0.38); }
+.rarity-epic      { border-color: rgba(192, 132, 252, 0.42); }
+.rarity-legendary { border-color: rgba(224, 179, 110, 0.5); }
 
 /* ---- Responsive ---- */
 @media (max-width: 900px) {

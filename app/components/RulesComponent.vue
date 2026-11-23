@@ -86,13 +86,13 @@
           </p>
           <div class="element-cycle">
             <div class="element-item fire">{{ $t('rules.elements.fire') }}</div>
-            <span class="element-arrow">&rarr;</span>
+            <span class="element-arrow" aria-hidden="true"><Papicon name="arrow-right" :size="15" /></span>
             <div class="element-item wind">{{ $t('rules.elements.wind') }}</div>
-            <span class="element-arrow">&rarr;</span>
+            <span class="element-arrow" aria-hidden="true"><Papicon name="arrow-right" :size="15" /></span>
             <div class="element-item earth">{{ $t('rules.elements.earth') }}</div>
-            <span class="element-arrow">&rarr;</span>
+            <span class="element-arrow" aria-hidden="true"><Papicon name="arrow-right" :size="15" /></span>
             <div class="element-item water">{{ $t('rules.elements.water') }}</div>
-            <span class="element-arrow">&rarr;</span>
+            <span class="element-arrow" aria-hidden="true"><Papicon name="arrow-right" :size="15" /></span>
             <div class="element-item fire">{{ $t('rules.elements.fire') }}</div>
           </div>
           <ul>
@@ -168,5 +168,9 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import Papicon from '~/components/Papicon.vue'
+</script>
 
 <style scoped src="~/assets/css/rules.css"></style>

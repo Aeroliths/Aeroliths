@@ -23,7 +23,7 @@
           placeholder="Search lithos by name or rarity..."
           class="search-input"
         />
-        <span class="search-icon">🔍</span>
+        <span class="search-icon" aria-hidden="true"><Papicon name="search" :size="16" /></span>
       </div>
     </div>
 
@@ -95,6 +95,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 
 const lithosList = ref<any[]>([])
 const loading = ref(false)

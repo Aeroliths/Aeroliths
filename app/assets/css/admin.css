@@ -17,12 +17,9 @@
 
 .admin-panel h1 {
   color: var(--color-text-primary);
-  font-size: var(--font-5xl);
+  font-size: clamp(1.85rem, 4vw, 2.4rem);
+  font-weight: 700;
   margin-bottom: var(--spacing-xl);
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* =========================================
@@ -72,29 +69,34 @@
    ========================================= */
 .tabs {
   display: flex;
-  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  gap: 0.35rem;
   margin-bottom: var(--spacing-xl);
-  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border-lighter);
 }
 
 .tabs button {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
+  padding: 0.55rem 0.95rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: var(--font-md);
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
   color: var(--color-text-muted);
-  transition: all var(--transition-normal);
+  transition: var(--transition-all);
 }
 
 .tabs button.active {
-  color: var(--color-brand-primary);
-  border-bottom-color: var(--color-brand-primary);
+  color: var(--color-brand-primary-light);
+  background: rgba(114, 188, 224, 0.12);
+  border-color: var(--color-border-brand-light);
 }
 
 .tabs button:hover {
-  color: var(--color-brand-primary-light);
+  color: var(--color-text-primary);
+  background: var(--bg-glass-light);
 }
 
 .tab-badge {
@@ -117,11 +119,12 @@
    TAB CONTENT
    ========================================= */
 .tab-content {
-  background: var(--bg-glass-light);
-  backdrop-filter: blur(10px);
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(14px);
   padding: var(--spacing-xl);
   border-radius: var(--radius-2xl);
-  border: 1px solid var(--color-border-light);
+  border: 1px solid var(--color-border-lighter);
+  box-shadow: var(--shadow-lg), var(--shadow-inset-highlight);
 }
 
 .tab-content h2 {
@@ -166,10 +169,25 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.65;
   color: var(--color-text-muted);
+}
+
+.spike-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.verified-badge,
+.oauth-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 /* =========================================
@@ -189,8 +207,8 @@
 }
 
 .btn-create:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(122, 184, 212, 0.3);
+  transform: translateY(-1px);
+  background: var(--color-brand-primary-light);
 }
 
 .lithos-actions button {
@@ -1391,10 +1409,10 @@ tr:hover td {
   min-width: 4px;
 }
 
-.bar-rarity-common { background: #94a3b8; }
-.bar-rarity-rare { background: #60a5fa; }
-.bar-rarity-epic { background: #a78bfa; }
-.bar-rarity-legendary { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.bar-rarity-common { background: #7d8694; }
+.bar-rarity-rare { background: #5889ba; }
+.bar-rarity-epic { background: #8f74b8; }
+.bar-rarity-legendary { background: #c29b5b; }
 
 .stats-bar-label {
   font-size: var(--font-xs);

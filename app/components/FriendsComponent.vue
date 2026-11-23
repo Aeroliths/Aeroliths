@@ -6,14 +6,17 @@
       <!-- Tab Navigation -->
       <div class="tabs">
         <button :class="{ active: activeTab === 'list' }" @click="activeTab = 'list'">
-          {{ $t('friends.tabs.myFriends') }}
+          <Papicon name="user" :size="16" />
+          <span>{{ $t('friends.tabs.myFriends') }}</span>
         </button>
         <button :class="{ active: activeTab === 'requests' }" @click="activeTab = 'requests'" class="tab-with-badge">
-          {{ $t('friends.tabs.requests') }}
+          <Papicon name="bell" :size="16" />
+          <span>{{ $t('friends.tabs.requests') }}</span>
           <span v-if="pendingCount > 0" class="tab-badge">{{ pendingCount }}</span>
         </button>
         <button :class="{ active: activeTab === 'search' }" @click="activeTab = 'search'">
-          {{ $t('friends.tabs.search') }}
+          <Papicon name="search" :size="16" />
+          <span>{{ $t('friends.tabs.search') }}</span>
         </button>
       </div>
 
@@ -26,6 +29,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useFriendRequests } from '~/composables/useFriendRequests'
 
 const activeTab = ref<'list' | 'requests' | 'search'>('list')

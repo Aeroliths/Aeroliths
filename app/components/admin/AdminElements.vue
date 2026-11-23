@@ -13,7 +13,7 @@
           placeholder="Search elements by name..."
           class="search-input"
         />
-        <span class="search-icon">🔍</span>
+        <span class="search-icon" aria-hidden="true"><Papicon name="search" :size="16" /></span>
       </div>
     </div>
 
@@ -180,6 +180,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useAuth } from '~/composables/useAuth'
 // Auto-import registers this one as AdminMediaPicker, after its directory, so
 // the template name only resolves through an explicit import.

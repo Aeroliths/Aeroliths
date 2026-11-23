@@ -16,23 +16,20 @@
 }
 
 .verify-email-card {
-  background: var(--bg-glass-light);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-2xl);
-  padding: var(--spacing-3xl) var(--spacing-2xl);
-  box-shadow: var(--shadow-2xl);
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl);
+  box-shadow: var(--shadow-2xl), var(--shadow-inset-highlight);
   text-align: center;
 }
 
 .verify-email-card h1 {
   font-size: var(--font-5xl);
-  font-weight: var(--font-bold);
+  font-weight: 700;
+  color: var(--color-text-primary);
   margin: 0 0 var(--spacing-lg) 0;
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .verify-email-card.success h1 {

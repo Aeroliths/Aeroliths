@@ -7,10 +7,12 @@
       <!-- Tab Navigation -->
       <div class="leaderboard-tabs">
         <button :class="{ active: activeTab === 'collection' }" @click="activeTab = 'collection'">
-          {{ $t('leaderboard.tabs.collection') }}
+          <Papicon name="folder" :size="16" />
+          <span>{{ $t('leaderboard.tabs.collection') }}</span>
         </button>
         <button :class="{ active: activeTab === 'battles' }" @click="activeTab = 'battles'">
-          {{ $t('leaderboard.tabs.battles') }}
+          <Papicon name="crown" :size="16" />
+          <span>{{ $t('leaderboard.tabs.battles') }}</span>
         </button>
       </div>
 
@@ -64,13 +66,15 @@
             <span class="podium-score">{{ leaderboard[1].score }}{{ $t('leaderboard.ptsSuffix') }}</span>
             <div v-if="leaderboard[1].badges.length > 0" class="podium-badges">
               <span v-for="badge in leaderboard[1].badges.slice(0, 2)" :key="badge.name" class="badge-mini" :title="badge.description">
-                {{ getBadgeIcon(badge.name) }}
+                <Papicon :name="getBadgeIcon(badge.name)" :size="14" />
               </span>
             </div>
           </div>
 
           <div class="podium-spot podium-1" @click="openProfile(leaderboard[0].username)">
-            <div class="podium-crown">&#x1F451;</div>
+            <div class="podium-crown" aria-hidden="true">
+              <Papicon name="crown" :size="26" />
+            </div>
             <div class="podium-avatar podium-avatar--gold">
               <img v-if="leaderboard[0].profilePicture" :src="leaderboard[0].profilePicture" :alt="leaderboard[0].username" />
               <span v-else class="avatar-placeholder">{{ leaderboard[0].username[0].toUpperCase() }}</span>
@@ -80,7 +84,7 @@
             <span class="podium-score">{{ leaderboard[0].score }}{{ $t('leaderboard.ptsSuffix') }}</span>
             <div v-if="leaderboard[0].badges.length > 0" class="podium-badges">
               <span v-for="badge in leaderboard[0].badges.slice(0, 3)" :key="badge.name" class="badge-mini" :title="badge.description">
-                {{ getBadgeIcon(badge.name) }}
+                <Papicon :name="getBadgeIcon(badge.name)" :size="14" />
               </span>
             </div>
           </div>
@@ -95,7 +99,7 @@
             <span class="podium-score">{{ leaderboard[2].score }}{{ $t('leaderboard.ptsSuffix') }}</span>
             <div v-if="leaderboard[2].badges.length > 0" class="podium-badges">
               <span v-for="badge in leaderboard[2].badges.slice(0, 2)" :key="badge.name" class="badge-mini" :title="badge.description">
-                {{ getBadgeIcon(badge.name) }}
+                <Papicon :name="getBadgeIcon(badge.name)" :size="14" />
               </span>
             </div>
           </div>
@@ -142,9 +146,15 @@
             @click="openProfile(player.username)"
           >
             <span class="col-rank">
-              <span v-if="index === 0" class="rank-medal">&#x1F947;</span>
-              <span v-else-if="index === 1" class="rank-medal">&#x1F948;</span>
-              <span v-else-if="index === 2" class="rank-medal">&#x1F949;</span>
+              <span v-if="index === 0" class="rank-medal rank-medal--gold" aria-label="1st place">
+                <Papicon name="crown" :size="16" />
+              </span>
+              <span v-else-if="index === 1" class="rank-medal rank-medal--silver" aria-label="2nd place">
+                <Papicon name="star" :size="15" />
+              </span>
+              <span v-else-if="index === 2" class="rank-medal rank-medal--bronze" aria-label="3rd place">
+                <Papicon name="star" :size="15" />
+              </span>
               <span v-else>{{ index + 1 }}</span>
             </span>
             <span class="col-player">
@@ -166,7 +176,7 @@
             </span>
             <span class="col-badges">
               <span v-for="badge in player.badges.slice(0, 3)" :key="badge.name" class="badge-mini" :title="badge.description">
-                {{ getBadgeIcon(badge.name) }}
+                <Papicon :name="getBadgeIcon(badge.name)" :size="14" />
               </span>
               <span v-if="player.badges.length > 3" class="badge-more">+{{ player.badges.length - 3 }}</span>
             </span>
@@ -183,7 +193,9 @@
     <!-- Profile Modal -->
     <div v-if="showProfile" class="modal-overlay" @click="showProfile = false">
       <div class="profile-modal" @click.stop>
-        <button class="profile-close" @click="showProfile = false">&#x2715;</button>
+        <button class="profile-close" @click="showProfile = false" aria-label="Close">
+          <Papicon name="cross" :size="18" />
+        </button>
 
         <div v-if="profileLoading" class="loading">{{ $t('leaderboard.profile.loading') }}</div>
         <div v-if="profileError" class="error-message">{{ profileError }}</div>
@@ -260,7 +272,9 @@
             <h3>{{ $t('leaderboard.profile.badgesTitle') }}</h3>
             <div class="badges-grid">
               <div v-for="badge in profile.badges" :key="badge.name" class="badge-card">
-                <span class="badge-icon">{{ getBadgeIcon(badge.name) }}</span>
+                <span class="badge-icon">
+                  <Papicon :name="getBadgeIcon(badge.name)" :size="24" />
+                </span>
                 <span class="badge-name">{{ badge.name }}</span>
                 <span class="badge-desc">{{ badge.description }}</span>
               </div>
@@ -294,7 +308,9 @@
                 <div class="element-progress-header">
                   <span class="element-name">{{ el.name }}</span>
                   <span class="element-count">{{ el.owned }}/{{ el.total }}</span>
-                  <span v-if="el.completed" class="element-complete-badge">&#x2713;</span>
+                  <span v-if="el.completed" class="element-complete-badge">
+                    <Papicon name="check" :size="14" />
+                  </span>
                 </div>
                 <div class="element-bar-bg">
                   <div
@@ -315,7 +331,9 @@
                 <div class="element-progress-header">
                   <span :class="['rarity-tag', 'rarity-' + r.rarity.toLowerCase()]">{{ r.rarity }}</span>
                   <span class="element-count">{{ r.owned }}/{{ r.total }}</span>
-                  <span v-if="r.completed" class="element-complete-badge">&#x2713;</span>
+                  <span v-if="r.completed" class="element-complete-badge">
+                    <Papicon name="check" :size="14" />
+                  </span>
                 </div>
                 <div class="element-bar-bg">
                   <div
@@ -348,6 +366,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
+import type { PapiconName } from '~/utils/papicons'
 import { useAuth } from '~/composables/useAuth'
 
 const { user } = useAuth()
@@ -454,20 +474,20 @@ const openProfile = async (username: string) => {
   }
 }
 
-const getBadgeIcon = (name: string): string => {
-  const icons: Record<string, string> = {
-    'Full Collection': '\u{1F3C6}',
-    'Legendary': '\u{2B50}',
-    'Epic Collector': '\u{1F48E}',
-    'Rare Hunter': '\u{1F50D}',
-    'Completionist': '\u{2705}',
-    'Hoarder': '\u{1F4E6}',
-    'Collector': '\u{1F392}',
-    'Explorer': '\u{1F9ED}',
+const getBadgeIcon = (name: string): PapiconName => {
+  const icons: Record<string, PapiconName> = {
+    'Full Collection': 'crown',
+    'Legendary': 'star',
+    'Epic Collector': 'sparkles',
+    'Rare Hunter': 'search',
+    'Completionist': 'check',
+    'Hoarder': 'archive',
+    'Collector': 'folder',
+    'Explorer': 'map-pin',
   }
   // Element mastery badges
-  if (name.endsWith(' Master')) return '\u{1F525}'
-  return icons[name] || '\u{1F3C5}'
+  if (name.endsWith(' Master')) return 'sun'
+  return icons[name] || 'bookmark'
 }
 
 const formatDate = (date: string) => new Date(date).toLocaleDateString()

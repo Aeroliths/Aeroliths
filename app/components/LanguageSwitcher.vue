@@ -1,5 +1,5 @@
 <template>
-  <div class="language-switcher">
+  <div class="language-switcher" role="group" aria-label="Language">
     <button
       v-for="code in availableLocaleCodes"
       :key="code"
@@ -22,15 +22,11 @@ const availableLocaleCodes = computed(() => locales.value.map((l) => (typeof l =
 
 async function selectLocale(code: string) {
   if (code === locale.value) return
-  // The codes come from the runtime locale list, which is typed as plain
-  // strings, while switchLocalePath expects the configured locale union.
   await navigateTo(switchLocalePath(code as typeof locale.value))
   if (isAuthenticated.value && user.value) {
     try {
       await $fetch(`/api/users/${user.value.id}`, { method: 'PATCH', body: { locale: code } })
     } catch (err) {
-      // Non-critical: the routing cookie already reflects the new locale for
-      // this session; DB sync can be retried the next time the user switches.
       console.error('Failed to persist locale preference:', err)
     }
   }
@@ -39,20 +35,22 @@ async function selectLocale(code: string) {
 
 <style scoped>
 .language-switcher {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: 2px;
+  background: var(--bg-glass-light);
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-md);
-  padding: 2px;
+  padding: 3px;
 }
 
 .language-switcher-option {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-sm);
+  padding: 0.3rem 0.55rem;
+  border-radius: calc(var(--radius-md) - 3px);
+  font-size: var(--font-xs);
   font-weight: var(--font-semibold);
-  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
   transition: all var(--transition-fast);
   background: none;
   border: none;
@@ -65,7 +63,7 @@ async function selectLocale(code: string) {
 }
 
 .language-switcher-option--active {
-  background: var(--gradient-primary);
+  background: var(--color-brand-primary);
   color: var(--color-bg-base);
 }
 </style>

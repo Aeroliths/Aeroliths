@@ -10,7 +10,7 @@
           :disabled="refreshing"
           title="Refresh stats"
         >
-          &#x21bb;
+          <Papicon name="clock" :size="16" />
         </button>
         <span v-if="lastUpdated" class="last-updated">
           Updated {{ formatRelative(lastUpdated) }}
@@ -27,7 +27,7 @@
       <div class="stats-section">
         <div class="stats-section-header" @click="toggleSection('overview')">
           <h3 class="stats-section-title">Overview</h3>
-          <span class="section-toggle" :class="{ collapsed: !sections.overview }">&#x25BC;</span>
+          <span class="section-toggle" :class="{ collapsed: !sections.overview }"><Papicon name="chevron-down" :size="15" /></span>
         </div>
         <div v-show="sections.overview">
           <div class="stats-cards">
@@ -58,7 +58,7 @@
       <div class="stats-section" ref="sectionUsers">
         <div class="stats-section-header" @click="toggleSection('users')">
           <h3 class="stats-section-title">Users</h3>
-          <span class="section-toggle" :class="{ collapsed: !sections.users }">&#x25BC;</span>
+          <span class="section-toggle" :class="{ collapsed: !sections.users }"><Papicon name="chevron-down" :size="15" /></span>
         </div>
         <div v-show="sections.users">
           <!-- Period Selector -->
@@ -165,7 +165,7 @@
         <div class="stats-section-header" @click="toggleSection('games')">
           <h3 class="stats-section-title">Games</h3>
           <span class="coming-soon-badge">In Development</span>
-          <span class="section-toggle" :class="{ collapsed: !sections.games }">&#x25BC;</span>
+          <span class="section-toggle" :class="{ collapsed: !sections.games }"><Papicon name="chevron-down" :size="15" /></span>
         </div>
         <div v-show="sections.games">
           <div class="stats-coming-soon">
@@ -196,7 +196,7 @@
       <div class="stats-section" ref="sectionLithos">
         <div class="stats-section-header" @click="toggleSection('lithos')">
           <h3 class="stats-section-title">Lithos</h3>
-          <span class="section-toggle" :class="{ collapsed: !sections.lithos }">&#x25BC;</span>
+          <span class="section-toggle" :class="{ collapsed: !sections.lithos }"><Papicon name="chevron-down" :size="15" /></span>
         </div>
         <div v-show="sections.lithos">
           <div class="stats-tables-row">
@@ -265,7 +265,7 @@
       <div class="stats-section" ref="sectionCollections">
         <div class="stats-section-header" @click="toggleSection('collections')">
           <h3 class="stats-section-title">Collections</h3>
-          <span class="section-toggle" :class="{ collapsed: !sections.collections }">&#x25BC;</span>
+          <span class="section-toggle" :class="{ collapsed: !sections.collections }"><Papicon name="chevron-down" :size="15" /></span>
         </div>
         <div v-show="sections.collections">
           <div class="stats-cards">
@@ -337,7 +337,7 @@
       <div class="stats-section">
         <div class="stats-section-header" @click="toggleSection('activity')">
           <h3 class="stats-section-title">Recent Activity</h3>
-          <span class="section-toggle" :class="{ collapsed: !sections.activity }">&#x25BC;</span>
+          <span class="section-toggle" :class="{ collapsed: !sections.activity }"><Papicon name="chevron-down" :size="15" /></span>
         </div>
         <div v-show="sections.activity">
           <!-- Search -->
@@ -348,7 +348,7 @@
               placeholder="Search by username..."
               class="search-input"
             />
-            <span class="search-icon">&#x1F50D;</span>
+            <span class="search-icon" aria-hidden="true"><Papicon name="search" :size="16" /></span>
           </div>
 
           <div class="stats-table-small stats-activity-table">
@@ -357,15 +357,15 @@
                 <tr>
                   <th class="th-sortable" @click="toggleActivitySort('username')">
                     Username
-                    <span v-if="activitySortBy === 'username'" class="sort-arrow">{{ activitySortDir === 'asc' ? '&#x25B2;' : '&#x25BC;' }}</span>
+                    <span v-if="activitySortBy === 'username'" class="sort-arrow"><Papicon :name="activitySortDir === 'asc' ? 'chevron-up' : 'chevron-down'" :size="13" /></span>
                   </th>
                   <th class="th-sortable" @click="toggleActivitySort('createdAt')">
                     Registered
-                    <span v-if="activitySortBy === 'createdAt'" class="sort-arrow">{{ activitySortDir === 'asc' ? '&#x25B2;' : '&#x25BC;' }}</span>
+                    <span v-if="activitySortBy === 'createdAt'" class="sort-arrow"><Papicon :name="activitySortDir === 'asc' ? 'chevron-up' : 'chevron-down'" :size="13" /></span>
                   </th>
                   <th class="th-sortable" @click="toggleActivitySort('lastActiveAt')">
                     Last Active
-                    <span v-if="activitySortBy === 'lastActiveAt'" class="sort-arrow">{{ activitySortDir === 'asc' ? '&#x25B2;' : '&#x25BC;' }}</span>
+                    <span v-if="activitySortBy === 'lastActiveAt'" class="sort-arrow"><Papicon :name="activitySortDir === 'asc' ? 'chevron-up' : 'chevron-down'" :size="13" /></span>
                   </th>
                   <th>Status</th>
                 </tr>
@@ -395,6 +395,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, reactive, watch, nextTick } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useAuth } from '~/composables/useAuth'
 
 const { initAuth } = useAuth()

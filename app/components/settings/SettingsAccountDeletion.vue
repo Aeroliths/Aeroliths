@@ -111,31 +111,33 @@ const cancelDeletion = async () => {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(10, 12, 18, 0.78);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: var(--z-modal);
 }
 
 .modal {
-  background: #1e2a3a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-xl);
   max-width: 480px;
   width: 90%;
+  box-shadow: var(--shadow-2xl);
 }
 
 .modal h3 {
   margin: 0 0 1rem;
-  color: #fff;
-  font-size: 1.2rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-2xl);
 }
 
 .modal p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-base);
   line-height: 1.6;
   margin: 0 0 0.75rem;
 }

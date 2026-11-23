@@ -4,16 +4,22 @@
     <div v-if="error" class="error-message">{{ error }}</div>
 
     <div v-if="!loading && chests.length === 0" class="no-chests">
-      {{ $t('play.chests.empty') }}
+      <span class="no-chests-icon" aria-hidden="true">
+        <Papicon name="archive" :size="28" />
+      </span>
+      <p>{{ $t('play.chests.empty') }}</p>
     </div>
 
     <div v-if="chests.length > 0" class="chest-grid">
       <div v-for="chest in chests" :key="chest.chestTypeId" class="chest-card">
-        <span class="chest-icon" aria-hidden="true">🧰</span>
+        <span class="chest-icon" aria-hidden="true">
+          <Papicon name="archive" :size="24" />
+        </span>
         <span class="chest-name">{{ chest.name }}</span>
         <span class="chest-count">{{ $t('play.chests.held', { count: chest.quantity }) }}</span>
         <button class="open-chest" :disabled="opening" @click="open(chest)">
-          {{ $t('play.chests.open') }}
+          <Papicon name="sparkles" :size="15" />
+          <span>{{ $t('play.chests.open') }}</span>
         </button>
       </div>
     </div>
@@ -27,6 +33,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 
 interface HeldChest {
   chestTypeId: string
@@ -59,8 +66,6 @@ async function open(chest: HeldChest) {
   try {
     const response = await $fetch<any>(`/api/chests/${chest.chestTypeId}/open`, { method: 'POST' })
     lastDrawn.value = response.data.lithos
-    // Reload rather than decrement locally: the server is the one that knows
-    // whether the chest was actually spent.
     await load()
   } catch (err: any) {
     error.value = err.data?.statusMessage || 'Failed to open the chest'
@@ -75,45 +80,101 @@ onMounted(load)
 <style scoped>
 .chest-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.9rem;
 }
 
 .chest-card {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.35rem;
-  padding: 0.9rem 1rem;
-  border-radius: var(--radius-xl, 1rem);
-  border: 1px solid var(--color-border-light);
-  background: var(--bg-glass-light);
+  gap: 0.4rem;
+  padding: 1.15rem 1.2rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border-lighter);
+  background: var(--color-bg-primary);
+  box-shadow: var(--shadow-inset-highlight);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.chest-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(224, 179, 110, 0.35);
 }
 
 .chest-icon {
-  font-size: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-lg);
+  background: rgba(224, 179, 110, 0.14);
+  border: 1px solid rgba(224, 179, 110, 0.28);
+  color: var(--color-accent-gold);
+  margin-bottom: 0.25rem;
 }
 
 .chest-name {
+  font-family: var(--font-display);
+  font-size: var(--font-md);
   font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
 }
 
 .chest-count,
-.no-chests,
 .empty {
   font-size: var(--font-sm);
   color: var(--color-text-muted);
 }
 
+.no-chests {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 2.75rem 1.5rem;
+  border-radius: var(--radius-xl);
+  border: 1px dashed var(--color-border-light);
+  background: var(--bg-glass-lighter);
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  text-align: center;
+}
+
+.no-chests-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-xl);
+  background: rgba(224, 179, 110, 0.1);
+  color: var(--color-accent-gold);
+}
+
 .open-chest {
-  margin-top: 0.35rem;
-  padding: 0.4rem 0.9rem;
-  border-radius: var(--radius-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-md);
   border: none;
-  background: var(--color-primary, #6366f1);
-  color: #fff;
+  background: var(--gradient-primary);
+  color: var(--color-bg-base);
+  font-size: var(--font-sm);
   font-weight: var(--font-semibold);
   cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.open-chest:hover:not(:disabled) {
+  background: var(--gradient-primary-hover);
+  box-shadow: var(--shadow-hover-brand);
 }
 
 .open-chest:disabled {
@@ -121,18 +182,35 @@ onMounted(load)
   cursor: not-allowed;
 }
 
+.error-message {
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-error-light);
+  font-size: var(--font-sm);
+}
+
 .chest-result {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-lg);
-  background: var(--bg-glass-medium);
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.15rem;
+  border-radius: var(--radius-xl);
+  background: rgba(114, 188, 224, 0.1);
+  border: 1px solid var(--color-border-brand);
+  color: var(--color-text-primary);
+  font-weight: var(--font-medium);
 }
 
 .chest-result img {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  object-fit: contain;
+  background: var(--color-bg-darker);
+  padding: 4px;
 }
 </style>

@@ -1,8 +1,8 @@
 <template>
   <section class="features">
     <div class="feature" v-for="feature in features" :key="feature.titleKey">
-      <div class="feature-icon" :style="{ background: feature.color }">
-        <UIcon :name="feature.icon" />
+      <div class="feature-icon" :class="`feature-icon--${feature.tone}`">
+        <Papicon :name="feature.icon" :size="24" />
       </div>
       <h3 class="feature-title">{{ $t(feature.titleKey) }}</h3>
       <p class="feature-desc">{{ $t(feature.descKey) }}</p>
@@ -11,24 +11,27 @@
 </template>
 
 <script setup lang="ts">
-const features = [
+import Papicon from '~/components/Papicon.vue'
+import type { PapiconName } from '~/utils/papicons'
+
+const features: { icon: PapiconName; titleKey: string; descKey: string; tone: string }[] = [
   {
-    icon: 'i-heroicons-bolt-solid',
+    icon: 'sparkles',
     titleKey: 'home.features.fastMatches.title',
     descKey: 'home.features.fastMatches.desc',
-    color: 'linear-gradient(135deg, #d4a76a, #b8864e)'
+    tone: 'gold',
   },
   {
-    icon: 'i-heroicons-puzzle-piece-solid',
+    icon: 'grid',
     titleKey: 'home.features.deepStrategy.title',
     descKey: 'home.features.deepStrategy.desc',
-    color: 'linear-gradient(135deg, #5898b8, #4a7fa5)'
+    tone: 'sky',
   },
   {
-    icon: 'i-heroicons-trophy-solid',
+    icon: 'crown',
     titleKey: 'home.features.rankedPlay.title',
     descKey: 'home.features.rankedPlay.desc',
-    color: 'linear-gradient(135deg, #7ab8d4, #6ba5c8)'
-  }
+    tone: 'azure',
+  },
 ]
 </script>

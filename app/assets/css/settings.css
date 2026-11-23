@@ -12,23 +12,21 @@
 
 .settings-card {
   width: 100%;
-  max-width: 600px;
-  background: var(--bg-glass-light);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-2xl);
-  padding: var(--spacing-xl);
-  margin-top: var(--spacing-xl);
+  max-width: 620px;
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-3xl);
+  padding: var(--spacing-2xl);
+  margin-top: var(--spacing-lg);
+  box-shadow: var(--shadow-xl), var(--shadow-inset-highlight);
 }
 
 .settings-card h1 {
   margin: 0 0 var(--spacing-lg) 0;
   color: var(--color-text-primary);
-  font-size: var(--font-5xl);
-  background: var(--gradient-brand);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: clamp(1.85rem, 4vw, 2.35rem);
+  font-weight: 700;
 }
 
 .settings-card h2 {
@@ -111,12 +109,12 @@
    BUTTON
    ========================================= */
 .submit-btn {
-  padding: var(--spacing-md);
-  background: var(--gradient-brand);
+  padding: 0.85rem var(--spacing-md);
+  background: var(--gradient-primary);
   border: none;
   border-radius: var(--radius-lg);
-  color: var(--color-text-primary);
-  font-size: var(--font-lg);
+  color: var(--color-bg-base);
+  font-size: var(--font-base);
   font-weight: var(--font-semibold);
   cursor: pointer;
   transition: var(--transition-all);
@@ -124,8 +122,9 @@
 }
 
 .submit-btn:hover:not(:disabled) {
+  background: var(--gradient-primary-hover);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+  box-shadow: var(--shadow-hover-brand);
 }
 
 .submit-btn:active:not(:disabled) {
@@ -171,8 +170,7 @@
   height: 96px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid var(--color-brand-primary);
-  box-shadow: 0 0 24px rgba(122, 184, 212, 0.2);
+  border: 2px solid var(--color-brand-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,8 +207,8 @@
 }
 
 .profile-card-avatar-edit:hover:not(.disabled) {
-  transform: scale(1.1);
-  box-shadow: 0 0 12px rgba(122, 184, 212, 0.4);
+  transform: scale(1.06);
+  background: var(--color-brand-primary-light);
 }
 
 .profile-card-avatar-edit.disabled {
@@ -219,7 +217,9 @@
 }
 
 .avatar-edit-icon {
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-bg-base);
   line-height: 1;
 }

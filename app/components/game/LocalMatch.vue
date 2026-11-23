@@ -17,14 +17,14 @@
           </select>
         </label>
         <div class="rule-toggles">
-          <label><input type="checkbox" v-model="rules.same" /> {{ $t('play.localMatch.same') }}</label>
-          <label><input type="checkbox" v-model="rules.plus" /> {{ $t('play.localMatch.plus') }}</label>
-          <label><input type="checkbox" v-model="rules.combo" /> {{ $t('play.localMatch.combo') }}</label>
-          <label><input type="checkbox" v-model="rules.wall" /> {{ $t('play.localMatch.wall') }}</label>
-          <label><input type="checkbox" v-model="elementalCells" /> {{ $t('play.localMatch.elementalCells') }}</label>
+          <label class="toggle-chip"><input type="checkbox" v-model="rules.same" /> <span>{{ $t('play.localMatch.same') }}</span></label>
+          <label class="toggle-chip"><input type="checkbox" v-model="rules.plus" /> <span>{{ $t('play.localMatch.plus') }}</span></label>
+          <label class="toggle-chip"><input type="checkbox" v-model="rules.combo" /> <span>{{ $t('play.localMatch.combo') }}</span></label>
+          <label class="toggle-chip"><input type="checkbox" v-model="rules.wall" /> <span>{{ $t('play.localMatch.wall') }}</span></label>
+          <label class="toggle-chip"><input type="checkbox" v-model="elementalCells" /> <span>{{ $t('play.localMatch.elementalCells') }}</span></label>
+          <label class="toggle-chip"><input type="checkbox" v-model="openHands" /> <span>{{ $t('play.localMatch.openHands') }}</span></label>
+          <label class="toggle-chip"><input type="checkbox" v-model="suddenDeath" /> <span>{{ $t('play.localMatch.suddenDeath') }}</span></label>
         </div>
-        <label><input type="checkbox" v-model="openHands" /> {{ $t('play.localMatch.openHands') }}</label>
-        <label><input type="checkbox" v-model="suddenDeath" /> {{ $t('play.localMatch.suddenDeath') }}</label>
         <label class="size-picker">
           {{ $t('play.localMatch.handRule') }}
           <select v-model="handRule">
@@ -61,9 +61,18 @@
       </div>
 
       <div class="hand-modes">
-        <button class="ghost-btn sm" @click="fillRandom">{{ $t('play.localMatch.handModeRandom') }}</button>
-        <button class="ghost-btn sm" @click="fillMirror">{{ $t('play.localMatch.handModeMirror') }}</button>
-        <button class="ghost-btn sm" @click="startDraft">{{ $t('play.localMatch.handModeDraft') }}</button>
+        <button class="ghost-btn sm" @click="fillRandom">
+          <Papicon name="sparkles" :size="13" />
+          <span>{{ $t('play.localMatch.handModeRandom') }}</span>
+        </button>
+        <button class="ghost-btn sm" @click="fillMirror">
+          <Papicon name="grid" :size="13" />
+          <span>{{ $t('play.localMatch.handModeMirror') }}</span>
+        </button>
+        <button class="ghost-btn sm" @click="startDraft">
+          <Papicon name="tasks" :size="13" />
+          <span>{{ $t('play.localMatch.handModeDraft') }}</span>
+        </button>
       </div>
 
       <div v-if="draftActive" class="draft">
@@ -143,7 +152,8 @@
       </p>
 
       <button class="start-btn" :disabled="!canStart" @click="start">
-        {{ $t('play.localMatch.startGame') }}
+        <Papicon name="play" :size="16" />
+        <span>{{ $t('play.localMatch.startGame') }}</span>
       </button>
 
       <!-- Floating Lithos that follows the cursor while dragging from the catalog -->
@@ -187,17 +197,29 @@
       <p v-if="botThinking" class="bot-thinking">{{ $t('play.localMatch.botThinking') }}</p>
 
       <div v-if="replaying" class="replay-bar">
-        <button class="ghost-btn sm" :disabled="replayIndex === 0" @click="replayStep(-1)">◀</button>
-        <span>{{ replayIndex }} / {{ timeline.length - 1 }}</span>
-        <button class="ghost-btn sm" :disabled="replayIndex >= timeline.length - 1" @click="replayStep(1)">▶</button>
+        <button class="ghost-btn sm" :disabled="replayIndex === 0" @click="replayStep(-1)" aria-label="Previous step">
+          <Papicon name="chevron-left" :size="15" />
+        </button>
+        <span class="replay-counter">{{ replayIndex }} / {{ timeline.length - 1 }}</span>
+        <button class="ghost-btn sm" :disabled="replayIndex >= timeline.length - 1" @click="replayStep(1)" aria-label="Next step">
+          <Papicon name="chevron-right" :size="15" />
+        </button>
         <button class="ghost-btn sm" @click="replayAuto">{{ $t('play.localMatch.auto') }}</button>
         <button class="ghost-btn sm" @click="stopReplay">{{ $t('play.localMatch.close') }}</button>
       </div>
 
       <div v-if="match.status !== 'finished'" class="play-actions">
-        <button class="ghost-btn" :disabled="!canUndo" @click="undo">{{ $t('play.localMatch.undo') }}</button>
-        <button class="ghost-btn" @click="reset">{{ $t('play.localMatch.editConfig') }}</button>
-        <button class="ghost-btn" @click="sound.toggleMute()">{{ sound.muted.value ? '🔇' : '🔊' }}</button>
+        <button class="ghost-btn" :disabled="!canUndo" @click="undo">
+          <Papicon name="arrow-left" :size="15" />
+          <span>{{ $t('play.localMatch.undo') }}</span>
+        </button>
+        <button class="ghost-btn" @click="reset">
+          <Papicon name="gears" :size="15" />
+          <span>{{ $t('play.localMatch.editConfig') }}</span>
+        </button>
+        <button class="ghost-btn icon-only" @click="sound.toggleMute()" :aria-label="sound.muted.value ? 'Unmute' : 'Mute'">
+          <Papicon :name="sound.muted.value ? 'volume-cross' : 'volume'" :size="17" />
+        </button>
         <input
           class="vol"
           type="range" min="0" max="1" step="0.1"
@@ -247,6 +269,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import GameBoard from './GameBoard.vue'
 import GameStone from './GameStone.vue'
 import { createMatch, placeStoneWithEvents, handSizeFor, randomMove, suddenDeathHands } from '~/game/engine/match'

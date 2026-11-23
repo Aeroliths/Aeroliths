@@ -6,7 +6,7 @@
       <button @click="openCreateModal" class="btn-create">Create New News</button>
       <div class="search-bar">
         <input v-model="searchQuery" type="text" placeholder="Search news by title..." class="search-input" />
-        <span class="search-icon">🔍</span>
+        <span class="search-icon" aria-hidden="true"><Papicon name="search" :size="16" /></span>
       </div>
     </div>
 
@@ -143,6 +143,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useAuth } from '~/composables/useAuth'
 import NewsEditor from '~/components/admin/NewsEditor.vue'
 

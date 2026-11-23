@@ -145,9 +145,9 @@ function onLeave() {
 .track-right { right: 4px; }
 
 .spike-bar {
-  background: linear-gradient(90deg, #8fd0ec, #f0d27a);
+  background: #c2a46c;
   border-radius: 999px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .bar-h { height: 100%; min-width: 0; }

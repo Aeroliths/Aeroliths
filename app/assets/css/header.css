@@ -1,27 +1,35 @@
 /* =========================================
-   HEADER
+   HEADER — Frosted Obsidian Bar
    ========================================= */
 
 .header {
-  background-color: var(--color-bg-primary);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: rgba(20, 22, 26, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border-lighter);
   color: var(--color-text-primary);
-  padding: var(--spacing-md) 0;
-  box-shadow: var(--shadow-md);
+  padding: 0.7rem 0;
 }
 
 .header-container {
-  max-width: 100%;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--spacing-lg);
 }
 
 /* =========================================
    LOGO
    ========================================= */
-.logo a {
+.logo-link {
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
   cursor: pointer;
 }
@@ -29,32 +37,39 @@
 .logo .logo-text {
   display: inline-block;
   margin: 0;
-  font-size: var(--font-4xl);
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
   color: var(--color-brand-primary);
-  font-weight: var(--font-bold);
-  transition: opacity var(--transition-normal);
+  transition: color var(--transition-fast), opacity var(--transition-fast);
   line-height: 1;
 }
 
-.logo a:hover .logo-text {
-  opacity: 0.8;
+.logo-link:hover .logo-text {
+  color: var(--color-brand-primary-light);
 }
 
 /* =========================================
-   MOBILE MENU
+   MOBILE MENU BUTTON
    ========================================= */
 .mobile-menu-btn {
   display: none;
-  background: none;
-  border: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
   color: var(--color-text-primary);
-  font-size: var(--font-3xl);
   cursor: pointer;
-  padding: var(--spacing-xs);
-  transition: color var(--transition-normal);
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .mobile-menu-btn:hover {
+  background: var(--bg-glass-medium);
+  border-color: var(--color-border-brand);
   color: var(--color-brand-primary);
 }
 
@@ -63,27 +78,54 @@
    ========================================= */
 .nav {
   display: flex;
-  gap: var(--spacing-xl);
+  flex: 1;
   align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-lg);
 }
 
-.nav a {
-  color: var(--color-text-primary);
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
   text-decoration: none;
+  font-size: var(--font-sm);
   font-weight: var(--font-medium);
-  transition: color var(--transition-normal);
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
-.nav a:hover {
-  color: var(--color-brand-primary);
+.nav-link:hover {
+  color: var(--color-text-primary);
+  background: var(--bg-glass-light);
+}
+
+.nav-link.router-link-exact-active {
+  color: var(--color-brand-primary-light);
+  background: rgba(114, 188, 224, 0.12);
+}
+
+.nav-link--play {
+  color: var(--color-text-primary);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
 }
 
 /* Friend request badge */
 .nav-link-with-badge {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .nav-badge {
@@ -93,60 +135,77 @@
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
-  background: #ef4444;
+  background: var(--color-error);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
-  border-radius: 99px;
+  border-radius: var(--radius-full);
   line-height: 1;
 }
 
-/* Admin link special styling */
+/* Admin link */
 .admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   background: var(--color-warning-bg);
   border: 1px solid var(--color-warning-border);
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-sm);
+  color: var(--color-warning);
+  padding: 0.42rem 0.78rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
   font-weight: var(--font-semibold);
+  text-decoration: none;
   transition: var(--transition-all);
 }
 
 .admin-link:hover {
   background: var(--color-warning-bg-hover);
   border-color: var(--color-warning-border-hover);
-  color: var(--color-warning) !important;
 }
 
 /* =========================================
-   USER MENU
+   USER MENU & AUTH BUTTONS
    ========================================= */
 .user-menu {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding-left: var(--spacing-md);
-  border-left: 1px solid var(--color-border-subtle);
+  gap: 0.5rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--color-border-lighter);
 }
 
 .username {
-  color: var(--color-brand-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-glass-light);
+  border: 1px solid var(--color-border-lighter);
+  color: var(--color-text-primary);
   font-weight: var(--font-semibold);
-  font-size: var(--font-base);
+  font-size: var(--font-sm);
   text-decoration: none;
   cursor: pointer;
-  transition: opacity var(--transition-normal);
+  transition: var(--transition-all);
 }
 
 .username:hover {
-  opacity: 0.8;
+  border-color: var(--color-border-brand);
+  color: var(--color-brand-primary-light);
+  background: rgba(114, 188, 224, 0.08);
 }
 
 .logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   background: var(--color-error-bg);
   border: 1px solid var(--color-error-border);
   color: var(--color-error-light);
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-sm);
+  padding: 0.42rem 0.78rem;
+  border-radius: var(--radius-md);
   font-weight: var(--font-medium);
   cursor: pointer;
   transition: var(--transition-all);
@@ -158,109 +217,100 @@
   border-color: var(--color-error-border-hover);
 }
 
+.nav-auth-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  transition: var(--transition-all);
+}
+
+.nav-auth-link:hover {
+  color: var(--color-text-primary);
+  background: var(--bg-glass-light);
+}
+
+.nav-register-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.46rem 0.95rem;
+  border-radius: var(--radius-md);
+  background: var(--color-brand-primary);
+  color: var(--color-bg-base);
+  text-decoration: none;
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  transition: var(--transition-all);
+}
+
+.nav-register-btn:hover {
+  background: var(--color-brand-primary-light);
+}
+
 /* =========================================
    RESPONSIVE
    ========================================= */
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   .header-container {
     padding: 0 var(--spacing-md);
     flex-wrap: wrap;
     position: relative;
   }
 
-  .logo .logo-text {
-    font-size: var(--font-3xl);
-  }
-
   .mobile-menu-btn {
-    display: block;
+    display: inline-flex;
   }
 
   .nav {
     display: none;
     width: 100%;
+    flex: none;
     flex-direction: column;
     align-items: stretch;
-    gap: var(--spacing-xxs);
-    margin-top: var(--spacing-md);
-    padding: var(--spacing-xs);
-    background-color: var(--color-bg-secondary);
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
   }
 
   .nav.nav-open {
     display: flex;
   }
 
-  .nav > a {
-    display: flex;
-    align-items: center;
+  .nav-links,
+  .nav-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.3rem;
+  }
+
+  .nav-link,
+  .admin-link,
+  .username,
+  .logout-btn,
+  .nav-auth-link,
+  .nav-register-btn {
     justify-content: center;
     width: 100%;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-top: none;
-    border-radius: var(--radius-md);
-    font-size: var(--font-md);
-    transition: background-color var(--transition-fast), color var(--transition-fast);
+    padding: 0.65rem var(--spacing-md);
+    font-size: var(--font-base);
   }
 
-  .nav > a:hover,
-  .nav > a:active {
-    background-color: var(--bg-glass-light);
-    color: var(--color-brand-primary);
-  }
-
-  .nav-link-with-badge {
-    justify-content: center;
-  }
-
-  /* Admin link: full-width with subtle warning accent, no awkward chip */
-  .admin-link {
-    background: var(--color-warning-bg);
-    border: 1px solid var(--color-warning-border);
-    color: var(--color-warning) !important;
-  }
-
-  .admin-link:hover,
-  .admin-link:active {
-    background: var(--color-warning-bg-hover);
-    border-color: var(--color-warning-border-hover);
-  }
-
-  /* User menu: separator + stacked items */
   .user-menu {
     width: 100%;
     flex-direction: column;
     align-items: stretch;
-    gap: var(--spacing-xxs);
-    margin-top: var(--spacing-xs);
-    padding: var(--spacing-xs) 0 0;
+    gap: 0.35rem;
+    padding: 0.5rem 0 0;
     border-left: none;
-    border-top: 1px solid var(--color-border-light);
-  }
-
-  .username {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-md);
-    font-size: var(--font-md);
-    transition: background-color var(--transition-fast);
-  }
-
-  .username:hover,
-  .username:active {
-    background-color: var(--bg-glass-light);
-    opacity: 1;
-  }
-
-  .logout-btn {
-    width: 100%;
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: var(--font-md);
+    border-top: 1px solid var(--color-border-lighter);
   }
 }

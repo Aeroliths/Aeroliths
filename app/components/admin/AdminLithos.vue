@@ -13,7 +13,7 @@
           placeholder="Search lithos by name or type..."
           class="search-input"
         />
-        <span class="search-icon">🔍</span>
+        <span class="search-icon" aria-hidden="true"><Papicon name="search" :size="16" /></span>
       </div>
     </div>
 
@@ -34,10 +34,10 @@
         </p>
         <p v-if="lithos.element" class="lithos-element">Element: {{ lithos.element.name }}</p>
         <div class="lithos-spikes">
-          <span>⬆️ {{ lithos.spikeUp }}</span>
-          <span>➡️ {{ lithos.spikeRight }}</span>
-          <span>⬇️ {{ lithos.spikeDown }}</span>
-          <span>⬅️ {{ lithos.spikeLeft }}</span>
+          <span class="spike-pill"><Papicon name="arrow-up" :size="13" /> {{ lithos.spikeUp }}</span>
+          <span class="spike-pill"><Papicon name="arrow-right" :size="13" /> {{ lithos.spikeRight }}</span>
+          <span class="spike-pill"><Papicon name="arrow-down" :size="13" /> {{ lithos.spikeDown }}</span>
+          <span class="spike-pill"><Papicon name="arrow-left" :size="13" /> {{ lithos.spikeLeft }}</span>
         </div>
         <div class="lithos-actions">
           <button @click="openEditLithosModal(lithos)" class="btn-edit" :disabled="actionLoading">Edit</button>
@@ -142,6 +142,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import Papicon from '~/components/Papicon.vue'
 import { useAuth } from '~/composables/useAuth'
 // Auto-import registers this one as AdminMediaPicker, after its directory, so
 // the template name only resolves through an explicit import.

@@ -420,8 +420,8 @@ watch(
 }
 
 .score.active {
-  border-color: var(--color-primary, #6366f1);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 2px rgba(114, 188, 224, 0.25);
 }
 
 .player-dot {
@@ -501,19 +501,19 @@ watch(
 .cell.placeable {
   cursor: pointer;
   border-style: dashed;
-  border-color: var(--color-primary, #6366f1);
+  border-color: var(--color-brand-primary);
 }
 
 .cell.placeable:hover {
-  background: rgba(99, 102, 241, 0.12);
+  background: rgba(107, 150, 173, 0.12);
 }
 
 .cell.preview-capture {
-  box-shadow: inset 0 0 0 2px #22c55e, 0 0 12px rgba(34, 197, 94, 0.45);
+  box-shadow: inset 0 0 0 2px var(--color-success);
 }
 
 .cell.last-move {
-  box-shadow: inset 0 0 0 2px var(--color-primary, #6366f1);
+  box-shadow: inset 0 0 0 2px var(--color-brand-primary);
 }
 
 .cell-element {
@@ -532,8 +532,7 @@ watch(
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--color-primary, #6366f1);
-  box-shadow: 0 0 6px rgba(99, 102, 241, 0.8);
+  background: var(--color-brand-primary);
 }
 
 /* Ephemeral element bonus badge on the contested edge of a captured cell. */
@@ -612,9 +611,9 @@ watch(
 }
 
 @keyframes lithos-captured {
-  0% { transform: rotateY(0deg) scale(1); box-shadow: none; }
-  50% { transform: rotateY(180deg) scale(1.14); box-shadow: 0 0 22px rgba(99, 102, 241, 0.75); }
-  100% { transform: rotateY(360deg) scale(1); box-shadow: none; }
+  0% { transform: rotateY(0deg) scale(1); }
+  50% { transform: rotateY(180deg) scale(1.1); }
+  100% { transform: rotateY(360deg) scale(1); }
 }
 
 /* ---- Hand ---- */
@@ -652,7 +651,7 @@ watch(
 .hand-card.selected { border-color: var(--color-primary, #6366f1); transform: translateY(-3px); }
 .hand-card.owner-A { border-color: var(--owner-a, #3b82f6); }
 .hand-card.owner-B { border-color: var(--owner-b, #ef4444); }
-.hand-card.selected { box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3); }
+.hand-card.selected { box-shadow: 0 0 0 2px rgba(114, 188, 224, 0.35); }
 
 /* The picked-up card is dimmed in place while its clone follows the cursor. */
 .hand-card.dragging { opacity: 0.35; transform: none; }
@@ -694,7 +693,7 @@ watch(
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cell.capturing { animation: none; box-shadow: 0 0 18px rgba(99, 102, 241, 0.6); }
+  .cell.capturing { animation: none; outline: 2px solid var(--color-brand-primary); }
   .ghost-card { animation: none; }
 }
 

@@ -3,7 +3,8 @@
     <!-- Back nav row, sits above the hero -->
     <div class="news-article__nav">
       <NuxtLinkLocale to="/news" class="news-article__back">
-        <span aria-hidden="true">←</span> {{ $t('news.backToAll') }}
+        <Papicon name="arrow-left" :size="15" />
+        <span>{{ $t('news.backToAll') }}</span>
       </NuxtLinkLocale>
     </div>
 
@@ -37,6 +38,8 @@
 </template>
 
 <script setup lang="ts">
+import Papicon from '~/components/Papicon.vue'
+
 type NewsItem = {
   id: string
   title: string
@@ -151,18 +154,14 @@ const formatDate = (iso: string | null) => {
 .news-article__hero-shade {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(19, 21, 28, 0.15) 0%, rgba(19, 21, 28, 0.45) 55%, rgba(19, 21, 28, 0.92) 100%),
-    radial-gradient(circle at 30% 0%, rgba(122, 184, 212, 0.12), transparent 60%);
+  background: linear-gradient(180deg, rgba(15, 17, 21, 0.15) 0%, rgba(15, 17, 21, 0.48) 55%, rgba(15, 17, 21, 0.92) 100%);
   z-index: 1;
   pointer-events: none;
 }
 
 .news-article__hero--no-cover {
   min-height: 240px;
-  background:
-    linear-gradient(135deg, rgba(122, 184, 212, 0.10), rgba(88, 152, 184, 0.04)),
-    var(--color-bg-primary);
+  background: var(--color-bg-primary);
 }
 
 .news-article__hero--no-cover .news-article__hero-shade {
